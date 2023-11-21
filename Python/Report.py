@@ -3,10 +3,12 @@
 import os
 import json
 import re
+import sys
 #from Bio.Seq import Seq
 #from Bio.SeqRecord import SeqRecord
 #from Bio import SeqIO
 from yaml import safe_load
+
 
 ###################################################
 ##      load packages
@@ -18,9 +20,13 @@ from RSV_functions import get_sub_folders, elements_not_in_array, pct_sum, deter
 ###################################################
 ##      load parameters from YAML file
 ###################################################
-config_file = input("Enter the path to the YAML config file: ")
-with open(config_file, 'r') as f:
-    config = safe_load(f)
+config_file = sys.argv[1]
+try:
+    with open(config_file, 'r') as f :
+        config = safe_load(f)
+except:
+    print('Can not open this file!')
+    sys.exit()
 
 data_folder_name = config['DATA_DIR']
 reference_folder_name = config['REFERENCE_DIR']

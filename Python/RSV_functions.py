@@ -1,5 +1,6 @@
 import os
 import re
+import subprocess
 
 # get sub folders for a dir
 def get_sub_folders(folder_path):
@@ -65,3 +66,15 @@ def processIGV(file_name):
 def determine_subtype(subtype_dict):
     sorted_subtypes = sorted(subtype_dict.keys(), key=lambda k: subtype_dict[k], reverse=True)
     return sorted_subtypes[0]
+
+# check tool availability
+def check_tool_availability(tool_name):
+    try:
+        # Use subprocess to run the command with the "--version" flag
+        subprocess.run([tool_name, '--version'], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print(f"{tool_name} is available.")
+        return 0
+    except:
+        print(f"{tool_name} is not available. Please install it and try again.")
+        return 1
+

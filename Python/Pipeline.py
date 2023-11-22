@@ -154,11 +154,12 @@ for sample_id in sorted(sample_dict.keys()):
 
     for ref_db in all_ref_db:
         map_A_folder = os.path.join(cur_folder, ref_db)
+        ref_db_folder = os.path.join(reference_folder_name, ref_db)
 
         cmd_index = f"samtools index Aligned.sortedByCoord.out.bam"
         subprocess.run(cmd_index, shell=True, cwd=map_A_folder)
 
-        cmd_count = f"igvtools count -z 5 -w 1 --bases Aligned.sortedByCoord.out.bam alignments.cov.wig {ref_db}.fasta"
+        cmd_count = f"igvtools count -z 5 -w 1 --bases Aligned.sortedByCoord.out.bam alignments.cov.wig {ref_db_folder}.fasta"
         subprocess.run(cmd_count, shell=True, cwd=map_A_folder)
 
     print("######################\nFinish Index and Count \n######################")

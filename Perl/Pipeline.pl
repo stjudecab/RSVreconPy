@@ -149,6 +149,7 @@ foreach (sort {$a <=> $b} keys %sample_hash)
 	
 	foreach my $ref_db (@all_ref_db) {
 		my $map_A_folder = $cur_folder.'/$ref_db/';
+		my $refdb_A = "$reference_folder_name/$ref_db";
 
 		my $cmd = "cd $map_A_folder; samtools index Aligned.sortedByCoord.out.bam";
 		# print STDERR $cmd;

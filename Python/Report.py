@@ -4,9 +4,7 @@ import os
 import json
 import re
 import sys
-#from Bio.Seq import Seq
-#from Bio.SeqRecord import SeqRecord
-#from Bio import SeqIO
+import argparse
 from yaml import safe_load
 
 
@@ -20,9 +18,16 @@ from RSV_functions import get_sub_folders, elements_not_in_array, pct_sum, deter
 ###################################################
 ##      load parameters from YAML file
 ###################################################
-config_file = sys.argv[1]
+
+# Create command-line argument parser
+parser = argparse.ArgumentParser(description='Run pipeline to map NGS reads against reference genomes.sortedByCoord')
+parser.add_argument('yaml_file', help='Path to the YAML file containing the setting.')
+
+# Parse command-line arguments
+args = parser.parse_args()
+
 try:
-    with open(config_file, 'r') as f :
+    with open(args.yaml_file, 'r') as f :
         config = safe_load(f)
 except:
     print('Can not open this file!')

@@ -5,6 +5,7 @@ import sys
 import subprocess
 from pathlib import Path
 from yaml import safe_load
+import argparse
 
 
 ###################################################
@@ -18,9 +19,16 @@ from RSV_functions import get_sub_folders, elements_not_in_array, check_tool_ava
 ###################################################
 ##      load parameters from YAML file
 ###################################################
-config_file = sys.argv[1]
+
+# Create command-line argument parser
+parser = argparse.ArgumentParser(description='Run pipeline to map NGS reads against reference genomes.sortedByCoord')
+parser.add_argument('yaml_file', help='Path to the YAML file containing the setting.')
+
+# Parse command-line arguments
+args = parser.parse_args()
+
 try:
-    with open(config_file, 'r') as f :
+    with open(args.yaml_file, 'r') as f :
         config = safe_load(f)
 except:
     print('Can not open this file!')
@@ -32,6 +40,11 @@ working_folder_name = config['OUTPUT_DIR']
 
 star_ThreadN = config.get('STAR_THREAD_N', 16)
 ref_use = config.get('REF_USE', 'all')
+tool = config.get('TOOL', 'STAR')
+
+if tool not in ['STAR']:
+    print(tool + " is not a supported aligner! Please use STAR!\n")
+    sys.exit()
 
 
 ###################################################
@@ -45,8 +58,9 @@ check_tool_availability_res += check_tool_availability("igvtools")
 check_tool_availability_res += check_tool_availability("samtools")
 # Check for fastp
 check_tool_availability_res += check_tool_availability("fastp")
-# Check for STAR
-check_tool_availability_res += check_tool_availability("STAR")
+# Check for aligners
+check_tool_availability_res += check_tool_availability(tool)
+
 
 if check_tool_availability_res > 0:
     sys.exit()
@@ -120,7 +134,7 @@ for sample_id in sorted(sample_dict.keys()):
     ##############################################################################
     ## step 2    STAR mapping
     ##############################################################################
-    print(f"######################\tStep 2 STAR mapping ... \t######################")
+    print(f"######################\tStep 2 mapping ... \t######################")
 
     # get all reference DB
     all_ref_db = get_sub_folders(reference_folder_name)

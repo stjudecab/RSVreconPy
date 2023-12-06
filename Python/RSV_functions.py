@@ -1,6 +1,8 @@
 import os
 import re
 import subprocess
+import pandas as pd
+import matplotlib.pyplot as plt
 
 # get sub folders for a dir
 def get_sub_folders(folder_path):
@@ -78,3 +80,50 @@ def check_tool_availability(tool_name):
         print(f"{tool_name} is not available. Please install it and try again.")
         return 1
 
+# Python code to get difference of two lists not using set()
+def list_diff(li1, li2):
+    li_dif = [i for i in li1 if i not in li2]
+    return li_dif
+
+# generate coverage fig from wig file
+def generate_Cov_fig(wig_file, fig_file):
+    # read wig file and transfer it to a data frame
+    data = {}
+    last_pos = 1
+
+    with open(wig_file, 'r') as file:
+        for line in file:
+            line = line.strip()
+            if line.startswith('track') or line.startswith('#') or line.startswith('variableStep chrom='):
+                continue
+            elif line[0].isdigit():
+                match = re.match(r'^(\d+)\t(\d+)\.0\t(\d+)\.0\t(\d+)\.0\t(\d+)\.0.+', line)
+                if match:
+                    pos, a, c, g, t = map(int, match.groups())
+                    data[pos] = [a, c, g, t]
+                    last_pos = pos
+
+    index_all = list(range(1,last_pos))
+    cur_index = list(data.keys())
+    empty_index = list_diff(index_all, cur_index)
+
+    if len(empty_index) > 0:
+        for index in empty_index:
+            data[index] = [0,0,0,0]
+
+    df = pd.DataFrame(data, index=['A', 'C', 'G', 'T'])
+
+    # generate coverage plot
+    ax = df.transpose().plot(kind='bar', stacked=True, colormap='viridis')
+    ax.set_xlabel('Position', fontsize=18)
+    ax.set_ylabel('Count (Log scale)', fontsize=18)
+    ax.set_title('Stacked Bar Plot of A, T, C, G Counts at Different Positions')
+    ax.xaxis.label.set_size(20)
+    plt.yscale('symlog')
+
+    # save plot
+    plt.gcf().set_size_inches(30, 3)
+    plt.savefig(fig_file, dpi = 300)
+
+    # return results
+    return df

@@ -1,7 +1,7 @@
 # set up data path
-DATA_DIR: /research/groups/cab/projects/automapper/common/lli75/RSV/data1
-REFERENCE_DIR: /research/groups/cab/projects/automapper/common/lli75/RSV/Reference
-OUTPUT_DIR: /research/groups/cab/projects/automapper/common/lli75/RSV/Test
+DATA_DIR: /Users/lli75/Documents/RSV/data1
+REFERENCE_DIR: /Users/lli75/Documents/RSV/Reference
+OUTPUT_DIR: /Users/lli75/Documents/RSV/Test
 # set up some other parameter
 STAR_THREAD_N: 16
 REF_USE: SubTypeA,SubTypeB

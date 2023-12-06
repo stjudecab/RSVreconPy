@@ -13,7 +13,7 @@ from yaml import safe_load
 ###################################################
 
 # Assuming RSV_functions is in the same directory as this script
-from RSV_functions import get_sub_folders, elements_not_in_array, pct_sum, determine_subtype, processIGV
+from RSV_functions import get_sub_folders, elements_not_in_array, pct_sum, determine_subtype, processIGV, generate_Cov_fig
 
 ###################################################
 ##      load parameters from YAML file
@@ -82,6 +82,11 @@ with open(sequence_file, 'w') as fasta:
 
     # collect information from each sample
     Sample_folders = [f for f in os.listdir(working_folder_name) if os.path.isdir(os.path.join(working_folder_name, f))]
+    
+    result_fig_folder = os.path.join(working_folder_name, "Figs")
+    if not os.path.exists(result_fig_folder):
+        os.mkdir(result_fig_folder)
+        
     for cur_folder in Sample_folders:
         if os.path.isfile(cur_folder):
             continue
@@ -139,6 +144,10 @@ with open(sequence_file, 'w') as fasta:
         genome_sequence = processIGV(wig_file)
 
         fasta.write('>' + sample + "\n" + genome_sequence + "\n")
+
+        # step 5: coverage STAT pics
+        fig_file = os.path.join(result_fig_folder, cur_folder + "_" + subtype_str + '_Cov.png')
+        res_STAT = generate_Cov_fig(wig_file, fig_file)
 
 ###################################################
 ##      program finished

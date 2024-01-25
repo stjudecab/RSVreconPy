@@ -125,7 +125,7 @@ for sample_id in sorted(sample_dict.keys()):
     read1_trim = "reads_trimed_R1.fastq"
     read2_trim = "reads_trimed_R2.fastq"
 
-    cmd = f"fastp -i {original_read1} -I {original_read2} -o {read1_trim} -O {read2_trim}"
+    cmd = f"fastp -i \"{original_read1}\" -I \"{original_read2}\" -o {read1_trim} -O {read2_trim}"
     subprocess.run(cmd, shell=True, cwd=cur_folder)
 
     print("######################\nFinish Quality trimming . \n######################")

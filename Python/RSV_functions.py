@@ -38,25 +38,15 @@ def processIGV(file_name):
                 match = re.match(r'^(\d+)\t(\d+)\.0\t(\d+)\.0\t(\d+)\.0\t(\d+)\.0.+', line)
                 if match:
                     pos, a, c, g, t = map(int, match.groups())
+                    
+                    count_dict = {'A':a,'C':c,'G':g,'T':t}
                     cov = a + c + g + t
 
-                    if a / cov > 0.5:
-                        sequence += "A"
-                    elif c / cov > 0.5:
-                        sequence += "C"
-                    elif g / cov > 0.5:
-                        sequence += "G"
-                    elif t / cov > 0.5:
-                        sequence += "T"
+                    if cov > 0:
+                        max_key = max(count_dict, key=count_dict.get)
+                        sequence += max_key
                     else:
-                        if a > c and a > g and a > t:
-                            sequence += "A"
-                        elif c > a and c > g and c > t:
-                            sequence += "C"
-                        elif g > a and g > c and g > t:
-                            sequence += "G"
-                        elif t > a and t > g and t > c:
-                            sequence += "T"
+                        sequence += "N"
                 else:
                     print("error")
             else:

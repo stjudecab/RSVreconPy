@@ -57,7 +57,12 @@ def processIGV(file_name):
 # determine the subtype
 def determine_subtype(subtype_dict):
     sorted_subtypes = sorted(subtype_dict.keys(), key=lambda k: subtype_dict[k], reverse=True)
-    return sorted_subtypes[0]
+    if subtype_dict[sorted_subtypes[0]] > 30:
+        return sorted_subtypes[0]
+    elif subtype_dict[sorted_subtypes[0]] > 10:
+        return sorted_subtypes[0].'(Low mapping rate)'
+    else:
+        return 'Not RSV'
 
 # check tool availability
 def check_tool_availability(tool_name):

@@ -13,7 +13,8 @@ from yaml import safe_load
 ###################################################
 
 # Assuming RSV_functions is in the same directory as this script
-from RSV_functions import get_sub_folders, elements_not_in_array, pct_sum, determine_subtype, processIGV, generate_Cov_fig
+from RSV_functions import get_sub_folders, elements_not_in_array, pct_sum, determine_subtype, processIGV
+from Report_functions import generate_pdf_report
 
 ###################################################
 ##      load parameters from YAML file
@@ -82,11 +83,6 @@ with open(sequence_file, 'w') as fasta:
 
     # collect information from each sample
     Sample_folders = [f for f in os.listdir(working_folder_name) if os.path.isdir(os.path.join(working_folder_name, f))]
-    
-    result_fig_folder = os.path.join(working_folder_name, "Figs")
-    if not os.path.exists(result_fig_folder):
-        os.mkdir(result_fig_folder)
-        
     for cur_folder in Sample_folders:
         if os.path.isfile(cur_folder):
             continue
@@ -129,7 +125,7 @@ with open(sequence_file, 'w') as fasta:
 
         for i, result in enumerate(result_array):
             map_str += f"{result['Uniquelymappedreads']},{pct_sum(result['ofreadsmappedtomultipleloci'], result['ofreadsmappedtotoomanyloci'])},{pct_sum(result['ofreadsunmappedtoomanymismatches'], result['ofreadsunmappedtooshort'], result['ofreadsunmappedother'])},{result['ofchimericreads']},"
-            uniquely_mapped_reads_hash[all_ref_db[i]] = result['Uniquelymappedreads']
+            uniquely_mapped_reads_hash[all_ref_db[i]] = float(result['Uniquelymappedreads'])
 
         subtype_str = determine_subtype(uniquely_mapped_reads_hash)
 
@@ -140,14 +136,18 @@ with open(sequence_file, 'w') as fasta:
             out.write(f"{sample},{QC_str}{map_str}{subtype_str}\n")
 
         # Step 4: assemble genome sequence
-        wig_file = os.path.join(working_folder_name, cur_folder, subtype_str, 'alignments.cov.wig')
-        genome_sequence = processIGV(wig_file)
+        if subtype_str in ['SubTypeA','SubTypeB']:
+            wig_file = os.path.join(working_folder_name, cur_folder, subtype_str, 'alignments.cov.wig')
+            genome_sequence = processIGV(wig_file)
 
-        fasta.write('>' + sample + "\n" + genome_sequence + "\n")
+            fasta.write('>' + sample + "\n" + genome_sequence + "\n")
 
-        # step 5: coverage STAT pics
-        fig_file = os.path.join(result_fig_folder, cur_folder + "_" + subtype_str + '_Cov.png')
-        res_STAT = generate_Cov_fig(wig_file, fig_file)
+###################################################
+##      generate pdf report
+###################################################
+
+print("Generating Pdf report...")
+generate_pdf_report(report, working_folder_name)
 
 ###################################################
 ##      program finished

@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	MF001042	1	15176
+MF001042	Geneious	source	1	15176	.	+	.	Name=source Human respiratory syncytial virus B;ID=source_1
+MF001042	Geneious	gene	33	452	.	+	0	ID=gene_1
+MF001042	Geneious	CDS	33	452	.	+	0	Name=nonstructural protein 1 CDS;ID=CDS_1
+MF001042	Geneious	gene	560	934	.	+	0	ID=gene_2
+MF001042	Geneious	CDS	560	934	.	+	0	Name=nonstructural protein 2 CDS;ID=CDS_2
+MF001042	Geneious	gene	1073	2248	.	+	0	ID=gene_3
+MF001042	Geneious	CDS	1073	2248	.	+	0	Name=nucleocapsid protein CDS;ID=CDS_3
+MF001042	Geneious	gene	2281	3006	.	+	0	ID=gene_4
+MF001042	Geneious	CDS	2281	3006	.	+	0	Name=phosphoprotein CDS;ID=CDS_4
+MF001042	Geneious	gene	3196	3966	.	+	0	ID=gene_5
+MF001042	Geneious	CDS	3196	3966	.	+	0	Name=matrix protein CDS;ID=CDS_5
+MF001042	Geneious	gene	4235	4432	.	+	0	ID=gene_6
+MF001042	Geneious	CDS	4235	4432	.	+	0	Name=small hydrophobic protein CDS;ID=CDS_6
+MF001042	Geneious	gene	4622	5554	.	+	0	ID=gene_7
+MF001042	Geneious	CDS	4622	5554	.	+	0	Name=attachment glycoprotein CDS;ID=CDS_7
+MF001042	Geneious	gene	5652	7376	.	+	0	ID=gene_8
+MF001042	Geneious	CDS	5652	7376	.	+	0	Name=fusion protein CDS;ID=CDS_8
+MF001042	Geneious	gene	7603	8190	.	+	0	ID=gene_9
+MF001042	Geneious	CDS	7603	8190	.	+	0	Name=matrix protein 2-1 CDS;ID=CDS_9
+MF001042	Geneious	gene	8156	8428	.	+	0	ID=gene_10
+MF001042	Geneious	CDS	8156	8428	.	+	0	Name=matrix protein 2-2 CDS;ID=CDS_10
+MF001042	Geneious	gene	8494	14994	.	+	0	ID=gene_11
+MF001042	Geneious	CDS	8494	14994	.	+	0	Name=RNA-directed RNA polymerase CDS;ID=CDS_11

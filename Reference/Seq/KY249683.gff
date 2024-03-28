@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	KY249683	1	15223
+KY249683	Geneious	source	1	15223	.	+	.	Name=type: B%3B subtype: BA10 source Human respiratory syncytial virus B;ID=source_1
+KY249683	Geneious	gene	46	465	.	+	0	ID=gene_1
+KY249683	Geneious	CDS	46	465	.	+	0	Name=NS1 CDS;ID=CDS_1
+KY249683	Geneious	gene	573	947	.	+	0	ID=gene_2
+KY249683	Geneious	CDS	573	947	.	+	0	Name=NS2 CDS;ID=CDS_2
+KY249683	Geneious	gene	1086	2261	.	+	0	ID=gene_3
+KY249683	Geneious	CDS	1086	2261	.	+	0	Name=N CDS;ID=CDS_3
+KY249683	Geneious	gene	2294	3019	.	+	0	ID=gene_4
+KY249683	Geneious	CDS	2294	3019	.	+	0	Name=P CDS;ID=CDS_4
+KY249683	Geneious	gene	3209	3979	.	+	0	ID=gene_5
+KY249683	Geneious	CDS	3209	3979	.	+	0	Name=M CDS;ID=CDS_5
+KY249683	Geneious	gene	4248	4445	.	+	0	ID=gene_6
+KY249683	Geneious	CDS	4248	4445	.	+	0	Name=SH CDS;ID=CDS_6
+KY249683	Geneious	gene	4635	5567	.	+	0	ID=gene_7
+KY249683	Geneious	CDS	4635	5567	.	+	0	Name=G CDS;ID=CDS_7
+KY249683	Geneious	gene	5665	7389	.	+	0	ID=gene_8
+KY249683	Geneious	CDS	5665	7389	.	+	0	Name=F CDS;ID=CDS_8
+KY249683	Geneious	gene	7616	8203	.	+	0	ID=gene_9
+KY249683	Geneious	CDS	7616	8203	.	+	0	Name=M2-1 CDS;ID=CDS_9
+KY249683	Geneious	gene	8169	8441	.	+	0	ID=gene_10
+KY249683	Geneious	CDS	8169	8441	.	+	0	Name=M2-2 CDS;ID=CDS_10
+KY249683	Geneious	gene	8507	15007	.	+	0	ID=gene_11
+KY249683	Geneious	CDS	8507	15007	.	+	0	Name=L CDS;ID=CDS_11

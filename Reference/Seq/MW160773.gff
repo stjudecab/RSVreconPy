@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	MW160773	1	15218
+MW160773	Geneious	source	1	15218	.	+	.	Name=source Human orthopneumovirus;ID=source_1
+MW160773	Geneious	gene	74	493	.	+	0	ID=gene_1
+MW160773	Geneious	CDS	74	493	.	+	0	Name=nonstructural protein 1 CDS;ID=CDS_1
+MW160773	Geneious	gene	603	977	.	+	0	ID=gene_2
+MW160773	Geneious	CDS	603	977	.	+	0	Name=nonstructural protein 2 CDS;ID=CDS_2
+MW160773	Geneious	gene	1115	2290	.	+	0	ID=gene_3
+MW160773	Geneious	CDS	1115	2290	.	+	0	Name=nucleoprotein CDS;ID=CDS_3
+MW160773	Geneious	gene	2322	3047	.	+	0	ID=gene_4
+MW160773	Geneious	CDS	2322	3047	.	+	0	Name=phosphoprotein CDS;ID=CDS_4
+MW160773	Geneious	gene	3230	4000	.	+	0	ID=gene_5
+MW160773	Geneious	CDS	3230	4000	.	+	0	Name=matrix protein CDS;ID=CDS_5
+MW160773	Geneious	gene	4270	4464	.	+	0	ID=gene_6
+MW160773	Geneious	CDS	4270	4464	.	+	0	Name=small hydrophobic protein CDS;ID=CDS_6
+MW160773	Geneious	gene	4656	5621	.	+	0	ID=gene_7
+MW160773	Geneious	CDS	4656	5621	.	+	0	Name=attachment glycoprotein CDS;ID=CDS_7
+MW160773	Geneious	gene	5701	7425	.	+	0	ID=gene_8
+MW160773	Geneious	CDS	5701	7425	.	+	0	Name=fusion protein CDS;ID=CDS_8
+MW160773	Geneious	gene	7644	8228	.	+	0	ID=gene_9
+MW160773	Geneious	CDS	7644	8228	.	+	0	Name=matrix protein 2-1 CDS;ID=CDS_9
+MW160773	Geneious	gene	8203	8469	.	+	0	ID=gene_10
+MW160773	Geneious	CDS	8203	8469	.	+	0	Name=matrix protein 2-2 CDS;ID=CDS_10
+MW160773	Geneious	gene	8536	15033	.	+	0	ID=gene_11
+MW160773	Geneious	CDS	8536	15033	.	+	0	Name=RNA-directed RNA polymerase CDS;ID=CDS_11

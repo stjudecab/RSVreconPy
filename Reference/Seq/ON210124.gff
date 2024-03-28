@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	ON210124	1	15087
+ON210124	Geneious	source	1	15087	.	+	.	Name=genotype: A source Human orthopneumovirus;ID=source_1
+ON210124	Geneious	gene	54	473	.	+	.	Name=NS1 gene;ID=gene_1
+ON210124	Geneious	CDS	54	473	.	+	0	Name=NS1 CDS;ID=CDS_1
+ON210124	Geneious	gene	583	957	.	+	.	Name=NS2 gene;ID=gene_2
+ON210124	Geneious	CDS	583	957	.	+	0	Name=NS2 CDS;ID=CDS_2
+ON210124	Geneious	gene	1095	2270	.	+	.	Name=N gene;ID=gene_3
+ON210124	Geneious	CDS	1095	2270	.	+	0	Name=N CDS;ID=CDS_3
+ON210124	Geneious	gene	2302	3027	.	+	.	Name=P gene;ID=gene_4
+ON210124	Geneious	CDS	2302	3027	.	+	0	Name=P CDS;ID=CDS_4
+ON210124	Geneious	gene	3211	3981	.	+	.	Name=M gene;ID=gene_5
+ON210124	Geneious	CDS	3211	3981	.	+	0	Name=M CDS;ID=CDS_5
+ON210124	Geneious	gene	4251	4445	.	+	.	Name=SH gene;ID=gene_6
+ON210124	Geneious	CDS	4251	4445	.	+	0	Name=SH CDS;ID=CDS_6
+ON210124	Geneious	gene	4636	5529	.	+	.	Name=G gene;ID=gene_7
+ON210124	Geneious	CDS	4636	5529	.	+	0	Name=G CDS;ID=CDS_7
+ON210124	Geneious	gene	5609	7333	.	+	.	Name=F gene;ID=gene_8
+ON210124	Geneious	CDS	5609	7333	.	+	0	Name=F CDS;ID=CDS_8
+ON210124	Geneious	gene	7552	8136	.	+	.	Name=M2-1 gene;ID=gene_9
+ON210124	Geneious	CDS	7552	8136	.	+	0	Name=M2-1 CDS;ID=CDS_9
+ON210124	Geneious	gene	8111	8377	.	+	.	Name=M2-2 gene;ID=gene_10
+ON210124	Geneious	CDS	8111	8377	.	+	0	Name=M2-2 CDS;ID=CDS_10
+ON210124	Geneious	gene	8444	14941	.	+	.	Name=L gene;ID=gene_11
+ON210124	Geneious	CDS	8444	14941	.	+	0	Name=L CDS;ID=CDS_11

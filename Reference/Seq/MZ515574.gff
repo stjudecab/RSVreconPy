@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	MZ515574	1	15269
+MZ515574	Geneious	source	1	15269	.	+	.	Name=genotype: BA source Human respiratory syncytial virus B;ID=source_1
+MZ515574	Geneious	gene	95	514	.	+	.	Name=NS1 gene;ID=gene_1
+MZ515574	Geneious	CDS	95	514	.	+	0	Name=NS1 CDS;ID=CDS_1
+MZ515574	Geneious	gene	622	996	.	+	.	Name=NS2 gene;ID=gene_2
+MZ515574	Geneious	CDS	622	996	.	+	0	Name=NS2 CDS;ID=CDS_2
+MZ515574	Geneious	gene	1135	2310	.	+	.	Name=N gene;ID=gene_3
+MZ515574	Geneious	CDS	1135	2310	.	+	0	Name=N CDS;ID=CDS_3
+MZ515574	Geneious	gene	2343	3068	.	+	.	Name=P gene;ID=gene_4
+MZ515574	Geneious	CDS	2343	3068	.	+	0	Name=P CDS;ID=CDS_4
+MZ515574	Geneious	gene	3258	4028	.	+	.	Name=M gene;ID=gene_5
+MZ515574	Geneious	CDS	3258	4028	.	+	0	Name=M CDS;ID=CDS_5
+MZ515574	Geneious	gene	4297	4494	.	+	.	Name=SH gene;ID=gene_6
+MZ515574	Geneious	CDS	4297	4494	.	+	0	Name=SH CDS;ID=CDS_6
+MZ515574	Geneious	gene	4683	5615	.	+	.	Name=G gene;ID=gene_7
+MZ515574	Geneious	CDS	4683	5615	.	+	0	Name=G CDS;ID=CDS_7
+MZ515574	Geneious	gene	5713	7437	.	+	.	Name=F gene;ID=gene_8
+MZ515574	Geneious	CDS	5713	7437	.	+	0	Name=F CDS;ID=CDS_8
+MZ515574	Geneious	gene	7664	8251	.	+	.	Name=M2 gene;ID=gene_9
+MZ515574	Geneious	CDS	7664	8251	.	+	0	Name=M2 CDS;ID=CDS_9
+MZ515574	Geneious	gene	8217	8489	.	+	.	Name=M2 gene;ID=gene_10
+MZ515574	Geneious	CDS	8217	8489	.	+	0	Name=M2 CDS;ID=CDS_10
+MZ515574	Geneious	gene	8555	15055	.	+	.	Name=L gene;ID=gene_11
+MZ515574	Geneious	CDS	8555	15055	.	+	0	Name=L CDS;ID=CDS_11

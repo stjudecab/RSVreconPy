@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	KR350475	1	15276
+KR350475	Geneious	source	1	15276	.	+	.	Name=source Human orthopneumovirus;ID=source_1
+KR350475	Geneious	gene	99	518	.	+	0	ID=gene_1
+KR350475	Geneious	CDS	99	518	.	+	0	Name=NS1 CDS;ID=CDS_1
+KR350475	Geneious	gene	626	1000	.	+	0	ID=gene_2
+KR350475	Geneious	CDS	626	1000	.	+	0	Name=NS2 CDS;ID=CDS_2
+KR350475	Geneious	gene	1141	2316	.	+	0	ID=gene_3
+KR350475	Geneious	CDS	1141	2316	.	+	0	Name=N CDS;ID=CDS_3
+KR350475	Geneious	gene	2349	3074	.	+	0	ID=gene_4
+KR350475	Geneious	CDS	2349	3074	.	+	0	Name=P CDS;ID=CDS_4
+KR350475	Geneious	gene	3264	4034	.	+	0	ID=gene_5
+KR350475	Geneious	CDS	3264	4034	.	+	0	Name=M CDS;ID=CDS_5
+KR350475	Geneious	gene	4303	4500	.	+	0	ID=gene_6
+KR350475	Geneious	CDS	4303	4500	.	+	0	Name=SH CDS;ID=CDS_6
+KR350475	Geneious	gene	4690	5622	.	+	0	ID=gene_7
+KR350475	Geneious	CDS	4690	5622	.	+	0	Name=G CDS;ID=CDS_7
+KR350475	Geneious	gene	5720	7444	.	+	0	ID=gene_8
+KR350475	Geneious	CDS	5720	7444	.	+	0	Name=F CDS;ID=CDS_8
+KR350475	Geneious	gene	7671	8258	.	+	0	ID=gene_9
+KR350475	Geneious	CDS	7671	8258	.	+	0	Name=M2-1 CDS;ID=CDS_9
+KR350475	Geneious	gene	8224	8496	.	+	0	ID=gene_10
+KR350475	Geneious	CDS	8224	8496	.	+	0	Name=M2-2 CDS;ID=CDS_10
+KR350475	Geneious	gene	8562	15062	.	+	0	ID=gene_11
+KR350475	Geneious	CDS	8562	15062	.	+	0	Name=L CDS;ID=CDS_11

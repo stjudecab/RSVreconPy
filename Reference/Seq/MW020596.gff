@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	MW020596	1	15208
+MW020596	Geneious	source	1	15208	.	+	.	Name=source Human respiratory syncytial virus A;ID=source_1
+MW020596	Geneious	gene	57	476	.	+	.	Name=NS1 gene;ID=gene_1
+MW020596	Geneious	CDS	57	476	.	+	0	Name=NS1 CDS;ID=CDS_1
+MW020596	Geneious	gene	586	960	.	+	.	Name=NS2 gene;ID=gene_2
+MW020596	Geneious	CDS	586	960	.	+	0	Name=NS2 CDS;ID=CDS_2
+MW020596	Geneious	gene	1098	2273	.	+	.	Name=N gene;ID=gene_3
+MW020596	Geneious	CDS	1098	2273	.	+	0	Name=N CDS;ID=CDS_3
+MW020596	Geneious	gene	2305	3030	.	+	.	Name=P gene;ID=gene_4
+MW020596	Geneious	CDS	2305	3030	.	+	0	Name=P CDS;ID=CDS_4
+MW020596	Geneious	gene	3213	3983	.	+	.	Name=M gene;ID=gene_5
+MW020596	Geneious	CDS	3213	3983	.	+	0	Name=M CDS;ID=CDS_5
+MW020596	Geneious	gene	4253	4447	.	+	.	Name=SH gene;ID=gene_6
+MW020596	Geneious	CDS	4253	4447	.	+	0	Name=SH CDS;ID=CDS_6
+MW020596	Geneious	gene	4638	5600	.	+	.	Name=G gene;ID=gene_7
+MW020596	Geneious	CDS	4638	5600	.	+	0	Name=G CDS;ID=CDS_7
+MW020596	Geneious	gene	5680	7404	.	+	.	Name=F gene;ID=gene_8
+MW020596	Geneious	CDS	5680	7404	.	+	0	Name=F CDS;ID=CDS_8
+MW020596	Geneious	gene	7623	8207	.	+	.	Name=M2-1 gene;ID=gene_9
+MW020596	Geneious	CDS	7623	8207	.	+	0	Name=M2-1 CDS;ID=CDS_9
+MW020596	Geneious	gene	8182	8448	.	+	.	Name=M2-2 gene;ID=gene_10
+MW020596	Geneious	CDS	8182	8448	.	+	0	Name=M2-2 CDS;ID=CDS_10
+MW020596	Geneious	gene	8515	15012	.	+	.	Name=L gene;ID=gene_11
+MW020596	Geneious	CDS	8515	15012	.	+	0	Name=L CDS;ID=CDS_11

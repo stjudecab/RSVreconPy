@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	OR522540	1	15194
+OR522540	Geneious	source	1	15194	.	+	.	Name=source Human respiratory syncytial virus B;ID=source_1
+OR522540	Geneious	gene	51	470	.	+	.	Name=NS1 gene;ID=gene_1
+OR522540	Geneious	CDS	51	470	.	+	0	Name=NS1 CDS;ID=CDS_1
+OR522540	Geneious	gene	578	952	.	+	.	Name=NS2 gene;ID=gene_2
+OR522540	Geneious	CDS	578	952	.	+	0	Name=NS2 CDS;ID=CDS_2
+OR522540	Geneious	gene	1091	2266	.	+	.	Name=N gene;ID=gene_3
+OR522540	Geneious	CDS	1091	2266	.	+	0	Name=N CDS;ID=CDS_3
+OR522540	Geneious	gene	2299	3024	.	+	.	Name=P gene;ID=gene_4
+OR522540	Geneious	CDS	2299	3024	.	+	0	Name=P CDS;ID=CDS_4
+OR522540	Geneious	gene	3214	3984	.	+	.	Name=M gene;ID=gene_5
+OR522540	Geneious	CDS	3214	3984	.	+	0	Name=M CDS;ID=CDS_5
+OR522540	Geneious	gene	4253	4450	.	+	.	Name=SH gene;ID=gene_6
+OR522540	Geneious	CDS	4253	4450	.	+	0	Name=SH CDS;ID=CDS_6
+OR522540	Geneious	gene	4639	5571	.	+	.	Name=G gene;ID=gene_7
+OR522540	Geneious	CDS	4639	5571	.	+	0	Name=G CDS;ID=CDS_7
+OR522540	Geneious	gene	5669	7393	.	+	.	Name=F gene;ID=gene_8
+OR522540	Geneious	CDS	5669	7393	.	+	0	Name=F CDS;ID=CDS_8
+OR522540	Geneious	gene	7619	8206	.	+	.	Name=M2 gene;ID=gene_9
+OR522540	Geneious	CDS	7619	8206	.	+	0	Name=M2 CDS;ID=CDS_9
+OR522540	Geneious	gene	8172	8444	.	+	.	Name=M2 gene;ID=gene_10
+OR522540	Geneious	CDS	8172	8444	.	+	0	Name=M2 CDS;ID=CDS_10
+OR522540	Geneious	gene	8510	15010	.	+	.	Name=L gene;ID=gene_11
+OR522540	Geneious	CDS	8510	15010	.	+	0	Name=L CDS;ID=CDS_11

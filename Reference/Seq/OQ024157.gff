@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	OQ024157	1	15249
+OQ024157	Geneious	source	1	15249	.	+	.	Name=Cluster Investigation source Human respiratory syncytial virus A;ID=source_1
+OQ024157	Geneious	gene	91	510	.	+	.	Name=NS1 gene;ID=gene_1
+OQ024157	Geneious	CDS	91	510	.	+	0	Name=NS1 CDS;ID=CDS_1
+OQ024157	Geneious	gene	620	994	.	+	.	Name=NS2 gene;ID=gene_2
+OQ024157	Geneious	CDS	620	994	.	+	0	Name=NS2 CDS;ID=CDS_2
+OQ024157	Geneious	gene	1132	2307	.	+	.	Name=N gene;ID=gene_3
+OQ024157	Geneious	CDS	1132	2307	.	+	0	Name=N CDS;ID=CDS_3
+OQ024157	Geneious	gene	2339	3064	.	+	.	Name=P gene;ID=gene_4
+OQ024157	Geneious	CDS	2339	3064	.	+	0	Name=P CDS;ID=CDS_4
+OQ024157	Geneious	gene	3248	4018	.	+	.	Name=M gene;ID=gene_5
+OQ024157	Geneious	CDS	3248	4018	.	+	0	Name=M CDS;ID=CDS_5
+OQ024157	Geneious	gene	4288	4482	.	+	.	Name=SH gene;ID=gene_6
+OQ024157	Geneious	CDS	4288	4482	.	+	0	Name=SH CDS;ID=CDS_6
+OQ024157	Geneious	gene	4674	5639	.	+	.	Name=G gene;ID=gene_7
+OQ024157	Geneious	CDS	4674	5639	.	+	0	Name=G CDS;ID=CDS_7
+OQ024157	Geneious	gene	5719	7443	.	+	.	Name=F gene;ID=gene_8
+OQ024157	Geneious	CDS	5719	7443	.	+	0	Name=F CDS;ID=CDS_8
+OQ024157	Geneious	gene	7662	8246	.	+	.	Name=M2-1 gene;ID=gene_9
+OQ024157	Geneious	CDS	7662	8246	.	+	0	Name=M2-1 CDS;ID=CDS_9
+OQ024157	Geneious	gene	8221	8487	.	+	.	Name=M2-2 gene;ID=gene_10
+OQ024157	Geneious	CDS	8221	8487	.	+	0	Name=M2-2 CDS;ID=CDS_10
+OQ024157	Geneious	gene	8554	15051	.	+	.	Name=L gene;ID=gene_11
+OQ024157	Geneious	CDS	8554	15051	.	+	0	Name=L CDS;ID=CDS_11

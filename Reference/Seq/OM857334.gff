@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	OM857334	1	15216
+OM857334	Geneious	source	1	15216	.	+	.	Name=source Human respiratory syncytial virus A;ID=source_1
+OM857334	Geneious	gene	67	486	.	+	0	ID=gene_1
+OM857334	Geneious	CDS	67	486	.	+	0	Name=nonstructural protein 1 CDS;ID=CDS_1
+OM857334	Geneious	gene	596	970	.	+	0	ID=gene_2
+OM857334	Geneious	CDS	596	970	.	+	0	Name=nonstructural protein 2 CDS;ID=CDS_2
+OM857334	Geneious	gene	1108	2283	.	+	0	ID=gene_3
+OM857334	Geneious	CDS	1108	2283	.	+	0	Name=nucleoprotein CDS;ID=CDS_3
+OM857334	Geneious	gene	2316	3041	.	+	0	ID=gene_4
+OM857334	Geneious	CDS	2316	3041	.	+	0	Name=phosphoprotein CDS;ID=CDS_4
+OM857334	Geneious	gene	3224	3994	.	+	0	ID=gene_5
+OM857334	Geneious	CDS	3224	3994	.	+	0	Name=matrix protein CDS;ID=CDS_5
+OM857334	Geneious	gene	4264	4458	.	+	0	ID=gene_6
+OM857334	Geneious	CDS	4264	4458	.	+	0	Name=small hydrophobic protein CDS;ID=CDS_6
+OM857334	Geneious	gene	4649	5611	.	+	0	ID=gene_7
+OM857334	Geneious	CDS	4649	5611	.	+	0	Name=attachment glycoprotein CDS;ID=CDS_7
+OM857334	Geneious	gene	5694	7418	.	+	0	ID=gene_8
+OM857334	Geneious	CDS	5694	7418	.	+	0	Name=fusion protein CDS;ID=CDS_8
+OM857334	Geneious	gene	7637	8221	.	+	0	ID=gene_9
+OM857334	Geneious	CDS	7637	8221	.	+	0	Name=matrix protein 2-1 CDS;ID=CDS_9
+OM857334	Geneious	gene	8196	8462	.	+	0	ID=gene_10
+OM857334	Geneious	CDS	8196	8462	.	+	0	Name=matrix protein 2-2 CDS;ID=CDS_10
+OM857334	Geneious	gene	8529	15026	.	+	0	ID=gene_11
+OM857334	Geneious	CDS	8529	15026	.	+	0	Name=RNA-directed RNA polymerase CDS;ID=CDS_11

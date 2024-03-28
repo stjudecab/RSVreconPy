@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2023.1.2
+##sequence-region	JQ901452	1	15216
+JQ901452	Geneious	source	1	15216	.	+	.	Name=genotype: GA2 source Human orthopneumovirus;ID=source_1
+JQ901452	Geneious	CDS	99	518	.	+	0	Name=NS1 CDS;ID=CDS_1
+JQ901452	Geneious	gene	99	518	.	+	0	Name=NS1 gene;ID=gene_1
+JQ901452	Geneious	CDS	628	1002	.	+	0	Name=NS2 CDS;ID=CDS_2
+JQ901452	Geneious	gene	628	1002	.	+	0	Name=NS2 gene;ID=gene_2
+JQ901452	Geneious	CDS	1140	2315	.	+	0	Name=N CDS;ID=CDS_3
+JQ901452	Geneious	gene	1140	2315	.	+	0	Name=N gene;ID=gene_3
+JQ901452	Geneious	CDS	2347	3072	.	+	0	Name=P CDS;ID=CDS_4
+JQ901452	Geneious	gene	2347	3072	.	+	0	Name=P gene;ID=gene_4
+JQ901452	Geneious	CDS	3257	4027	.	+	0	Name=M CDS;ID=CDS_5
+JQ901452	Geneious	gene	3257	4027	.	+	0	Name=M gene;ID=gene_5
+JQ901452	Geneious	CDS	4297	4491	.	+	0	Name=SH CDS;ID=CDS_6
+JQ901452	Geneious	gene	4297	4491	.	+	0	Name=SH gene;ID=gene_6
+JQ901452	Geneious	CDS	4682	5578	.	+	0	Name=G CDS;ID=CDS_7
+JQ901452	Geneious	gene	4682	5578	.	+	0	Name=G gene;ID=gene_7
+JQ901452	Geneious	CDS	5655	7379	.	+	0	Name=F CDS;ID=CDS_8
+JQ901452	Geneious	gene	5655	7379	.	+	0	Name=F gene;ID=gene_8
+JQ901452	Geneious	CDS	7600	8184	.	+	0	Name=M2-1 CDS;ID=CDS_9
+JQ901452	Geneious	gene	7600	8184	.	+	0	Name=M2-1 gene;ID=gene_9
+JQ901452	Geneious	CDS	8159	8425	.	+	0	Name=M2-2 CDS;ID=CDS_10
+JQ901452	Geneious	gene	8159	8425	.	+	0	Name=M2-2 gene;ID=gene_10
+JQ901452	Geneious	CDS	8492	14989	.	+	0	Name=L CDS;ID=CDS_11
+JQ901452	Geneious	gene	8492	14989	.	+	0	Name=L gene;ID=gene_11

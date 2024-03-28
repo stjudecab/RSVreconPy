@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	KF973319	1	15137
+KF973319	Geneious	source	1	15137	.	+	.	Name=source Respiratory syncytial virus type A;ID=source_1
+KF973319	Geneious	five_prime_UTR	1	54	.	+	.	ID=five_prime_UTR_1
+KF973319	Geneious	gene	55	474	.	+	.	Name=NS1 gene;ID=gene_1
+KF973319	Geneious	CDS	55	474	.	+	0	Name=NS1 CDS;ID=CDS_1
+KF973319	Geneious	gene	584	958	.	+	.	Name=NS2 gene;ID=gene_2
+KF973319	Geneious	CDS	584	958	.	+	0	Name=NS2 CDS;ID=CDS_2
+KF973319	Geneious	gene	1096	2271	.	+	.	Name=N gene;ID=gene_3
+KF973319	Geneious	CDS	1096	2271	.	+	0	Name=N CDS;ID=CDS_3
+KF973319	Geneious	gene	2303	3028	.	+	.	Name=P gene;ID=gene_4
+KF973319	Geneious	CDS	2303	3028	.	+	0	Name=P CDS;ID=CDS_4
+KF973319	Geneious	gene	3212	3982	.	+	.	Name=M gene;ID=gene_5
+KF973319	Geneious	CDS	3212	3982	.	+	0	Name=M CDS;ID=CDS_5
+KF973319	Geneious	gene	4253	4447	.	+	.	Name=SH gene;ID=gene_6
+KF973319	Geneious	CDS	4253	4447	.	+	0	Name=SH CDS;ID=CDS_6
+KF973319	Geneious	gene	4638	5534	.	+	.	Name=G gene;ID=gene_7
+KF973319	Geneious	CDS	4638	5534	.	+	0	Name=G CDS;ID=CDS_7
+KF973319	Geneious	gene	5611	7335	.	+	.	Name=F gene;ID=gene_8
+KF973319	Geneious	CDS	5611	7335	.	+	0	Name=F CDS;ID=CDS_8
+KF973319	Geneious	gene	7554	8138	.	+	.	Name=M2 gene;ID=gene_9
+KF973319	Geneious	CDS	7554	8138	.	+	0	Name=M2 CDS;ID=CDS_9
+KF973319	Geneious	gene	8446	14943	.	+	.	Name=L gene;ID=gene_10
+KF973319	Geneious	CDS	8446	14943	.	+	0	Name=L CDS;ID=CDS_10
+KF973319	Geneious	three_prime_UTR	14944	15137	.	+	.	ID=three_prime_UTR_1

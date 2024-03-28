@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	MT373704	1	15155
+MT373704	Geneious	source	1	15155	.	+	.	Name=source Human respiratory syncytial virus B;ID=source_1
+MT373704	Geneious	gene	1	420	.	+	.	Name=NS1 gene;ID=gene_1
+MT373704	Geneious	CDS	1	420	.	+	0	Name=NS1 CDS;ID=CDS_1
+MT373704	Geneious	gene	528	902	.	+	.	Name=NS2 gene;ID=gene_2
+MT373704	Geneious	CDS	528	902	.	+	0	Name=NS2 CDS;ID=CDS_2
+MT373704	Geneious	gene	1041	2216	.	+	.	Name=N gene;ID=gene_3
+MT373704	Geneious	CDS	1041	2216	.	+	0	Name=N CDS;ID=CDS_3
+MT373704	Geneious	gene	2249	2974	.	+	.	Name=P gene;ID=gene_4
+MT373704	Geneious	CDS	2249	2974	.	+	0	Name=P CDS;ID=CDS_4
+MT373704	Geneious	gene	3164	3934	.	+	.	Name=M gene;ID=gene_5
+MT373704	Geneious	CDS	3164	3934	.	+	0	Name=M CDS;ID=CDS_5
+MT373704	Geneious	gene	4203	4400	.	+	.	Name=SH gene;ID=gene_6
+MT373704	Geneious	CDS	4203	4400	.	+	0	Name=SH CDS;ID=CDS_6
+MT373704	Geneious	gene	4589	5521	.	+	.	Name=G gene;ID=gene_7
+MT373704	Geneious	CDS	4589	5521	.	+	0	Name=G CDS;ID=CDS_7
+MT373704	Geneious	gene	5619	7343	.	+	.	Name=F gene;ID=gene_8
+MT373704	Geneious	CDS	5619	7343	.	+	0	Name=F CDS;ID=CDS_8
+MT373704	Geneious	gene	7570	8157	.	+	.	Name=M2-1 gene;ID=gene_9
+MT373704	Geneious	CDS	7570	8157	.	+	0	Name=M2-1 CDS;ID=CDS_9
+MT373704	Geneious	gene	8123	8395	.	+	.	Name=M2-2 gene;ID=gene_10
+MT373704	Geneious	CDS	8123	8395	.	+	0	Name=M2-2 CDS;ID=CDS_10
+MT373704	Geneious	gene	8461	14961	.	+	.	Name=L gene;ID=gene_11
+MT373704	Geneious	CDS	8461	14961	.	+	0	Name=L CDS;ID=CDS_11

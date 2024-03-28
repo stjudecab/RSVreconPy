@@ -1,0 +1,25 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	KJ939966	1	15211
+KJ939966	Geneious	source	1	15211	.	+	.	Name=subgroup: RSV A source Human orthopneumovirus;ID=source_1
+KJ939966	Geneious	gene	99	518	.	+	.	Name=NS1 gene;ID=gene_1
+KJ939966	Geneious	CDS	99	518	.	+	0	Name=NS1 CDS;ID=CDS_1
+KJ939966	Geneious	gene	628	1002	.	+	.	Name=NS2 gene;ID=gene_2
+KJ939966	Geneious	CDS	628	1002	.	+	0	Name=NS2 CDS;ID=CDS_2
+KJ939966	Geneious	gene	1140	2315	.	+	.	Name=N gene;ID=gene_3
+KJ939966	Geneious	CDS	1140	2315	.	+	0	Name=N CDS;ID=CDS_3
+KJ939966	Geneious	gene	2347	3072	.	+	.	Name=P gene;ID=gene_4
+KJ939966	Geneious	CDS	2347	3072	.	+	0	Name=P CDS;ID=CDS_4
+KJ939966	Geneious	gene	3253	4023	.	+	.	Name=M gene;ID=gene_5
+KJ939966	Geneious	CDS	3253	4023	.	+	0	Name=M CDS;ID=CDS_5
+KJ939966	Geneious	gene	4293	4487	.	+	.	Name=SH gene;ID=gene_6
+KJ939966	Geneious	CDS	4293	4487	.	+	0	Name=SH CDS;ID=CDS_6
+KJ939966	Geneious	gene	4678	5571	.	+	.	Name=G gene;ID=gene_7
+KJ939966	Geneious	CDS	4678	5571	.	+	0	Name=G CDS;ID=CDS_7
+KJ939966	Geneious	gene	5651	7375	.	+	.	Name=F gene;ID=gene_8
+KJ939966	Geneious	CDS	5651	7375	.	+	0	Name=F CDS;ID=CDS_8
+KJ939966	Geneious	gene	7595	8420	.	+	.	Name=M2 gene;ID=gene_9
+KJ939966	Geneious	CDS	7595	8179	.	+	0	Name=M2 CDS;ID=CDS_9
+KJ939966	Geneious	CDS	8154	8420	.	+	0	Name=M2 CDS;ID=CDS_10
+KJ939966	Geneious	gene	8487	14984	.	+	.	Name=L gene;ID=gene_10
+KJ939966	Geneious	CDS	8487	14984	.	+	0	Name=L CDS;ID=CDS_11

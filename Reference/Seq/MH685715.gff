@@ -1,0 +1,25 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	MH685715	1	15261
+MH685715	Geneious	source	1	15261	.	+	.	Name=source Human orthopneumovirus;ID=source_1
+MH685715	Geneious	gene	110	529	.	+	.	Name=NS1 gene;ID=gene_1
+MH685715	Geneious	CDS	110	529	.	+	0	Name=NS1 CDS;ID=CDS_1
+MH685715	Geneious	gene	637	1011	.	+	.	Name=NS2 gene;ID=gene_2
+MH685715	Geneious	CDS	637	1011	.	+	0	Name=NS2 CDS;ID=CDS_2
+MH685715	Geneious	gene	1150	2325	.	+	.	Name=N gene;ID=gene_3
+MH685715	Geneious	CDS	1150	2325	.	+	0	Name=N CDS;ID=CDS_3
+MH685715	Geneious	gene	2358	3083	.	+	.	Name=P gene;ID=gene_4
+MH685715	Geneious	CDS	2358	3083	.	+	0	Name=P CDS;ID=CDS_4
+MH685715	Geneious	gene	3276	4046	.	+	.	Name=M gene;ID=gene_5
+MH685715	Geneious	CDS	3276	4046	.	+	0	Name=M CDS;ID=CDS_5
+MH685715	Geneious	gene	4315	4512	.	+	.	Name=SH gene;ID=gene_6
+MH685715	Geneious	CDS	4315	4512	.	+	0	Name=SH CDS;ID=CDS_6
+MH685715	Geneious	gene	4702	5634	.	+	0	ID=gene_7
+MH685715	Geneious	CDS	4702	5634	.	+	0	Name=attachment glycoprotein CDS;ID=CDS_7
+MH685715	Geneious	gene	5732	7456	.	+	.	Name=F gene;ID=gene_8
+MH685715	Geneious	CDS	5732	7456	.	+	0	Name=F CDS;ID=CDS_8
+MH685715	Geneious	gene	7682	8507	.	+	.	Name=M2 gene;ID=gene_9
+MH685715	Geneious	CDS	7682	8269	.	+	0	Name=M2 CDS;ID=CDS_9
+MH685715	Geneious	CDS	8235	8507	.	+	0	Name=M2 CDS;ID=CDS_10
+MH685715	Geneious	gene	8573	15073	.	+	.	Name=L gene;ID=gene_10
+MH685715	Geneious	CDS	8573	15073	.	+	0	Name=L CDS;ID=CDS_11

@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	MF614947	1	15236
+MF614947	Geneious	source	1	15236	.	+	.	Name=genotype: ON1 source Human respiratory syncytial virus A;ID=source_1
+MF614947	Geneious	gene	80	499	.	+	.	Name=NS1 gene;ID=gene_1
+MF614947	Geneious	CDS	80	499	.	+	0	Name=NS1 CDS;ID=CDS_1
+MF614947	Geneious	gene	609	983	.	+	.	Name=NS2 gene;ID=gene_2
+MF614947	Geneious	CDS	609	983	.	+	0	Name=NS2 CDS;ID=CDS_2
+MF614947	Geneious	gene	1121	2296	.	+	.	Name=N gene;ID=gene_3
+MF614947	Geneious	CDS	1121	2296	.	+	0	Name=N CDS;ID=CDS_3
+MF614947	Geneious	gene	2328	3053	.	+	.	Name=P gene;ID=gene_4
+MF614947	Geneious	CDS	2328	3053	.	+	0	Name=P CDS;ID=CDS_4
+MF614947	Geneious	gene	3236	4006	.	+	.	Name=M gene;ID=gene_5
+MF614947	Geneious	CDS	3236	4006	.	+	0	Name=M CDS;ID=CDS_5
+MF614947	Geneious	gene	4276	4470	.	+	.	Name=SH gene;ID=gene_6
+MF614947	Geneious	CDS	4276	4470	.	+	0	Name=SH CDS;ID=CDS_6
+MF614947	Geneious	gene	4662	5627	.	+	.	Name=G gene;ID=gene_7
+MF614947	Geneious	CDS	4662	5627	.	+	0	Name=G CDS;ID=CDS_7
+MF614947	Geneious	gene	5707	7431	.	+	.	Name=F gene;ID=gene_8
+MF614947	Geneious	CDS	5707	7431	.	+	0	Name=F CDS;ID=CDS_8
+MF614947	Geneious	gene	7650	8234	.	+	.	Name=M2-1 gene;ID=gene_9
+MF614947	Geneious	CDS	7650	8234	.	+	0	Name=M2-1 CDS;ID=CDS_9
+MF614947	Geneious	gene	8209	8475	.	+	.	Name=M2-2 gene;ID=gene_10
+MF614947	Geneious	CDS	8209	8475	.	+	0	Name=M2-2 CDS;ID=CDS_10
+MF614947	Geneious	gene	8542	15039	.	+	.	Name=L gene;ID=gene_11
+MF614947	Geneious	CDS	8542	15039	.	+	0	Name=L CDS;ID=CDS_11

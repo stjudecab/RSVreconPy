@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2023.1.2
+##sequence-region	JX576760	1	15216
+JX576760	Geneious	source	1	15216	.	+	.	Name=genotype: GB12 source Human orthopneumovirus;ID=source_1
+JX576760	Geneious	CDS	99	518	.	+	0	Name=NS1 CDS;ID=CDS_1
+JX576760	Geneious	gene	99	518	.	+	0	Name=NS1 gene;ID=gene_1
+JX576760	Geneious	CDS	626	1000	.	+	0	Name=NS2 CDS;ID=CDS_2
+JX576760	Geneious	gene	626	1000	.	+	0	Name=NS2 gene;ID=gene_2
+JX576760	Geneious	CDS	1137	2312	.	+	0	Name=N CDS;ID=CDS_3
+JX576760	Geneious	gene	1137	2312	.	+	0	Name=N gene;ID=gene_3
+JX576760	Geneious	CDS	2345	3070	.	+	0	Name=P CDS;ID=CDS_4
+JX576760	Geneious	gene	2345	3070	.	+	0	Name=P gene;ID=gene_4
+JX576760	Geneious	CDS	3257	4027	.	+	0	Name=M CDS;ID=CDS_5
+JX576760	Geneious	gene	3257	4027	.	+	0	Name=M gene;ID=gene_5
+JX576760	Geneious	CDS	4296	4493	.	+	0	Name=SH CDS;ID=CDS_6
+JX576760	Geneious	gene	4296	4493	.	+	0	Name=SH gene;ID=gene_6
+JX576760	Geneious	CDS	4683	5582	.	+	0	Name=G CDS;ID=CDS_7
+JX576760	Geneious	gene	4683	5582	.	+	0	Name=G gene;ID=gene_7
+JX576760	Geneious	CDS	5659	7383	.	+	0	Name=F CDS;ID=CDS_8
+JX576760	Geneious	gene	5659	7383	.	+	0	Name=F gene;ID=gene_8
+JX576760	Geneious	CDS	7610	8197	.	+	0	Name=M2-1 CDS;ID=CDS_9
+JX576760	Geneious	gene	7610	8197	.	+	0	Name=M2-1 gene;ID=gene_9
+JX576760	Geneious	CDS	8163	8435	.	+	0	Name=M2-2 CDS;ID=CDS_10
+JX576760	Geneious	gene	8163	8435	.	+	0	Name=M2-2 gene;ID=gene_10
+JX576760	Geneious	CDS	8501	15001	.	+	0	Name=L CDS;ID=CDS_11
+JX576760	Geneious	gene	8501	15001	.	+	0	Name=L gene;ID=gene_11

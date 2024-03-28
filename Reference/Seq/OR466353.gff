@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	OR466353	1	15260
+OR466353	Geneious	source	1	15260	.	+	.	Name=type: A source Human respiratory syncytial virus A;ID=source_1
+OR466353	Geneious	gene	90	509	.	+	.	Name=NS1 gene;ID=gene_1
+OR466353	Geneious	CDS	90	509	.	+	0	Name=NS1 CDS;ID=CDS_1
+OR466353	Geneious	gene	619	993	.	+	.	Name=NS2 gene;ID=gene_2
+OR466353	Geneious	CDS	619	993	.	+	0	Name=NS2 CDS;ID=CDS_2
+OR466353	Geneious	gene	1131	2306	.	+	.	Name=N gene;ID=gene_3
+OR466353	Geneious	CDS	1131	2306	.	+	0	Name=N CDS;ID=CDS_3
+OR466353	Geneious	gene	2338	3063	.	+	.	Name=P gene;ID=gene_4
+OR466353	Geneious	CDS	2338	3063	.	+	0	Name=P CDS;ID=CDS_4
+OR466353	Geneious	gene	3246	4016	.	+	.	Name=M gene;ID=gene_5
+OR466353	Geneious	CDS	3246	4016	.	+	0	Name=M CDS;ID=CDS_5
+OR466353	Geneious	gene	4287	4481	.	+	.	Name=SH gene;ID=gene_6
+OR466353	Geneious	CDS	4287	4481	.	+	0	Name=SH CDS;ID=CDS_6
+OR466353	Geneious	gene	4673	5635	.	+	.	Name=G gene;ID=gene_7
+OR466353	Geneious	CDS	4673	5635	.	+	0	Name=G CDS;ID=CDS_7
+OR466353	Geneious	gene	5715	7439	.	+	.	Name=F gene;ID=gene_8
+OR466353	Geneious	CDS	5715	7439	.	+	0	Name=F CDS;ID=CDS_8
+OR466353	Geneious	gene	7658	8242	.	+	.	Name=M2-1 gene;ID=gene_9
+OR466353	Geneious	CDS	7658	8242	.	+	0	Name=M2-1 CDS;ID=CDS_9
+OR466353	Geneious	gene	8217	8483	.	+	.	Name=M2-2 gene;ID=gene_10
+OR466353	Geneious	CDS	8217	8483	.	+	0	Name=M2-2 CDS;ID=CDS_10
+OR466353	Geneious	gene	8550	15047	.	+	.	Name=L gene;ID=gene_11
+OR466353	Geneious	CDS	8550	15047	.	+	0	Name=L CDS;ID=CDS_11

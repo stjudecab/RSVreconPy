@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	ON237171	1	15213
+ON237171	Geneious	source	1	15213	.	+	.	Name=subtype: B source Human respiratory syncytial virus B;ID=source_1
+ON237171	Geneious	gene	55	474	.	+	.	Name=NS1 gene;ID=gene_1
+ON237171	Geneious	CDS	55	474	.	+	0	Name=NS1 CDS;ID=CDS_1
+ON237171	Geneious	gene	582	956	.	+	.	Name=NS2 gene;ID=gene_2
+ON237171	Geneious	CDS	582	956	.	+	0	Name=NS2 CDS;ID=CDS_2
+ON237171	Geneious	gene	1095	2270	.	+	.	Name=N gene;ID=gene_3
+ON237171	Geneious	CDS	1095	2270	.	+	0	Name=N CDS;ID=CDS_3
+ON237171	Geneious	gene	2303	3028	.	+	.	Name=P gene;ID=gene_4
+ON237171	Geneious	CDS	2303	3028	.	+	0	Name=P CDS;ID=CDS_4
+ON237171	Geneious	gene	3221	3991	.	+	.	Name=M gene;ID=gene_5
+ON237171	Geneious	CDS	3221	3991	.	+	0	Name=M CDS;ID=CDS_5
+ON237171	Geneious	gene	4260	4457	.	+	.	Name=SH gene;ID=gene_6
+ON237171	Geneious	CDS	4260	4457	.	+	0	Name=SH CDS;ID=CDS_6
+ON237171	Geneious	gene	4646	5578	.	+	.	Name=G gene;ID=gene_7
+ON237171	Geneious	CDS	4646	5578	.	+	0	Name=G CDS;ID=CDS_7
+ON237171	Geneious	gene	5676	7400	.	+	.	Name=F gene;ID=gene_8
+ON237171	Geneious	CDS	5676	7400	.	+	0	Name=F CDS;ID=CDS_8
+ON237171	Geneious	gene	7627	8214	.	+	.	Name=M2 gene;ID=gene_9
+ON237171	Geneious	CDS	7627	8214	.	+	0	Name=M2 CDS;ID=CDS_9
+ON237171	Geneious	gene	8180	8452	.	+	.	Name=M2 gene;ID=gene_10
+ON237171	Geneious	CDS	8180	8452	.	+	0	Name=M2 CDS;ID=CDS_10
+ON237171	Geneious	gene	8518	15018	.	+	.	Name=L gene;ID=gene_11
+ON237171	Geneious	CDS	8518	15018	.	+	0	Name=L CDS;ID=CDS_11

@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	MN365452	1	15154
+MN365452	Geneious	source	1	15154	.	+	.	Name=source Human orthopneumovirus;ID=source_1
+MN365452	Geneious	gene	25	444	.	+	0	ID=gene_1
+MN365452	Geneious	CDS	25	444	.	+	0	Name=nonstructural protein 1 CDS;ID=CDS_1
+MN365452	Geneious	gene	552	926	.	+	0	ID=gene_2
+MN365452	Geneious	CDS	552	926	.	+	0	Name=nonstructural protein 2 CDS;ID=CDS_2
+MN365452	Geneious	gene	1065	2240	.	+	0	ID=gene_3
+MN365452	Geneious	CDS	1065	2240	.	+	0	Name=nucleoprotein CDS;ID=CDS_3
+MN365452	Geneious	gene	2273	2998	.	+	0	ID=gene_4
+MN365452	Geneious	CDS	2273	2998	.	+	0	Name=phosphoprotein CDS;ID=CDS_4
+MN365452	Geneious	gene	3188	3958	.	+	0	ID=gene_5
+MN365452	Geneious	CDS	3188	3958	.	+	0	Name=matrix protein CDS;ID=CDS_5
+MN365452	Geneious	gene	4227	4424	.	+	0	ID=gene_6
+MN365452	Geneious	CDS	4227	4424	.	+	0	Name=small hydrophobic protein CDS;ID=CDS_6
+MN365452	Geneious	gene	4614	5546	.	+	0	ID=gene_7
+MN365452	Geneious	CDS	4614	5546	.	+	0	Name=attachment glycoprotein CDS;ID=CDS_7
+MN365452	Geneious	gene	5644	7368	.	+	0	ID=gene_8
+MN365452	Geneious	CDS	5644	7368	.	+	0	Name=fusion protein CDS;ID=CDS_8
+MN365452	Geneious	gene	7595	8182	.	+	0	ID=gene_9
+MN365452	Geneious	CDS	7595	8182	.	+	0	Name=transcription elongation factor M2-1 CDS;ID=CDS_9
+MN365452	Geneious	gene	8148	8420	.	+	0	ID=gene_10
+MN365452	Geneious	CDS	8148	8420	.	+	0	Name=transcription elongation factor M2-2 CDS;ID=CDS_10
+MN365452	Geneious	gene	8486	14986	.	+	0	ID=gene_11
+MN365452	Geneious	CDS	8486	14986	.	+	0	Name=RNA-dependent RNA polymerase CDS;ID=CDS_11

@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	OK649714	1	15254
+OK649714	Geneious	source	1	15254	.	+	.	Name=subtype: B source Human respiratory syncytial virus B;ID=source_1
+OK649714	Geneious	gene	96	515	.	+	0	ID=gene_1
+OK649714	Geneious	CDS	96	515	.	+	0	Name=nonstructural protein 1 CDS;ID=CDS_1
+OK649714	Geneious	gene	623	997	.	+	0	ID=gene_2
+OK649714	Geneious	CDS	623	997	.	+	0	Name=nonstructural protein 2 CDS;ID=CDS_2
+OK649714	Geneious	gene	1136	2311	.	+	0	ID=gene_3
+OK649714	Geneious	CDS	1136	2311	.	+	0	Name=nucleoprotein CDS;ID=CDS_3
+OK649714	Geneious	gene	2344	3069	.	+	0	ID=gene_4
+OK649714	Geneious	CDS	2344	3069	.	+	0	Name=phosphoprotein CDS;ID=CDS_4
+OK649714	Geneious	gene	3259	4029	.	+	0	ID=gene_5
+OK649714	Geneious	CDS	3259	4029	.	+	0	Name=matrix protein CDS;ID=CDS_5
+OK649714	Geneious	gene	4298	4495	.	+	0	ID=gene_6
+OK649714	Geneious	CDS	4298	4495	.	+	0	Name=small hydrophobic protein CDS;ID=CDS_6
+OK649714	Geneious	gene	4685	5638	.	+	0	ID=gene_7
+OK649714	Geneious	CDS	4685	5638	.	+	0	Name=attachment glycoprotein CDS;ID=CDS_7
+OK649714	Geneious	gene	5715	7439	.	+	0	ID=gene_8
+OK649714	Geneious	CDS	5715	7439	.	+	0	Name=fusion protein CDS;ID=CDS_8
+OK649714	Geneious	gene	7666	8253	.	+	0	ID=gene_9
+OK649714	Geneious	CDS	7666	8253	.	+	0	Name=matrix protein 2-1 CDS;ID=CDS_9
+OK649714	Geneious	gene	8219	8491	.	+	0	ID=gene_10
+OK649714	Geneious	CDS	8219	8491	.	+	0	Name=matrix protein 2-2 CDS;ID=CDS_10
+OK649714	Geneious	gene	8557	15057	.	+	0	ID=gene_11
+OK649714	Geneious	CDS	8557	15057	.	+	0	Name=RNA-directed RNA polymerase CDS;ID=CDS_11

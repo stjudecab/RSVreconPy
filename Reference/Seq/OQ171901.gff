@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	OQ171901	1	15225
+OQ171901	Geneious	source	1	15225	.	+	.	Name=cluster investigation source Human respiratory syncytial virus A;ID=source_1
+OQ171901	Geneious	gene	79	498	.	+	.	Name=NS1 gene;ID=gene_1
+OQ171901	Geneious	CDS	79	498	.	+	0	Name=NS1 CDS;ID=CDS_1
+OQ171901	Geneious	gene	610	984	.	+	.	Name=NS2 gene;ID=gene_2
+OQ171901	Geneious	CDS	610	984	.	+	0	Name=NS2 CDS;ID=CDS_2
+OQ171901	Geneious	gene	1122	2297	.	+	.	Name=N gene;ID=gene_3
+OQ171901	Geneious	CDS	1122	2297	.	+	0	Name=N CDS;ID=CDS_3
+OQ171901	Geneious	gene	2329	3054	.	+	.	Name=P gene;ID=gene_4
+OQ171901	Geneious	CDS	2329	3054	.	+	0	Name=P CDS;ID=CDS_4
+OQ171901	Geneious	gene	3237	4007	.	+	.	Name=M gene;ID=gene_5
+OQ171901	Geneious	CDS	3237	4007	.	+	0	Name=M CDS;ID=CDS_5
+OQ171901	Geneious	gene	4277	4471	.	+	.	Name=SH gene;ID=gene_6
+OQ171901	Geneious	CDS	4277	4471	.	+	0	Name=SH CDS;ID=CDS_6
+OQ171901	Geneious	gene	4662	5627	.	+	.	Name=G gene;ID=gene_7
+OQ171901	Geneious	CDS	4662	5627	.	+	0	Name=G CDS;ID=CDS_7
+OQ171901	Geneious	gene	5707	7431	.	+	.	Name=F gene;ID=gene_8
+OQ171901	Geneious	CDS	5707	7431	.	+	0	Name=F CDS;ID=CDS_8
+OQ171901	Geneious	gene	7650	8234	.	+	.	Name=M2-1 gene;ID=gene_9
+OQ171901	Geneious	CDS	7650	8234	.	+	0	Name=M2-1 CDS;ID=CDS_9
+OQ171901	Geneious	gene	8209	8475	.	+	.	Name=M2-2 gene;ID=gene_10
+OQ171901	Geneious	CDS	8209	8475	.	+	0	Name=M2-2 CDS;ID=CDS_10
+OQ171901	Geneious	gene	8542	15039	.	+	.	Name=L gene;ID=gene_11
+OQ171901	Geneious	CDS	8542	15039	.	+	0	Name=L CDS;ID=CDS_11

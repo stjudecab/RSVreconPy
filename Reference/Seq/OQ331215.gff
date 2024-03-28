@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	OQ331215	1	15183
+OQ331215	Geneious	source	1	15183	.	+	.	Name=source Human respiratory syncytial virus B;ID=source_1
+OQ331215	Geneious	gene	59	478	.	+	0	ID=gene_1
+OQ331215	Geneious	CDS	59	478	.	+	0	Name=nonstructural protein 1 CDS;ID=CDS_1
+OQ331215	Geneious	gene	586	960	.	+	0	ID=gene_2
+OQ331215	Geneious	CDS	586	960	.	+	0	Name=nonstructural protein 2 CDS;ID=CDS_2
+OQ331215	Geneious	gene	1099	2274	.	+	0	ID=gene_3
+OQ331215	Geneious	CDS	1099	2274	.	+	0	Name=nucleocapsid protein CDS;ID=CDS_3
+OQ331215	Geneious	gene	2307	3032	.	+	0	ID=gene_4
+OQ331215	Geneious	CDS	2307	3032	.	+	0	Name=phosphoprotein CDS;ID=CDS_4
+OQ331215	Geneious	gene	3222	3992	.	+	0	ID=gene_5
+OQ331215	Geneious	CDS	3222	3992	.	+	0	Name=matrix protein CDS;ID=CDS_5
+OQ331215	Geneious	gene	4261	4458	.	+	0	ID=gene_6
+OQ331215	Geneious	CDS	4261	4458	.	+	0	Name=small hydrophobic protein CDS;ID=CDS_6
+OQ331215	Geneious	gene	4647	5579	.	+	0	ID=gene_7
+OQ331215	Geneious	CDS	4647	5579	.	+	0	Name=attachment glycoprotein CDS;ID=CDS_7
+OQ331215	Geneious	gene	5677	7401	.	+	0	ID=gene_8
+OQ331215	Geneious	CDS	5677	7401	.	+	0	Name=fusion glycoprotein CDS;ID=CDS_8
+OQ331215	Geneious	gene	7628	8215	.	+	0	ID=gene_9
+OQ331215	Geneious	CDS	7628	8215	.	+	0	Name=transcription elongation factor M2-1 CDS;ID=CDS_9
+OQ331215	Geneious	gene	8181	8453	.	+	0	ID=gene_10
+OQ331215	Geneious	CDS	8181	8453	.	+	0	Name=transcription-replication factor M2-2 CDS;ID=CDS_10
+OQ331215	Geneious	gene	8519	15019	.	+	0	ID=gene_11
+OQ331215	Geneious	CDS	8519	15019	.	+	0	Name=RNA-directed RNA polymerase CDS;ID=CDS_11

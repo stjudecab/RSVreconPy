@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	MN306031	1	15204
+MN306031	Geneious	source	1	15204	.	+	.	Name=source Human orthopneumovirus;ID=source_1
+MN306031	Geneious	gene	65	484	.	+	0	ID=gene_1
+MN306031	Geneious	CDS	65	484	.	+	0	Name=nonstructural protein 1 CDS;ID=CDS_1
+MN306031	Geneious	gene	594	968	.	+	0	ID=gene_2
+MN306031	Geneious	CDS	594	968	.	+	0	Name=nonstructural protein 2 CDS;ID=CDS_2
+MN306031	Geneious	gene	1106	2281	.	+	0	ID=gene_3
+MN306031	Geneious	CDS	1106	2281	.	+	0	Name=nucleoprotein CDS;ID=CDS_3
+MN306031	Geneious	gene	2314	3039	.	+	0	ID=gene_4
+MN306031	Geneious	CDS	2314	3039	.	+	0	Name=phosphoprotein CDS;ID=CDS_4
+MN306031	Geneious	gene	3221	3991	.	+	0	ID=gene_5
+MN306031	Geneious	CDS	3221	3991	.	+	0	Name=matrix protein CDS;ID=CDS_5
+MN306031	Geneious	gene	4262	4456	.	+	0	ID=gene_6
+MN306031	Geneious	CDS	4262	4456	.	+	0	Name=small hydrophobic protein CDS;ID=CDS_6
+MN306031	Geneious	gene	4647	5612	.	+	0	ID=gene_7
+MN306031	Geneious	CDS	4647	5612	.	+	0	Name=attachment glycoprotein CDS;ID=CDS_7
+MN306031	Geneious	gene	5692	7416	.	+	0	ID=gene_8
+MN306031	Geneious	CDS	5692	7416	.	+	0	Name=fusion protein CDS;ID=CDS_8
+MN306031	Geneious	gene	7635	8219	.	+	0	ID=gene_9
+MN306031	Geneious	CDS	7635	8219	.	+	0	Name=matrix protein 2-1 CDS;ID=CDS_9
+MN306031	Geneious	gene	8194	8460	.	+	0	ID=gene_10
+MN306031	Geneious	CDS	8194	8460	.	+	0	Name=matrix protein 2-2 CDS;ID=CDS_10
+MN306031	Geneious	gene	8527	15024	.	+	0	ID=gene_11
+MN306031	Geneious	CDS	8527	15024	.	+	0	Name=RNA-directed RNA polymerase CDS;ID=CDS_11

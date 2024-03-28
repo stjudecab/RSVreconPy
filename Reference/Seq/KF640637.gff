@@ -1,0 +1,36 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	KF640637	1	15277
+KF640637	Geneious	source	1	15277	.	+	.	Name=subgroup: B%3B genotype: BA source Human orthopneumovirus;ID=source_1
+KF640637	Geneious	gene	46	577	.	+	.	Name=NS1 gene;ID=gene_1
+KF640637	Geneious	mRNA	46	577	.	+	.	Name=NS1 mRNA;ID=mRNA_1
+KF640637	Geneious	CDS	100	519	.	+	0	Name=NS1 CDS;ID=CDS_1
+KF640637	Geneious	gene	595	1097	.	+	.	Name=NS2 gene;ID=gene_2
+KF640637	Geneious	mRNA	595	1097	.	+	.	Name=NS2 mRNA;ID=mRNA_2
+KF640637	Geneious	CDS	627	1001	.	+	0	Name=NS2 CDS;ID=CDS_2
+KF640637	Geneious	gene	1125	2327	.	+	.	Name=N gene;ID=gene_3
+KF640637	Geneious	mRNA	1125	2327	.	+	.	Name=N mRNA;ID=mRNA_3
+KF640637	Geneious	CDS	1140	2315	.	+	0	Name=N CDS;ID=CDS_3
+KF640637	Geneious	gene	2331	3243	.	+	.	Name=P gene;ID=gene_4
+KF640637	Geneious	mRNA	2331	3243	.	+	.	Name=P mRNA;ID=mRNA_4
+KF640637	Geneious	CDS	2348	3073	.	+	0	Name=P CDS;ID=CDS_4
+KF640637	Geneious	gene	3254	4207	.	+	.	Name=M gene;ID=gene_5
+KF640637	Geneious	mRNA	3254	4207	.	+	.	Name=M mRNA;ID=mRNA_5
+KF640637	Geneious	CDS	3263	4033	.	+	0	Name=M CDS;ID=CDS_5
+KF640637	Geneious	gene	4217	4629	.	+	.	Name=SH gene;ID=gene_6
+KF640637	Geneious	mRNA	4217	4629	.	+	.	Name=SH mRNA;ID=mRNA_6
+KF640637	Geneious	CDS	4302	4499	.	+	0	Name=SH CDS;ID=CDS_6
+KF640637	Geneious	gene	4674	5653	.	+	.	Name=G gene;ID=gene_7
+KF640637	Geneious	mRNA	4674	5653	.	+	.	Name=G mRNA;ID=mRNA_7
+KF640637	Geneious	CDS	4689	5621	.	+	0	Name=G CDS;ID=CDS_7
+KF640637	Geneious	gene	5706	7605	.	+	.	Name=F gene;ID=gene_8
+KF640637	Geneious	mRNA	5706	7605	.	+	.	Name=F mRNA;ID=mRNA_8
+KF640637	Geneious	CDS	5719	7443	.	+	0	Name=F CDS;ID=CDS_8
+KF640637	Geneious	gene	7661	8620	.	+	.	Name=M2 gene;ID=gene_9
+KF640637	Geneious	mRNA	7661	8620	.	+	.	Name=M2 mRNA;ID=mRNA_9
+KF640637	Geneious	mRNA	7661	8257	.	+	.	Name=M2 mRNA;ID=mRNA_10
+KF640637	Geneious	CDS	7670	8257	.	+	0	Name=M2 CDS;ID=CDS_9
+KF640637	Geneious	CDS	8223	8495	.	+	0	Name=M2 CDS;ID=CDS_10
+KF640637	Geneious	gene	8553	15132	.	+	.	Name=L gene;ID=gene_10
+KF640637	Geneious	mRNA	8553	15132	.	+	.	Name=L mRNA;ID=mRNA_11
+KF640637	Geneious	CDS	8561	15061	.	+	0	Name=L CDS;ID=CDS_11

@@ -1,0 +1,20 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	MT107528	1	15311
+MT107528	Geneious	source	1	15311	.	+	.	Name=source Human respiratory syncytial virus B;ID=source_1
+MT107528	Geneious	gene	125	544	.	+	.	Name=NS1 gene;ID=gene_1
+MT107528	Geneious	CDS	125	544	.	+	0	Name=NS1 CDS;ID=CDS_1
+MT107528	Geneious	gene	652	1026	.	+	.	Name=NS2 gene;ID=gene_2
+MT107528	Geneious	CDS	652	1026	.	+	0	Name=NS2 CDS;ID=CDS_2
+MT107528	Geneious	gene	1165	2340	.	+	.	Name=N gene;ID=gene_3
+MT107528	Geneious	CDS	1165	2340	.	+	0	Name=N CDS;ID=CDS_3
+MT107528	Geneious	gene	2373	3098	.	+	.	Name=P gene;ID=gene_4
+MT107528	Geneious	CDS	2373	3098	.	+	0	Name=P CDS;ID=CDS_4
+MT107528	Geneious	gene	3288	4058	.	+	.	Name=M gene;ID=gene_5
+MT107528	Geneious	CDS	3288	4058	.	+	0	Name=M CDS;ID=CDS_5
+MT107528	Geneious	gene	4713	5645	.	+	.	Name=G gene;ID=gene_6
+MT107528	Geneious	CDS	4713	5645	.	+	0	Name=G CDS;ID=CDS_6
+MT107528	Geneious	gene	5743	7467	.	+	.	Name=F gene;ID=gene_7
+MT107528	Geneious	CDS	5743	7467	.	+	0	Name=F CDS;ID=CDS_7
+MT107528	Geneious	gene	8519	15085	.	+	.	Name=L gene;ID=gene_8
+MT107528	Geneious	CDS	8519	15085	.	+	0	Name=L CDS;ID=CDS_8

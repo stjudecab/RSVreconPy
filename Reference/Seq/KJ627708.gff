@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	KJ627708	1	15125
+KJ627708	Geneious	source	1	15125	.	+	.	Name=cohort population: Infant%3B type: A source Respiratory syncytial virus type A;ID=source_1
+KJ627708	Geneious	five_prime_UTR	1	43	.	+	.	ID=five_prime_UTR_1
+KJ627708	Geneious	gene	44	463	.	+	.	Name=NS1 gene;ID=gene_1
+KJ627708	Geneious	CDS	44	463	.	+	0	Name=NS1 CDS;ID=CDS_1
+KJ627708	Geneious	gene	573	947	.	+	.	Name=NS2 gene;ID=gene_2
+KJ627708	Geneious	CDS	573	947	.	+	0	Name=NS2 CDS;ID=CDS_2
+KJ627708	Geneious	gene	1085	2260	.	+	.	Name=N gene;ID=gene_3
+KJ627708	Geneious	CDS	1085	2260	.	+	0	Name=N CDS;ID=CDS_3
+KJ627708	Geneious	gene	2292	3017	.	+	.	Name=P gene;ID=gene_4
+KJ627708	Geneious	CDS	2292	3017	.	+	0	Name=P CDS;ID=CDS_4
+KJ627708	Geneious	gene	3201	3971	.	+	.	Name=M gene;ID=gene_5
+KJ627708	Geneious	CDS	3201	3971	.	+	0	Name=M CDS;ID=CDS_5
+KJ627708	Geneious	gene	4242	4436	.	+	.	Name=SH gene;ID=gene_6
+KJ627708	Geneious	CDS	4242	4436	.	+	0	Name=SH CDS;ID=CDS_6
+KJ627708	Geneious	gene	4627	5523	.	+	.	Name=G gene;ID=gene_7
+KJ627708	Geneious	CDS	4627	5523	.	+	0	Name=G CDS;ID=CDS_7
+KJ627708	Geneious	gene	5600	7324	.	+	.	Name=F gene;ID=gene_8
+KJ627708	Geneious	CDS	5600	7324	.	+	0	Name=F CDS;ID=CDS_8
+KJ627708	Geneious	gene	7543	8127	.	+	.	Name=M2 gene;ID=gene_9
+KJ627708	Geneious	CDS	7543	8127	.	+	0	Name=M2 CDS;ID=CDS_9
+KJ627708	Geneious	gene	8435	14932	.	+	.	Name=L gene;ID=gene_10
+KJ627708	Geneious	CDS	8435	14932	.	+	0	Name=L CDS;ID=CDS_10
+KJ627708	Geneious	three_prime_UTR	14933	15125	.	+	.	ID=three_prime_UTR_1

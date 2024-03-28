@@ -1,0 +1,46 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	KU950660	1	15232
+KU950660	Geneious	source	1	15232	.	+	.	Name=subtype: RSVA source Human orthopneumovirus;ID=source_1
+KU950660	Geneious	misc_feature	1	15232	.	+	.	Name=misc;ID=misc_feature_1
+KU950660	Geneious	gene	23	555	.	+	.	Name=NS1 gene;ID=gene_1
+KU950660	Geneious	five_prime_UTR	23	76	.	+	.	Name=NS1 five_prime_UTR;ID=five_prime_UTR_1
+KU950660	Geneious	CDS	77	496	.	+	0	Name=NS1 CDS;ID=CDS_1
+KU950660	Geneious	three_prime_UTR	497	555	.	+	.	Name=NS1 three_prime_UTR;ID=three_prime_UTR_1
+KU950660	Geneious	gene	574	1078	.	+	.	Name=NS2 gene;ID=gene_2
+KU950660	Geneious	five_prime_UTR	574	605	.	+	.	Name=NS2 five_prime_UTR;ID=five_prime_UTR_2
+KU950660	Geneious	CDS	606	980	.	+	0	Name=NS2 CDS;ID=CDS_2
+KU950660	Geneious	three_prime_UTR	981	1078	.	+	.	Name=NS2 three_prime_UTR;ID=three_prime_UTR_2
+KU950660	Geneious	gene	1103	2316	.	+	.	Name=N gene;ID=gene_3
+KU950660	Geneious	five_prime_UTR	1103	1117	.	+	.	Name=N five_prime_UTR;ID=five_prime_UTR_3
+KU950660	Geneious	CDS	1118	2293	.	+	0	Name=N CDS;ID=CDS_3
+KU950660	Geneious	three_prime_UTR	2294	2316	.	+	.	Name=N three_prime_UTR;ID=three_prime_UTR_3
+KU950660	Geneious	gene	2308	3419	.	+	.	Name=P gene;ID=gene_4
+KU950660	Geneious	five_prime_UTR	2308	2324	.	+	.	Name=P five_prime_UTR;ID=five_prime_UTR_4
+KU950660	Geneious	CDS	2325	3050	.	+	0	Name=P CDS;ID=CDS_4
+KU950660	Geneious	three_prime_UTR	3051	3419	.	+	.	Name=P three_prime_UTR;ID=three_prime_UTR_4
+KU950660	Geneious	gene	3220	4182	.	+	.	Name=M gene;ID=gene_5
+KU950660	Geneious	five_prime_UTR	3220	3232	.	+	.	Name=M five_prime_UTR;ID=five_prime_UTR_5
+KU950660	Geneious	CDS	3233	4003	.	+	0	Name=M CDS;ID=CDS_5
+KU950660	Geneious	three_prime_UTR	4004	4182	.	+	.	Name=M three_prime_UTR;ID=three_prime_UTR_5
+KU950660	Geneious	gene	4049	4599	.	+	.	Name=SH gene;ID=gene_6
+KU950660	Geneious	five_prime_UTR	4049	4272	.	+	.	Name=SH five_prime_UTR;ID=five_prime_UTR_6
+KU950660	Geneious	CDS	4273	4467	.	+	0	Name=SH CDS;ID=CDS_6
+KU950660	Geneious	three_prime_UTR	4468	4599	.	+	.	Name=SH three_prime_UTR;ID=three_prime_UTR_6
+KU950660	Geneious	gene	4644	5639	.	+	.	Name=G gene;ID=gene_7
+KU950660	Geneious	five_prime_UTR	4644	4658	.	+	.	Name=G five_prime_UTR;ID=five_prime_UTR_7
+KU950660	Geneious	CDS	4659	5624	.	+	0	Name=G CDS;ID=CDS_7
+KU950660	Geneious	three_prime_UTR	5625	5639	.	+	.	Name=G three_prime_UTR;ID=three_prime_UTR_7
+KU950660	Geneious	gene	5691	7595	.	+	.	Name=F gene;ID=gene_8
+KU950660	Geneious	five_prime_UTR	5691	5703	.	+	.	Name=F five_prime_UTR;ID=five_prime_UTR_8
+KU950660	Geneious	CDS	5704	7428	.	+	0	Name=F CDS;ID=CDS_8
+KU950660	Geneious	three_prime_UTR	7429	7595	.	+	.	Name=F three_prime_UTR;ID=three_prime_UTR_8
+KU950660	Geneious	gene	7638	8606	.	+	.	Name=M2 gene;ID=gene_9
+KU950660	Geneious	five_prime_UTR	7638	7646	.	+	.	Name=M2 five_prime_UTR;ID=five_prime_UTR_9
+KU950660	Geneious	CDS	7647	8231	.	+	0	Name=M2 CDS;ID=CDS_9
+KU950660	Geneious	CDS	8206	8472	.	+	0	Name=M2 CDS;ID=CDS_10
+KU950660	Geneious	three_prime_UTR	8473	8606	.	+	.	Name=M2 three_prime_UTR;ID=three_prime_UTR_9
+KU950660	Geneious	gene	8531	15104	.	+	.	Name=L gene;ID=gene_10
+KU950660	Geneious	five_prime_UTR	8531	8538	.	+	.	Name=L five_prime_UTR;ID=five_prime_UTR_10
+KU950660	Geneious	CDS	8539	15036	.	+	0	Name=L CDS;ID=CDS_11
+KU950660	Geneious	three_prime_UTR	15037	15104	.	+	.	Name=L three_prime_UTR;ID=three_prime_UTR_10

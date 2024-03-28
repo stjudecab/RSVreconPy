@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	OK500268	1	15255
+OK500268	Geneious	source	1	15255	.	+	.	Name=genotype: GA2.3.6b source Human respiratory syncytial virus A;ID=source_1
+OK500268	Geneious	gene	85	504	.	+	.	Name=NS1 gene;ID=gene_1
+OK500268	Geneious	CDS	85	504	.	+	0	Name=NS1 CDS;ID=CDS_1
+OK500268	Geneious	gene	614	988	.	+	.	Name=NS2 gene;ID=gene_2
+OK500268	Geneious	CDS	614	988	.	+	0	Name=NS2 CDS;ID=CDS_2
+OK500268	Geneious	gene	1126	2301	.	+	.	Name=N gene;ID=gene_3
+OK500268	Geneious	CDS	1126	2301	.	+	0	Name=N CDS;ID=CDS_3
+OK500268	Geneious	gene	2333	3058	.	+	.	Name=P gene;ID=gene_4
+OK500268	Geneious	CDS	2333	3058	.	+	0	Name=P CDS;ID=CDS_4
+OK500268	Geneious	gene	3241	4011	.	+	.	Name=M gene;ID=gene_5
+OK500268	Geneious	CDS	3241	4011	.	+	0	Name=M CDS;ID=CDS_5
+OK500268	Geneious	gene	4281	4475	.	+	.	Name=SH gene;ID=gene_6
+OK500268	Geneious	CDS	4281	4475	.	+	0	Name=SH CDS;ID=CDS_6
+OK500268	Geneious	gene	4666	5631	.	+	.	Name=G gene;ID=gene_7
+OK500268	Geneious	CDS	4666	5631	.	+	0	Name=G CDS;ID=CDS_7
+OK500268	Geneious	gene	5711	7435	.	+	.	Name=F gene;ID=gene_8
+OK500268	Geneious	CDS	5711	7435	.	+	0	Name=F CDS;ID=CDS_8
+OK500268	Geneious	gene	7651	8235	.	+	.	Name=M2 gene;ID=gene_9
+OK500268	Geneious	CDS	7651	8235	.	+	0	Name=M2 CDS;ID=CDS_9
+OK500268	Geneious	gene	8210	8476	.	+	.	Name=M2 gene;ID=gene_10
+OK500268	Geneious	CDS	8210	8476	.	+	0	Name=M2 CDS;ID=CDS_10
+OK500268	Geneious	gene	8543	15040	.	+	.	Name=L gene;ID=gene_11
+OK500268	Geneious	CDS	8543	15040	.	+	0	Name=L CDS;ID=CDS_11

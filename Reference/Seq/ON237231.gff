@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	ON237231	1	15212
+ON237231	Geneious	source	1	15212	.	+	.	Name=subtype: A source Human respiratory syncytial virus A;ID=source_1
+ON237231	Geneious	gene	61	480	.	+	.	Name=NS1 gene;ID=gene_1
+ON237231	Geneious	CDS	61	480	.	+	0	Name=NS1 CDS;ID=CDS_1
+ON237231	Geneious	gene	590	964	.	+	.	Name=NS2 gene;ID=gene_2
+ON237231	Geneious	CDS	590	964	.	+	0	Name=NS2 CDS;ID=CDS_2
+ON237231	Geneious	gene	1102	2277	.	+	.	Name=N gene;ID=gene_3
+ON237231	Geneious	CDS	1102	2277	.	+	0	Name=N CDS;ID=CDS_3
+ON237231	Geneious	gene	2309	3034	.	+	.	Name=P gene;ID=gene_4
+ON237231	Geneious	CDS	2309	3034	.	+	0	Name=P CDS;ID=CDS_4
+ON237231	Geneious	gene	3213	3983	.	+	.	Name=M gene;ID=gene_5
+ON237231	Geneious	CDS	3213	3983	.	+	0	Name=M CDS;ID=CDS_5
+ON237231	Geneious	gene	4253	4447	.	+	.	Name=SH gene;ID=gene_6
+ON237231	Geneious	CDS	4253	4447	.	+	0	Name=SH CDS;ID=CDS_6
+ON237231	Geneious	gene	4639	5604	.	+	.	Name=G gene;ID=gene_7
+ON237231	Geneious	CDS	4639	5604	.	+	0	Name=G CDS;ID=CDS_7
+ON237231	Geneious	gene	5684	7408	.	+	.	Name=F gene;ID=gene_8
+ON237231	Geneious	CDS	5684	7408	.	+	0	Name=F CDS;ID=CDS_8
+ON237231	Geneious	gene	7627	8211	.	+	.	Name=M2-1 gene;ID=gene_9
+ON237231	Geneious	CDS	7627	8211	.	+	0	Name=M2-1 CDS;ID=CDS_9
+ON237231	Geneious	gene	8186	8452	.	+	.	Name=M2-2 gene;ID=gene_10
+ON237231	Geneious	CDS	8186	8452	.	+	0	Name=M2-2 CDS;ID=CDS_10
+ON237231	Geneious	gene	8519	15016	.	+	.	Name=L gene;ID=gene_11
+ON237231	Geneious	CDS	8519	15016	.	+	0	Name=L CDS;ID=CDS_11

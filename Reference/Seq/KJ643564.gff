@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	KJ643564	1	15190
+KJ643564	Geneious	source	1	15190	.	+	.	Name=cohort population: Adult%3B type: A source Respiratory syncytial virus type A;ID=source_1
+KJ643564	Geneious	five_prime_UTR	1	86	.	+	.	ID=five_prime_UTR_1
+KJ643564	Geneious	gene	87	506	.	+	.	Name=NS1 gene;ID=gene_1
+KJ643564	Geneious	CDS	87	506	.	+	0	Name=NS1 CDS;ID=CDS_1
+KJ643564	Geneious	gene	616	990	.	+	.	Name=NS2 gene;ID=gene_2
+KJ643564	Geneious	CDS	616	990	.	+	0	Name=NS2 CDS;ID=CDS_2
+KJ643564	Geneious	gene	1128	2303	.	+	.	Name=N gene;ID=gene_3
+KJ643564	Geneious	CDS	1128	2303	.	+	0	Name=N CDS;ID=CDS_3
+KJ643564	Geneious	gene	2335	3060	.	+	.	Name=P gene;ID=gene_4
+KJ643564	Geneious	CDS	2335	3060	.	+	0	Name=P CDS;ID=CDS_4
+KJ643564	Geneious	gene	3246	4016	.	+	.	Name=M gene;ID=gene_5
+KJ643564	Geneious	CDS	3246	4016	.	+	0	Name=M CDS;ID=CDS_5
+KJ643564	Geneious	gene	4287	4481	.	+	.	Name=SH gene;ID=gene_6
+KJ643564	Geneious	CDS	4287	4481	.	+	0	Name=SH CDS;ID=CDS_6
+KJ643564	Geneious	gene	4672	5568	.	+	.	Name=G gene;ID=gene_7
+KJ643564	Geneious	CDS	4672	5568	.	+	0	Name=G CDS;ID=CDS_7
+KJ643564	Geneious	gene	5645	7369	.	+	.	Name=F gene;ID=gene_8
+KJ643564	Geneious	CDS	5645	7369	.	+	0	Name=F CDS;ID=CDS_8
+KJ643564	Geneious	gene	7588	8172	.	+	.	Name=M2 gene;ID=gene_9
+KJ643564	Geneious	CDS	7588	8172	.	+	0	Name=M2 CDS;ID=CDS_9
+KJ643564	Geneious	gene	8480	14977	.	+	.	Name=L gene;ID=gene_10
+KJ643564	Geneious	CDS	8480	14977	.	+	0	Name=L CDS;ID=CDS_10
+KJ643564	Geneious	three_prime_UTR	14978	15190	.	+	.	ID=three_prime_UTR_1

@@ -1,0 +1,46 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	MK749908	1	15224
+MK749908	Geneious	source	1	15224	.	+	.	Name=subtype: B source Human respiratory syncytial virus B;ID=source_1
+MK749908	Geneious	misc_feature	1	15224	.	+	.	Name=misc;ID=misc_feature_1
+MK749908	Geneious	gene	14	546	.	+	.	Name=NS1 gene;ID=gene_1
+MK749908	Geneious	five_prime_UTR	14	67	.	+	.	Name=NS1 five_prime_UTR;ID=five_prime_UTR_1
+MK749908	Geneious	CDS	68	487	.	+	0	Name=NS1 CDS;ID=CDS_1
+MK749908	Geneious	three_prime_UTR	488	546	.	+	.	Name=NS1 three_prime_UTR;ID=three_prime_UTR_1
+MK749908	Geneious	gene	563	1068	.	+	.	Name=NS2 gene;ID=gene_2
+MK749908	Geneious	five_prime_UTR	563	594	.	+	.	Name=NS2 five_prime_UTR;ID=five_prime_UTR_2
+MK749908	Geneious	CDS	595	969	.	+	0	Name=NS2 CDS;ID=CDS_2
+MK749908	Geneious	three_prime_UTR	970	1068	.	+	.	Name=NS2 three_prime_UTR;ID=three_prime_UTR_2
+MK749908	Geneious	gene	1093	2296	.	+	.	Name=N gene;ID=gene_3
+MK749908	Geneious	five_prime_UTR	1093	1107	.	+	.	Name=N five_prime_UTR;ID=five_prime_UTR_3
+MK749908	Geneious	CDS	1108	2283	.	+	0	Name=N CDS;ID=CDS_3
+MK749908	Geneious	three_prime_UTR	2284	2296	.	+	.	Name=N three_prime_UTR;ID=three_prime_UTR_3
+MK749908	Geneious	gene	2299	3213	.	+	.	Name=P gene;ID=gene_4
+MK749908	Geneious	five_prime_UTR	2299	2315	.	+	.	Name=P five_prime_UTR;ID=five_prime_UTR_4
+MK749908	Geneious	CDS	2316	3041	.	+	0	Name=P CDS;ID=CDS_4
+MK749908	Geneious	three_prime_UTR	3042	3213	.	+	.	Name=P three_prime_UTR;ID=three_prime_UTR_4
+MK749908	Geneious	gene	3130	4178	.	+	.	Name=M gene;ID=gene_5
+MK749908	Geneious	five_prime_UTR	3130	3230	.	+	.	Name=M five_prime_UTR;ID=five_prime_UTR_5
+MK749908	Geneious	CDS	3231	4001	.	+	0	Name=M CDS;ID=CDS_5
+MK749908	Geneious	three_prime_UTR	4002	4178	.	+	.	Name=M three_prime_UTR;ID=three_prime_UTR_5
+MK749908	Geneious	gene	4183	4598	.	+	.	Name=SH gene;ID=gene_6
+MK749908	Geneious	five_prime_UTR	4183	4269	.	+	.	Name=SH five_prime_UTR;ID=five_prime_UTR_6
+MK749908	Geneious	CDS	4270	4467	.	+	0	Name=SH CDS;ID=CDS_6
+MK749908	Geneious	three_prime_UTR	4468	4598	.	+	.	Name=SH three_prime_UTR;ID=three_prime_UTR_6
+MK749908	Geneious	gene	4606	5629	.	+	.	Name=G gene;ID=gene_7
+MK749908	Geneious	five_prime_UTR	4606	4656	.	+	.	Name=G five_prime_UTR;ID=five_prime_UTR_7
+MK749908	Geneious	CDS	4657	5616	.	+	0	Name=G CDS;ID=CDS_7
+MK749908	Geneious	three_prime_UTR	5617	5629	.	+	.	Name=G three_prime_UTR;ID=three_prime_UTR_7
+MK749908	Geneious	gene	5680	7580	.	+	.	Name=F gene;ID=gene_8
+MK749908	Geneious	five_prime_UTR	5680	5692	.	+	.	Name=F five_prime_UTR;ID=five_prime_UTR_8
+MK749908	Geneious	CDS	5693	7417	.	+	0	Name=F CDS;ID=CDS_8
+MK749908	Geneious	three_prime_UTR	7418	7580	.	+	.	Name=F three_prime_UTR;ID=three_prime_UTR_8
+MK749908	Geneious	gene	7635	8596	.	+	.	Name=M2 gene;ID=gene_9
+MK749908	Geneious	five_prime_UTR	7635	7643	.	+	.	Name=M2 five_prime_UTR;ID=five_prime_UTR_9
+MK749908	Geneious	CDS	7644	8231	.	+	0	Name=M2 CDS;ID=CDS_9
+MK749908	Geneious	CDS	8197	8469	.	+	0	Name=M2 CDS;ID=CDS_10
+MK749908	Geneious	three_prime_UTR	8470	8596	.	+	.	Name=M2 three_prime_UTR;ID=three_prime_UTR_9
+MK749908	Geneious	gene	8527	15107	.	+	.	Name=L gene;ID=gene_10
+MK749908	Geneious	five_prime_UTR	8527	8534	.	+	.	Name=L five_prime_UTR;ID=five_prime_UTR_10
+MK749908	Geneious	CDS	8535	15035	.	+	0	Name=L CDS;ID=CDS_11
+MK749908	Geneious	three_prime_UTR	15036	15107	.	+	.	Name=L three_prime_UTR;ID=three_prime_UTR_10

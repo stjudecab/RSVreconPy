@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	KY674983	1	15146
+KY674983	Geneious	source	1	15146	.	+	.	Name=source Human respiratory syncytial virus B;ID=source_1
+KY674983	Geneious	gene	49	468	.	+	0	ID=gene_1
+KY674983	Geneious	CDS	49	468	.	+	0	Name=non-structural protein 1 CDS;ID=CDS_1
+KY674983	Geneious	gene	576	950	.	+	0	ID=gene_2
+KY674983	Geneious	CDS	576	950	.	+	0	Name=non-structural protein 2 CDS;ID=CDS_2
+KY674983	Geneious	gene	1090	2265	.	+	0	ID=gene_3
+KY674983	Geneious	CDS	1090	2265	.	+	0	Name=nucleocapsid protein CDS;ID=CDS_3
+KY674983	Geneious	gene	2298	3023	.	+	0	ID=gene_4
+KY674983	Geneious	CDS	2298	3023	.	+	0	Name=phosphoprotein CDS;ID=CDS_4
+KY674983	Geneious	gene	3213	3983	.	+	0	ID=gene_5
+KY674983	Geneious	CDS	3213	3983	.	+	0	Name=matrix protein CDS;ID=CDS_5
+KY674983	Geneious	gene	4253	4450	.	+	0	ID=gene_6
+KY674983	Geneious	CDS	4253	4450	.	+	0	Name=small hydrophobic protein CDS;ID=CDS_6
+KY674983	Geneious	gene	4640	5539	.	+	0	ID=gene_7
+KY674983	Geneious	CDS	4640	5539	.	+	0	Name=attachment glycoprotein CDS;ID=CDS_7
+KY674983	Geneious	gene	5616	7340	.	+	0	ID=gene_8
+KY674983	Geneious	CDS	5616	7340	.	+	0	Name=fusion protein CDS;ID=CDS_8
+KY674983	Geneious	gene	7568	8155	.	+	0	ID=gene_9
+KY674983	Geneious	CDS	7568	8155	.	+	0	Name=matrix protein 2 CDS;ID=CDS_9
+KY674983	Geneious	gene	8121	8393	.	+	0	ID=gene_10
+KY674983	Geneious	CDS	8121	8393	.	+	0	Name=matrix protein 2 CDS;ID=CDS_10
+KY674983	Geneious	gene	8459	14959	.	+	0	ID=gene_11
+KY674983	Geneious	CDS	8459	14959	.	+	0	Name=polymerase CDS;ID=CDS_11

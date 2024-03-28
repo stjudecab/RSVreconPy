@@ -1,0 +1,26 @@
+##gff-version 3
+##source-version geneious 2021.2.2
+##sequence-region	KC731483	1	15176
+KC731483	Geneious	source	1	15176	.	+	.	Name=genotype: A source Human orthopneumovirus;ID=source_1
+KC731483	Geneious	gene	70	489	.	+	0	ID=gene_1
+KC731483	Geneious	CDS	70	489	.	+	0	Name=non-structural protein 1 CDS;ID=CDS_1
+KC731483	Geneious	gene	599	973	.	+	0	ID=gene_2
+KC731483	Geneious	CDS	599	973	.	+	0	Name=non-structural protein 2 CDS;ID=CDS_2
+KC731483	Geneious	gene	1111	2286	.	+	0	ID=gene_3
+KC731483	Geneious	CDS	1111	2286	.	+	0	Name=nucleocapsid protein CDS;ID=CDS_3
+KC731483	Geneious	gene	2318	3043	.	+	0	ID=gene_4
+KC731483	Geneious	CDS	2318	3043	.	+	0	Name=phosphoprotein CDS;ID=CDS_4
+KC731483	Geneious	gene	3227	3997	.	+	0	ID=gene_5
+KC731483	Geneious	CDS	3227	3997	.	+	0	Name=matrix protein CDS;ID=CDS_5
+KC731483	Geneious	gene	4267	4461	.	+	0	ID=gene_6
+KC731483	Geneious	CDS	4267	4461	.	+	0	Name=small hydrophobic protein CDS;ID=CDS_6
+KC731483	Geneious	gene	4652	5545	.	+	0	ID=gene_7
+KC731483	Geneious	CDS	4652	5545	.	+	0	Name=glycoprotein CDS;ID=CDS_7
+KC731483	Geneious	gene	5625	7349	.	+	0	ID=gene_8
+KC731483	Geneious	CDS	5625	7349	.	+	0	Name=fusion protein CDS;ID=CDS_8
+KC731483	Geneious	gene	7568	8152	.	+	0	ID=gene_9
+KC731483	Geneious	CDS	7568	8152	.	+	0	Name=matrix protein 2-1 CDS;ID=CDS_9
+KC731483	Geneious	gene	8127	8393	.	+	0	ID=gene_10
+KC731483	Geneious	CDS	8127	8393	.	+	0	Name=matrix protein 2-2 CDS;ID=CDS_10
+KC731483	Geneious	gene	8460	14957	.	+	0	ID=gene_11
+KC731483	Geneious	CDS	8460	14957	.	+	0	Name=polymerase CDS;ID=CDS_11

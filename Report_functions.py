@@ -11,6 +11,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Flowable, T
 from reportlab.lib.colors import black
 from reportlab.lib import colors
 from reportlab.lib.units import inch
+from RSV_functions import parse_gff, find_gene_at_position
 
 class Line(Flowable):
     """Line flowable --- draws a line in a flowable"""
@@ -258,7 +259,7 @@ def generate_pdf_report(csv_file, working_folder):
             elements.append(img_tree)
 
     ######################################################################
-    # section 2, Details
+    # section 2, Details for each sample
     ######################################################################
     elements.append(PageBreak())
     subtitle_summary_section = Paragraph("Details", styles['Heading2'])
@@ -281,7 +282,7 @@ def generate_pdf_report(csv_file, working_folder):
         subtitle_cur_sample = Paragraph("Sample: " + cur_folder, styles['Heading3'])
         elements.append(subtitle_cur_sample)
 
-        # genotype calling
+        # ######################################## genotype calling
         subtitle = Paragraph('Genotype calls', styles['Heading4'])
         elements.append(subtitle)
 
@@ -289,7 +290,7 @@ def generate_pdf_report(csv_file, working_folder):
         paragraph = Paragraph(genotype_text, styles['BodyText'])
         elements.append(paragraph)
 
-        # QC details
+        # ######################################## QC details
         subtitle = Paragraph('QC Details', styles['Heading4'])
         elements.append(subtitle)
 
@@ -317,8 +318,7 @@ def generate_pdf_report(csv_file, working_folder):
         table.setStyle(style)
         elements.append(table)
 
-
-        # coverage summary
+        # ######################################## coverage summary
         subtitle = Paragraph('Coverage summary', styles['Heading4'])
         elements.append(subtitle)
 
@@ -326,7 +326,7 @@ def generate_pdf_report(csv_file, working_folder):
         subfolders = [ f.name for f in os.scandir(reference_genome_path) if f.is_dir() ]
         reference_genome_accession = subfolders[0]
 
-        ref_text = f"Reference genome:   <b><a href='http://www.google.com'>{reference_genome_accession}</a></b>"
+        ref_text = f"Reference genome:   <b><a href='https://www.ncbi.nlm.nih.gov/nuccore/{reference_genome_accession}'>{reference_genome_accession}, click for details</a></b>"
         wig_file = os.path.join(working_folder, cur_folder, 'mapping', 'alignments.cov.wig')
 
         if genotype_text == 'SubtypeA':
@@ -409,6 +409,10 @@ def generate_pdf_report(csv_file, working_folder):
 
         img_cov = Image(png_file, width=600, height=200)
         elements.append(img_cov)
+
+        # ######################################## SNP section
+
+
 
     # build the doc
     doc.build(elements)

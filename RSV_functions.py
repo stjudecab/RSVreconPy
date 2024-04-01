@@ -90,4 +90,26 @@ def check_tool_availability(tool_name):
 def rna_to_dna(rna_seq):
     dna_seq = rna_seq.replace('U', 'T')
     return dna_seq
-    
+
+# parse gff file (not tested)
+def parse_gff(gff_file):
+    gene_positions = {}
+    with open(gff_file, 'r') as file:
+        for line in file:
+            if not line.startswith('#'):
+                fields = line.strip().split('\t')
+                if len(fields) >= 9 and fields[2] == 'gene':
+                    seq_id = fields[0]
+                    start = int(fields[3])
+                    end = int(fields[4])
+                    gene_name = fields[8].split(';')[0].split('=')[1]
+                    gene_positions[gene_name] = (seq_id, start, end)
+    return gene_positions
+
+# find_gene_at_position (not tested)
+def find_gene_at_position(gene_positions, position):
+    for gene_name, (seq_id, start, end) in gene_positions.items():
+        if seq_id == sequence_id and start <= position <= end:
+            return gene_name
+    return 'Not in CDS'
+

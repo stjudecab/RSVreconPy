@@ -109,6 +109,13 @@ if not os.path.exists(working_folder_name):
 for sample_id in sorted(sample_dict.keys()):
     print(f"Start process {sample_id} ...")
 
+    #sample_id = sample_id
+    #working_folder_name = working_folder_name
+    #original_read1 = os.path.join(data_folder_name, sample_dict[sample_id][0])
+    #original_read2 = os.path.join(data_folder_name, sample_dict[sample_id][1])
+    #reference_folder_name = reference_folder_name
+    #cmd = f"python Mapping.py {sample_id} {working_folder_name} {original_read1} {original_read2} {reference_folder_name} {star_ThreadN}"
+
     # skip Undetermined reads
     if "Undetermined" in sample_id:
         continue
@@ -122,8 +129,7 @@ for sample_id in sorted(sample_dict.keys()):
     if not os.path.exists(log_cur_folder):
         os.mkdir(log_cur_folder)
 
-    original_read1 = os.path.join(data_folder_name, sample_dict[sample_id][0])
-    original_read2 = os.path.join(data_folder_name, sample_dict[sample_id][1])
+    
 
     ##############################################################################
     ### step 1    QC using fastp

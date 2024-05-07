@@ -11,7 +11,7 @@ import shutil
 
 
 
-def sample_mapping(sample_id, working_folder_name, original_read1, original_read2, reference_folder_name)
+def sample_mapping(sample_id, working_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN)
     # skip Undetermined reads
     if "Undetermined" in sample_id:
         return
@@ -163,5 +163,6 @@ if __name__ == "__main__":
     original_read1 = sys.argv[3]
     original_read2 = sys.argv[4]
     reference_folder_name = sys.argv[5]
+    star_ThreadN = sys.argv[6]
 
-    sample_mapping(sample_id, working_folder_name, original_read1, original_read2, reference_folder_name)
+    sample_mapping(sample_id, working_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN)

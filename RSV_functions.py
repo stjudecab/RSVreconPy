@@ -25,7 +25,7 @@ def pct_sum(*args):
     return total
 
 # assemble sequences from IGV counts
-def processIGV(file_name):
+def processIGV(file_name, cutoff):
     sequence = ""
 
     with open(file_name, 'r') as file:
@@ -41,7 +41,7 @@ def processIGV(file_name):
                     count_dict = {'A':a,'C':c,'G':g,'T':t}
                     cov = a + c + g + t
 
-                    if cov > 0:
+                    if cov > cutoff:
                         max_key = max(count_dict, key=count_dict.get)
                         sequence += max_key
                     else:
@@ -109,7 +109,18 @@ def parse_gff(gff_file):
 # find_gene_at_position (not tested)
 def find_gene_at_position(gene_positions, position):
     for gene_name, (seq_id, start, end) in gene_positions.items():
-        if seq_id == sequence_id and start <= position <= end:
+        if start <= position <= end:
             return gene_name
     return 'Not in CDS'
+
+# find gff file under a path
+def find_gff_files_in_path(path):
+    # Get a list of all files and directories in the specified path
+    entries = os.listdir(path)
+
+    # Filter the entries to only include files with a ".gff" extension
+    gff_files = [entry for entry in entries if os.path.isfile(os.path.join(path, entry)) and entry.endswith(".gff")]
+
+    # Return the list of GFF files
+    return gff_files
 

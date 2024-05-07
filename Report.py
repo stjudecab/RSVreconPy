@@ -23,7 +23,7 @@ from Report_functions import generate_pdf_report
 ##      functions
 ###################################################
 
-def generate_csv_fasta(report, sequence_file, reference_folder_name, working_folder_name, sequence_file_a, sequence_file_b):
+def generate_csv_fasta(report, sequence_file, reference_folder_name, working_folder_name, sequence_file_a, sequence_file_b, igv_cutoff):
     # create output CSV
     CSV_header = 'Sample name,before_filtering_total_reads, before_filtering_q20_rate, before_filtering_q30_rate, after_filtering_total_reads, after_filtering_q20_rate, after_filtering_q30_rate, QC rate,'
     CSV_header += "Uniquely mapped reads %,MULTI-MAPPING READS %,UNMAPPED READS%,CHIMERIC READS%,"
@@ -87,7 +87,7 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
 
             # Step 4: assemble genome sequence
             wig_file = os.path.join(working_folder_name, cur_folder, 'mapping', 'alignments.cov.wig')
-            genome_sequence = processIGV(wig_file)
+            genome_sequence = processIGV(wig_file, igv_cutoff)
             my_subtype = subtype_str.split(',')[0]
             if my_subtype in ['SubtypeA','SubtypeB']:
                 fasta.write('>' + sample + "\n" + genome_sequence + "\n")
@@ -105,7 +105,7 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
     return subtype_a_names, subtype_b_names
 
 # generate tree 
-def generate_phylogenetic_tree(root_file_path, working_folder, subtype_a_names, subtype_b_names, Temp_folder_name, addtional_results = None):
+def generate_phylogenetic_tree(root_file_path, working_folder_name, subtype_a_names, subtype_b_names, Temp_folder_name, addtional_results = None):
     # set up file path
     reference_file_a = os.path.join(root_file_path, 'Resource','Know_ref_A.fasta')
     reference_file_b = os.path.join(root_file_path, 'Resource','Know_ref_B.fasta')
@@ -270,14 +270,12 @@ if __name__ == "__main__":
     working_folder_name = config['OUTPUT_DIR']
 
     star_ThreadN = config.get('STAR_THREAD_N', 16)
-    ref_use = config.get('REF_USE', 'all')
+    igv_cutoff = config.get('IGV_CUTOFF', 50)
 
     ###################################################
     ##      setup working dir
     ###################################################
     working_folder_name = os.path.normpath(working_folder_name)
-    if not os.path.exists(working_folder_name):
-        os.mkdir(working_folder_name)
 
     Temp_folder_name = os.path.join(working_folder_name, 'Temp')
     if not os.path.exists(Temp_folder_name):
@@ -293,8 +291,9 @@ if __name__ == "__main__":
     sequence_file = os.path.join(working_folder_name, "Sequence.fasta")
     sequence_file_a = os.path.join(working_folder_name, "Sequence_A.fasta")
     sequence_file_b = os.path.join(working_folder_name, "Sequence_B.fasta")
+    mapres_folder = os.path.join(working_folder_name, "Mapping")
     print("Aggregating results ...")
-    subtype_a_names, subtype_b_names = generate_csv_fasta(report, sequence_file, reference_folder_name, working_folder_name, sequence_file_a, sequence_file_b)
+    subtype_a_names, subtype_b_names = generate_csv_fasta(report, sequence_file, reference_folder_name, mapres_folder, sequence_file_a, sequence_file_b, igv_cutoff)
 
     ###################################################
     ##      generate phylogenetic tree with reference
@@ -309,7 +308,7 @@ if __name__ == "__main__":
     ###################################################
 
     print("Generating Pdf report...")
-    generate_pdf_report(report, working_folder_name)
+    generate_pdf_report(report, working_folder_name, mapres_folder)
 
     ###################################################
     ##      program finished

@@ -11,7 +11,9 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Flowable, T
 from reportlab.lib.colors import black
 from reportlab.lib import colors
 from reportlab.lib.units import inch
-from RSV_functions import parse_gff, find_gene_at_position
+from RSV_functions import parse_gff, find_gene_at_position, find_gff_files_in_path
+from SNP import SNP_calling
+
 
 class Line(Flowable):
     """Line flowable --- draws a line in a flowable"""
@@ -57,7 +59,7 @@ def count_greater_than_n(array, n):
     return len([x for x in array if x > n])
 
 # generate pdf report
-def generate_pdf_report(csv_file, working_folder):
+def generate_pdf_report(csv_file, working_folder, mapres_folder):
     
     line_width = 440
 
@@ -100,7 +102,9 @@ def generate_pdf_report(csv_file, working_folder):
     line = Line(line_width)  # width of line
     elements.append(line)
 
-    # section 1, summary
+    ######################################################################
+    # section 1, Summary
+    ######################################################################
     subtitle_summary_section = Paragraph("Summary", styles['Heading2'])
     elements.append(subtitle_summary_section)
 
@@ -110,6 +114,8 @@ def generate_pdf_report(csv_file, working_folder):
     table_info_text = "Subtypes of each reference are highlighted in different colors: <font color='red'>Subtype A</font> and <font color='blue'>Subtype B</font>"
     paragraph = Paragraph(table_info_text, styles['BodyText'])
     elements.append(paragraph)
+    spacer = Spacer(1, 6)  # width and height in points
+    elements.append(spacer)
 
     # load table for summary section
     df = pd.read_csv(csv_file, header=0)
@@ -162,9 +168,15 @@ def generate_pdf_report(csv_file, working_folder):
         plt.close()
 
         cur_sample_png = Image(png_file, width=4.5*inch, height=0.25*inch)
-        data[row] = [cur_sample_name, data[row][1], cur_sample_png, data[row][3]]
 
-    df_columns = ['Sample name', 'Pass QC', 'Mapping rate', 'Subtype']
+        if cur_sample_subtype == 'Not RSV':
+            png_file = os.path.join(file_path, 'Resource','error.png')
+        else:
+            png_file = os.path.join(file_path, 'Resource','correct.png')
+        sing_png = Image(png_file, width=0.2*inch, height=0.2*inch)
+        data[row] = [cur_sample_name, data[row][1], cur_sample_png, data[row][3],sing_png]
+
+    df_columns = ['Sample name', 'Pass QC', 'Mapping rate', 'Subtype', 'Sign']
     data.insert(0, df_columns)
     table = Table(data)
     #table._argW = [100,60,150,80]
@@ -209,7 +221,9 @@ def generate_pdf_report(csv_file, working_folder):
     #line = Line(line_width)  # width of line
     #elements.append(line)
 
-    # if tree figure exists, add tree
+    ######################################################################
+    # section 2, phylogenetic tree
+    ######################################################################
     tree_A_file = os.path.join(temp_folder, "RSV_A.png")
     tree_B_file = os.path.join(temp_folder, "RSV_B.png")
     if os.path.isfile(tree_A_file) or os.path.isfile(tree_B_file):
@@ -259,14 +273,14 @@ def generate_pdf_report(csv_file, working_folder):
             elements.append(img_tree)
 
     ######################################################################
-    # section 2, Details for each sample
+    # section 3, Details for each sample
     ######################################################################
     elements.append(PageBreak())
     subtitle_summary_section = Paragraph("Details", styles['Heading2'])
     elements.append(subtitle_summary_section)
 
     df = pd.read_csv(csv_file, skiprows = 0, header=0, index_col=0)
-    Sample_folders = [f for f in os.listdir(working_folder) if os.path.isdir(os.path.join(working_folder, f))]
+    Sample_folders = [f for f in os.listdir(mapres_folder) if os.path.isdir(os.path.join(mapres_folder, f))]
     sample_count = 0
     for cur_folder in sorted(Sample_folders):
         if os.path.isfile(cur_folder):
@@ -287,7 +301,15 @@ def generate_pdf_report(csv_file, working_folder):
         elements.append(subtitle)
 
         genotype_text = df.loc[cur_folder][11]
-        paragraph = Paragraph(genotype_text, styles['BodyText'])
+        fig_size = '20'
+        if genotype_text == "Not RSV":
+            genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','error.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  ' + genotype_text
+        else:
+            genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','correct.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  ' + genotype_text
+        paragraph = Paragraph(genotype_para)
+        
+        spacer = Spacer(1, 4)  # width and height in points
+        elements.append(spacer)
         elements.append(paragraph)
 
         # ######################################## QC details
@@ -322,12 +344,12 @@ def generate_pdf_report(csv_file, working_folder):
         subtitle = Paragraph('Coverage summary', styles['Heading4'])
         elements.append(subtitle)
 
-        reference_genome_path = os.path.join(working_folder, cur_folder, 'reference')
+        reference_genome_path = os.path.join(mapres_folder, cur_folder, 'reference')
         subfolders = [ f.name for f in os.scandir(reference_genome_path) if f.is_dir() ]
         reference_genome_accession = subfolders[0]
 
         ref_text = f"Reference genome:   <b><a href='https://www.ncbi.nlm.nih.gov/nuccore/{reference_genome_accession}'>{reference_genome_accession}, click for details</a></b>"
-        wig_file = os.path.join(working_folder, cur_folder, 'mapping', 'alignments.cov.wig')
+        wig_file = os.path.join(mapres_folder, cur_folder, 'mapping', 'alignments.cov.wig')
 
         if genotype_text == 'SubtypeA':
             genome_intervals = [(70,420),(599,375),(1111,1176),(2318,726),(3226,771),(4266,195),(4652,966),(5697,1725),(7640,585),(8158,273),(8532,6498)] # subtype A
@@ -411,7 +433,30 @@ def generate_pdf_report(csv_file, working_folder):
         elements.append(img_cov)
 
         # ######################################## SNP section
-
+        cutoff = 0.2
+        gff_file = find_gff_files_in_path(os.path.join(mapres_folder, cur_folder, 'reference'))
+        gff_path = os.path.join(mapres_folder, cur_folder, 'reference',gff_file[0])
+        table_data = SNP_calling(wig_file, cutoff, genotype_text, gff_path, temp_folder, cur_folder)
+        # heading
+        subtitle = Paragraph('SNP details', styles['Heading4'])
+        elements.append(subtitle)
+        # figure
+        png_file = os.path.join(temp_folder, cur_folder + '_snp_figure.png')
+        img_cov = Image(png_file, width=600, height=200)
+        elements.append(img_cov)
+        # table
+        style = TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),  # Header background color
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),  # Header text color
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Center align all cells
+            ('LINEABOVE', (0, 0), (-1, 0), 2, colors.black),  # Top border
+            ('LINEBELOW', (0, 0), (-1, 0), 1, colors.black),  # Border under header
+            ('LINEBELOW', (0, -1), (-1, -1), 2, colors.black),  # Bottom border
+        ])
+        #print(table_data)
+        table = Table(table_data)
+        table.setStyle(style)
+        elements.append(table)
 
 
     # build the doc

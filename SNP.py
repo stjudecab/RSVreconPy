@@ -7,12 +7,22 @@ from matplotlib import gridspec
 import matplotlib.colors as mcolors
 from RSV_functions import get_sub_folders, elements_not_in_array, pct_sum, determine_subtype, processIGV, find_gene_at_position, parse_gff
 
-# get sub folders for a dir
-def SNP_calling(wig_file, cutoff, genome_path, gtf_path, out_path, cur_folder, gtf_file):
-    
-    genome_intervals = [(70,420),(599,375),(1111,1176),(2318,726),(3226,771),(4266,195),(4652,966),(5697,1725),(7640,585),(8158,273),(8532,6498)] # subtype A
-    genome_xticks = [70,800,1600,2700,3550,4366,5000,6300,7650,8400,11500]
-    gene_names = ['NS1','NS2','N','P','M','SH','G','F','M2-1','M2-2','L']
+def float_to_percentage(value):
+    return "{:.2%}".format(value)
+
+def SNP_calling(wig_file, cutoff, genotype_text, gff_path, out_path, prefix_name):
+    if genotype_text == 'SubtypeA':
+        genome_intervals = [(70,420),(599,375),(1111,1176),(2318,726),(3226,771),(4266,195),(4652,966),(5697,1725),(7640,585),(8158,273),(8532,6498)] # subtype A
+        genome_xticks = [70,800,1600,2700,3550,4366,5000,6300,7650,8400,11500]
+        gene_names = ['NS1','NS2','N','P','M','SH','G','F','M2-1','M2-2','L']
+    elif genotype_text == 'SubtypeB':
+        genome_intervals = [(57,420),(584,375),(1097,1176),(2305,726),(3220,771),(4259,198),(4646,933),(5676,1725),(7627,588),(8180,273),(8518,6501)] # subtype B
+        genome_xticks = [70,800,1600,2700,3550,4366,5000,6300,7650,8400,11500]
+        gene_names = ['NS1','NS2','N','P','M','SH','G','F','M2-1','M2-2','L']
+    else:
+        genome_intervals = [(70,420),(599,375),(1111,1176),(2318,726),(3226,771),(4266,195),(4652,966),(5697,1725),(7640,585),(8158,273),(8532,6498)] # subtype A
+        genome_xticks = [70,800,1600,2700,3550,4366,5000,6300,7650,8400,11500]
+        gene_names = ['NS1','NS2','N','P','M','SH','G','F','M2-1','M2-2','L']
 
     cov_df = pd.read_csv(wig_file, skiprows=3, delimiter='\t', index_col=0, header=None)
     column_names = ['A', 'C', 'G','T','N']
@@ -65,25 +75,32 @@ def SNP_calling(wig_file, cutoff, genome_path, gtf_path, out_path, cur_folder, g
     ax_genome.spines['bottom'].set_visible(False)
     ax_genome.spines['left'].set_visible(False)
 
-    png_file = os.path.join(out_path, cur_folder + '_snp_figure.png')
+    png_file = os.path.join(out_path, prefix_name + '_snp_figure.png')
     plt.savefig(png_file, dpi = 300)
     plt.close()
 
 
     # table
-    gene_positions = parse_gff(gtf_path)
+    gene_positions = parse_gff(gff_path)
     data = [['Position','A', 'A%', 'C', 'C%', 'G', 'G%', 'T', '%T', 'Gene']]
 
     for index_label in filtered_df.index:
-        sub_list = [index_label,
-            filtered_df.loc[index_label, 'A'],filtered_pct_df.loc[index_label, 'A'],
-            filtered_df.loc[index_label, 'C'],filtered_pct_df.loc[index_label, 'C'],
-            filtered_df.loc[index_label, 'G'],filtered_pct_df.loc[index_label, 'G'],
-            filtered_df.loc[index_label, 'T'],filtered_pct_df.loc[index_label, 'T'],
+        sub_list = [int(index_label),
+            int(filtered_df.loc[index_label, 'A']),float_to_percentage(filtered_pct_df.loc[index_label, 'A']),
+            int(filtered_df.loc[index_label, 'C']),float_to_percentage(filtered_pct_df.loc[index_label, 'C']),
+            int(filtered_df.loc[index_label, 'G']),float_to_percentage(filtered_pct_df.loc[index_label, 'G']),
+            int(filtered_df.loc[index_label, 'T']),float_to_percentage(filtered_pct_df.loc[index_label, 'T']),
             find_gene_at_position(gene_positions, index_label)
         ]
 
         data.append(sub_list)
 
-    print(data)
+    return(data)
     
+
+#wig_file = '/research/groups/cab/projects/automapper/common/lli75/RSV_run/3083501/Report/1_S1/mapping/alignments.cov.wig'
+#cutoff = 0.2
+#gff_path = '/research/groups/cab/projects/automapper/common/lli75/RSV_run/3083501/Report/1_S1/reference/MG813995.gff'
+#out_path = './'
+#prefix_name = 'test'
+#SNP_calling(wig_file, cutoff, 'SubtypeA', gff_path, out_path, prefix_name)

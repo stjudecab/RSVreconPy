@@ -5,12 +5,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import matplotlib.colors as mcolors
-from RSV_functions import get_sub_folders, elements_not_in_array, pct_sum, determine_subtype, processIGV, find_gene_at_position, parse_gff
+from RSV_functions import get_sub_folders, elements_not_in_array, pct_sum, determine_subtype, processIGV, find_gene_at_position, parse_gff, last_pos_gff
 
 def float_to_percentage(value):
     return "{:.2%}".format(value)
 
-def SNP_calling(wig_file, cutoff, genotype_text, gff_path, out_path, prefix_name):
+def SNP_calling(wig_file, cutoff, genotype_text, gff_path, out_path, prefix_name, cov_cutoff):
     if genotype_text == 'SubtypeA':
         genome_intervals = [(70,420),(599,375),(1111,1176),(2318,726),(3226,771),(4266,195),(4652,966),(5697,1725),(7640,585),(8158,273),(8532,6498)] # subtype A
         genome_xticks = [70,800,1600,2700,3550,4366,5000,6300,7650,8400,11500]
@@ -29,6 +29,12 @@ def SNP_calling(wig_file, cutoff, genotype_text, gff_path, out_path, prefix_name
     cov_df.columns = column_names
     cov = cov_df.sum(axis=1)
     percentage_df = cov_df.divide(cov, axis=0)
+    percentage_df['cov'] = cov
+
+    # remove columns that are lowly covered
+    cov_df = cov_df[percentage_df['cov'] > cov_cutoff]
+    percentage_df = percentage_df[percentage_df['cov'] > cov_cutoff]
+    del percentage_df['cov']
 
     num_columns_to_check = 2  # Number of columns larger than the threshold required
     # Filter rows based on the condition
@@ -36,9 +42,11 @@ def SNP_calling(wig_file, cutoff, genotype_text, gff_path, out_path, prefix_name
     filtered_df = cov_df[(percentage_df > cutoff).sum(axis=1) >= num_columns_to_check]
     
     # get a cutoff from gtf file
-    end_pos_cds = 15000
+    end_pos_cds = last_pos_gff(gff_path)
     filtered_pct_df = filtered_pct_df[filtered_pct_df.index < end_pos_cds]
     filtered_df = filtered_df[filtered_df.index < end_pos_cds]
+    cov = filtered_df.sum(axis=1)
+    filtered_df['cov'] = cov
 
     genome_colors = ['red', 'yellow', 'green', 'cyan', 'blue', 'magenta', '#CCCC00', '#800080', '#D2B48C', '#8B4513', '#ADD8E6'] 
     fig = plt.figure(figsize=(12, 4))
@@ -82,10 +90,10 @@ def SNP_calling(wig_file, cutoff, genotype_text, gff_path, out_path, prefix_name
 
     # table
     gene_positions = parse_gff(gff_path)
-    data = [['Position','A', 'A%', 'C', 'C%', 'G', 'G%', 'T', '%T', 'Gene']]
+    data = [['Position','Coverage','A', 'A%', 'C', 'C%', 'G', 'G%', 'T', '%T', 'Gene']]
 
     for index_label in filtered_df.index:
-        sub_list = [int(index_label),
+        sub_list = [int(index_label), int(filtered_df.loc[index_label, 'cov']),
             int(filtered_df.loc[index_label, 'A']),float_to_percentage(filtered_pct_df.loc[index_label, 'A']),
             int(filtered_df.loc[index_label, 'C']),float_to_percentage(filtered_pct_df.loc[index_label, 'C']),
             int(filtered_df.loc[index_label, 'G']),float_to_percentage(filtered_pct_df.loc[index_label, 'G']),

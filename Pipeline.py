@@ -41,6 +41,7 @@ reference_folder_name = config['REFERENCE_DIR']
 working_folder_name = config['OUTPUT_DIR']
 
 star_ThreadN = config.get('STAR_THREAD_N', 16)
+igv_cutoff = config.get('IGV_CUTOFF', 50)
 tool = config.get('TOOL', 'STAR')
 
 if tool not in ['STAR']:
@@ -63,6 +64,8 @@ check_tool_availability_res += check_tool_availability("fastp")
 check_tool_availability_res += check_tool_availability(tool)
 # Check for kma
 check_tool_availability_res += check_tool_availability('kma')
+# Check for blastn
+check_tool_availability_res += check_tool_availability('blastn')
 
 
 if check_tool_availability_res > 0:
@@ -124,12 +127,12 @@ for sample_id in sorted(sample_dict.keys()):
     original_read1 = os.path.join(data_folder_name, sample_dict[sample_id][0])
     original_read2 = os.path.join(data_folder_name, sample_dict[sample_id][1])
     reference_folder_name = reference_folder_name
-    cmd = f"python Mapping.py {sample_id} '{working_folder_name}' '{original_read1}' '{original_read2}' '{reference_folder_name}' {star_ThreadN}"
+    #cmd = f"python Mapping.py {sample_id} '{working_folder_name}' '{original_read1}' '{original_read2}' '{reference_folder_name}' {star_ThreadN}"
 
     root_file_path = os.path.dirname(os.path.realpath(__file__))
     log_file = os.path.join(log_folder_name, sample_id + '.log')
     errlog_file = os.path.join(log_folder_name, sample_id + '.errlog')
-    bsub_command = f"bsub -q priority -P CAB -J STAR_Mapping_{sample_id} -M 50G -n {star_ThreadN} -oo {log_file} -eo {errlog_file} \"python {root_file_path}/Mapping.py {sample_id} \'{mapres_folder_name}\' \'{original_read1}\' \'{original_read2}\' \'{reference_folder_name}\' {star_ThreadN}\""
+    bsub_command = f"bsub -q priority -P CAB -J STAR_Mapping_{sample_id} -M 2G -n {star_ThreadN} -oo {log_file} -eo {errlog_file} \"python {root_file_path}/Mapping.py {sample_id} \'{mapres_folder_name}\' \'{original_read1}\' \'{original_read2}\' \'{reference_folder_name}\' {star_ThreadN} {igv_cutoff}\""
     #print(bsub_command)
     subprocess.run(bsub_command, shell = True)
 

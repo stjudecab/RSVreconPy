@@ -1,3 +1,0 @@
-subtype,strain
-A,OK649591
-B,OQ941661

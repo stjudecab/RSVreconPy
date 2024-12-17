@@ -28,8 +28,15 @@ def pct_sum(*args):
     return total
 
 # assemble sequences from IGV counts
-def processIGV(file_name, cutoff):
+def processIGV(file_name, ref_file, cutoff):
+    # Load the ref genome sequence
+    ref_genome_record = next(SeqIO.parse(ref_file, "fasta"))
+    ref_genome_sequence = str(ref_genome_record.seq)
+    ref_genome_name = str(ref_genome_record.id)
+    ref_length = len(ref_genome_sequence)
+
     sequence = ""
+    sequence_array = ["N"] * ref_length
 
     with open(file_name, 'r') as file:
         for line in file:
@@ -40,19 +47,20 @@ def processIGV(file_name, cutoff):
                 match = re.match(r'^(\d+)\t(\d+)\.0\t(\d+)\.0\t(\d+)\.0\t(\d+)\.0.+', line)
                 if match:
                     pos, a, c, g, t = map(int, match.groups())
+                    pos = pos - 1
                     
                     count_dict = {'A':a,'C':c,'G':g,'T':t}
                     cov = a + c + g + t
 
                     if cov > cutoff:
                         max_key = max(count_dict, key=count_dict.get)
-                        sequence += max_key
-                    else:
-                        sequence += "N"
+                        sequence_array[pos] = max_key
                 else:
                     print("error")
             else:
                 print("error1")
+
+    sequence = ''.join(sequence_array)
 
     return sequence
 
@@ -197,7 +205,11 @@ def align_sequences(ref_sequence, assembled_sequence):
     aligner.extend_gap_score = 0
     alignments = aligner.align(ref_sequence, assembled_sequence)
     best_alignment = alignments[0]  # Get the best alignment
-    return best_alignment
+    
+    aligned_query_seq = best_alignment.aligned[1]   # get aligned region of query
+    aligned_query_parts = ''.join([assembled_sequence[start:end] for start, end in aligned_query_seq])  # make aligned parts
+
+    return aligned_query_parts
 
 def translate_nt_to_aa(nucleotide_sequence):
     # Create a Seq object from the nucleotide sequence
@@ -208,30 +220,51 @@ def translate_nt_to_aa(nucleotide_sequence):
 
     return str(amino_acid_sequence)
 
-def extract_F_protein(assembled_sequence_file, reference_sequence_file, gff_file):
-    # Parse GFF to get F gene coordinates
-    gene_coordinates = parse_gff_return_id(gff_file)
+def extract_gene_seq(assembled_sequence_file, reference_sequence_file, gff_file, cds_name):
+    
+    # Load the assembled genome sequence
+    assembled_genome_record = next(SeqIO.parse(assembled_sequence_file, "fasta"))
+    assembled_genome_sequence = str(assembled_genome_record.seq)
+    assembled_genome_name = str(assembled_genome_record.id)
 
-    start = gene_coordinates['gene_8'][1]
-    end = gene_coordinates['gene_8'][2]
+    # Load the reference
+    reference = next(SeqIO.parse(assembled_sequence_file, "fasta"))
+    reference_sequence = str(reference.seq)
+    reference_name = str(reference.id)
+
+    if len(reference_sequence) == len(assembled_genome_sequence):
+        # Parse GFF to get F gene coordinates
+        gene_coordinates = parse_gff_return_CDSid(gff_file)
+
+        start = gene_coordinates[cds_name][1]
+        end = gene_coordinates[cds_name][2]
+
+        extracted_sequence = assembled_genome_sequence[start-1:end]
+
+    return assembled_genome_name, extracted_sequence
+
+
+def extract_gene_seq_old(assembled_sequence_file, reference_sequence_file, gff_file, cds_name):
+    # Parse GFF to get F gene coordinates
+    gene_coordinates = parse_gff_return_CDSid(gff_file)
+
+    start = gene_coordinates[cds_name][1]
+    end = gene_coordinates[cds_name][2]
 
     # Extract F gene sequence from reference genome
-    ref_f_gene_sequence = extract_sequence_from_fasta(reference_sequence_file, start, end)
+    ref_gene_sequence = extract_sequence_from_fasta(reference_sequence_file, start, end)
 
     #print(ref_f_gene_sequence)
 
     # Load the assembled genome sequence
     assembled_genome_record = next(SeqIO.parse(assembled_sequence_file, "fasta"))
     assembled_genome_sequence = str(assembled_genome_record.seq)
+    assembled_genome_name = str(assembled_genome_record.id)
 
     # Align the F gene sequence with the assembled genome
-    alignment = align_sequences(ref_f_gene_sequence, assembled_genome_sequence)
+    alignment_query = align_sequences(ref_gene_sequence, assembled_genome_sequence)
 
-    #print(alignment.target)
-    assembled_f_protein_sequence = translate_nt_to_aa(alignment.target)
-    #print(assembled_f_protein_sequence)
-
-    return assembled_f_protein_sequence
+    return assembled_genome_name, alignment_query
 
 def detect_F_mutation(assembled_f_protein_sequence, mutation_file):
     # load mutation table
@@ -246,12 +279,36 @@ def detect_F_mutation(assembled_f_protein_sequence, mutation_file):
             next
         else:
             #print(f"{df.loc[position]['original']}{position}{aa_cur_seq}")
-            if aa_cur_seq in df.loc[position]['alternative']:
+            if aa_cur_seq == 'X':
+                pass
+            elif aa_cur_seq in df.loc[position]['alternative']:
                 screen_res.append([f"{df.loc[position]['original']}{position}{aa_cur_seq}", 'Reported'])
             else:
                 screen_res.append([f"{df.loc[position]['original']}{position}{aa_cur_seq}", 'Novel'])
         
     return screen_res
+
+def extract_key_residue_fgene(fasta, key_mutation_file, output_csv):
+    # Step 1: Read the FASTA file into a DataFrame
+    sequence_names = []
+    sequences = []
+    for record in SeqIO.parse(fasta, "fasta"):
+        sequence_names.append(record.id)  # Store the sequence name (header)
+        sequences.append(list(str(record.seq)))  # Convert sequence to a list of amino acids
+
+    seq_df = pd.DataFrame(sequences, index=sequence_names)      # Create a DataFrame
+    seq_df.columns = range(1, seq_df.shape[1] + 1)  # Rename columns to start from 1
+
+    # Step 2: Read the CSV file and extract positions
+    data = pd.read_csv(key_mutation_file, header=None, names=["Residue", "Position", "Substitutions"])
+    positions = data["Position"].astype(int).tolist()   # Extract positions as a list of integers
+
+    # Step 3: Subset the DataFrame to keep only specified positions
+    seq_df = seq_df[positions]
+
+    # Step 4: Write the subset DataFrame to a CSV file
+    seq_df.to_csv(output_csv, index=True, header=True)
+
 
 def read_wig(wig_file):
     cov_df = pd.read_csv(wig_file, skiprows=3, delimiter='\t', index_col=0, header=None)
@@ -279,4 +336,16 @@ def extract_gene_covarage(wig_file, gff_file):
 
     return gene_cov
 
+def fetch_file_by_type(folder, pattern):
+    found_files = []
+    # List only the files in the given directory (no recursion)
+    for filename in os.listdir(folder):
+        if filename.endswith(pattern):
+            found_files.append(os.path.join(folder, filename))
+    return found_files
 
+def get_version(version_file):
+    with open(version_file, "r") as file:
+    # Read the first line
+    first_line = file.readline().strip()  # strip() removes leading/trailing whitespace
+    return first_line

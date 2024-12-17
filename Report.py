@@ -18,28 +18,39 @@ import shutil
 ###################################################
 
 # Assuming RSV_functions is in the same directory as this script
-from RSV_functions import get_sub_folders, elements_not_in_array, pct_sum, determine_subtype, processIGV, get_genotype_res, extract_F_protein, detect_F_mutation, extract_gene_covarage
-from Report_functions import generate_pdf_report
+from RSV_functions import get_sub_folders, elements_not_in_array, pct_sum, determine_subtype, processIGV, get_genotype_res,extract_gene_seq, detect_F_mutation, extract_key_residue_fgene, extract_gene_covarage, translate_nt_to_aa, get_version
+from Report_functions import generate_pdf_report, generate_html_report
 
 ###################################################
 ##      functions
 ###################################################
 
 def generate_csv_fasta(report, sequence_file, reference_folder_name, working_folder_name, sequence_file_a, sequence_file_b, igv_cutoff):
+    # get version info
+    current_script_path = os.path.abspath(__file__)
+    version_file_path = os.path.join(current_script_path, 'version.txt')
+    current_version = get_version(version_file_path)
+
     # create output CSV
-    CSV_header = 'Sample name,before_filtering_total_reads, before_filtering_q20_rate, before_filtering_q30_rate, after_filtering_total_reads, after_filtering_q20_rate, after_filtering_q30_rate, QC rate,'
+    CSV_header = f"Pipeline verions: {current_version}\n"
+    CSV_header += "Sample name,before_filtering_total_reads, before_filtering_q20_rate, before_filtering_q30_rate, after_filtering_total_reads, after_filtering_q20_rate, after_filtering_q30_rate, QC rate,"
     CSV_header += "Uniquely mapped reads %,MULTI-MAPPING READS %,UNMAPPED READS%,CHIMERIC READS%,"
-    CSV_header += "Subtype suggestion,reference_accession,ref_subtype,"
+    CSV_header += "Subtype,reference_accession,ref_subtype,"
     CSV_header += "F protein mutations,"
-    CSV_header += "NS1_cov,NS2_cov,N_cov,P_cov,M_cov,SH_cov,G_cov,F_cov,M2-1_cov,M2-2_cov,L_cov"
+    CSV_header += "NS1_cov,NS2_cov,N_cov,P_cov,M_cov,SH_cov,G_cov,F_cov,M2-1_cov,M2-2_cov,L_cov,"
+    CSV_header += "G-protein Clade(NextClade),Whole Genome Clade(NextClade),G-protein Clade(Blast),Whole Genome Clade(Blast)"
 
     subtype_a_names = []
     subtype_b_names = []
 
-    with open(report, 'w') as out:
-        out.write(CSV_header + "\n")
+    F_protein_dict_A = {}
+    F_protein_dict_B = {}
 
-    with open(report, 'a') as out:
+    F_sequence_A = sequence_file.replace('Sequence.fasta', 'F_protein_seq_A.fasta')
+    F_sequence_B = sequence_file.replace('Sequence.fasta', 'F_protein_seq_B.fasta')
+
+    with open(report, 'w') as out, open(F_sequence_A, 'w') as f_protein_a, open(F_sequence_B, 'w') as f_protein_b:
+        out.write(CSV_header + "\n")
 
         # collect information from each sample
         Sample_folders = [f for f in os.listdir(working_folder_name) if os.path.isdir(os.path.join(working_folder_name, f))]
@@ -76,17 +87,19 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
 
                 # Step 3: output info to a CSV
                 rate = after['total_reads'] / before['total_reads'] * 100
-                QC_str = f"{before['total_reads']},{before['q20_rate']},{before['q30_rate']},{after['total_reads']},{after['q20_rate']},{after['q30_rate']},{rate},"
+                QC_str = f"{before['total_reads']},{before['q20_rate']},{before['q30_rate']},{after['total_reads']},{after['q20_rate']},{after['q30_rate']},{rate}"
 
-                map_str = f"{cur_map_hash['Uniquelymappedreads']},{pct_sum(cur_map_hash['ofreadsmappedtomultipleloci'], cur_map_hash['ofreadsmappedtotoomanyloci'])},{pct_sum(cur_map_hash['ofreadsunmappedtoomanymismatches'], cur_map_hash['ofreadsunmappedtooshort'], cur_map_hash['ofreadsunmappedother'])},{cur_map_hash['ofchimericreads']},"
+                map_str = f"{cur_map_hash['Uniquelymappedreads']},{pct_sum(cur_map_hash['ofreadsmappedtomultipleloci'], cur_map_hash['ofreadsmappedtotoomanyloci'])},{pct_sum(cur_map_hash['ofreadsunmappedtoomanymismatches'], cur_map_hash['ofreadsunmappedtooshort'], cur_map_hash['ofreadsunmappedother'])},{cur_map_hash['ofchimericreads']}"
 
-                # determine subtype
+                # reference subtype
                 genotype_file = os.path.join(working_folder_name, cur_folder, 'Genotype', 'Genotype.txt')
                 if os.path.isfile(genotype_file):
                     subtype_str, blast_pct_identity, blast_alignment_length, starin = get_genotype_res(genotype_file)
                     ##### fix later
                     if int(blast_alignment_length) < 1500:
                         subtype_str = 'Not RSV'
+                    else:
+                        subtype_str = subtype_str[0]
                 else:
                     subtype_str = 'Not RSV'
 
@@ -96,7 +109,7 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
                 ref_str = determine_subtype(kma_out_file, reference_folder_name, 10)
                 ref_str = ref_str.split(",")
 
-                out.write(f"{sample},{QC_str}{map_str}{subtype_str},{ref_str[1]},{ref_str[2]}")
+                out.write(f"{sample},{QC_str},{map_str},{subtype_str},{ref_str[1]},{ref_str[2]}")
 
                 # Step 4: get assembled genome sequence
                 genome_sequence_file = os.path.join(working_folder_name, cur_folder, 'sequence.fasta')
@@ -108,12 +121,12 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
                         else:
                             genome_sequence += line.strip()   
 
-                with open(sequence_file, 'w') as fasta, open(sequence_file_a, 'w') as fasta_a, open(sequence_file_b, 'w') as fasta_b:
+                with open(sequence_file, 'a') as fasta, open(sequence_file_a, 'a') as fasta_a, open(sequence_file_b, 'a') as fasta_b:
                     if subtype_str == 'Not RSV':
                         sequence_file_error = sequence_file + '.err'
                         with open(sequence_file_error, 'a') as fasta_err:
                             fasta_err.write('>' + sample + "\n" + genome_sequence + "\n")
-                    elif subtype_str[0] == 'A':
+                    elif subtype_str == 'A':
                         fasta.write('>' + sample + "\n" + genome_sequence + "\n")
                         fasta_a.write('>' + sample + "\n" + genome_sequence + "\n")
                         subtype_a_names.append(sample)
@@ -129,20 +142,24 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
                     mutations_str = ''
                 elif subtype_str[0] == 'A':
                     mutation_file = os.path.join(reference_folder_name, 'Genotype_ref','RSV_A_F_Mutation.csv')
-                    assembled_f_protein_sequence = extract_F_protein(sequence_file, reference_sequence_file, gff_file)
+                    seq_name, assembled_f_gene_sequence = extract_gene_seq(genome_sequence_file, reference_sequence_file, gff_file, 'CDS_8')
+                    assembled_f_protein_sequence = translate_nt_to_aa(assembled_f_gene_sequence)
                     #print(assembled_f_protein_sequence)
+                    f_protein_a.write(f">{cur_folder}\n{assembled_f_protein_sequence}\n")
                     F_mutation = detect_F_mutation(assembled_f_protein_sequence, mutation_file)
                     mutations_str = [f"{ele[0]}({ele[1]})" for ele in F_mutation]
+                    F_protein_dict_A[cur_folder] = mutations_str
                     mutations_str = "|".join(mutations_str)
                 else:
                     mutation_file = os.path.join(reference_folder_name, 'Genotype_ref','RSV_B_F_Mutation.csv')
-                    assembled_f_protein_sequence = extract_F_protein(sequence_file, reference_sequence_file, gff_file)
+                    seq_name, assembled_f_gene_sequence = extract_gene_seq(genome_sequence_file, reference_sequence_file, gff_file, 'CDS_8')
+                    assembled_f_protein_sequence = translate_nt_to_aa(assembled_f_gene_sequence)
                     #print(assembled_f_protein_sequence)
+                    f_protein_b.write(f">{cur_folder}\n{assembled_f_protein_sequence}\n")
                     F_mutation = detect_F_mutation(assembled_f_protein_sequence, mutation_file)
                     mutations_str = [f"{ele[0]}({ele[1]})" for ele in F_mutation]
+                    F_protein_dict_B[cur_folder] = mutations_str
                     mutations_str = "|".join(mutations_str)
-                
-                out.write(","+mutations_str)
 
                 # step 6: calculate coverage for each gene segment
                 wig_file = os.path.join(working_folder_name, cur_folder, 'mapping', 'alignments.cov.wig')
@@ -151,14 +168,128 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
                 coverages = [coverage_by_gene[gene] for gene in rsvgenes]
                 coverages_str = ','.join(str(x) for x in coverages)
 
-                out.write(","+coverages_str + "\n")
+                if mutations_str == '' and coverage_by_gene['CDS_8'] < 20:
+                    mutations_str = 'Low coverage of F gene'
+
+                out.write(f",{mutations_str},{coverages_str}")
+
+                # Step 7: Fetch genotype information from NextClade
+                if subtype_str != 'Not RSV':
+                    nextclade_file = os.path.join(working_folder_name, cur_folder, 'Genotype', 'NextClade', 'nextclade.tsv')
+                    df = pd.read_csv(nextclade_file, index_col=0, header=0, sep='\t')
+                    G_subtype_str = df.iloc[0,2]
+                    W_subtype_str = df.iloc[0,1]
+                else:
+                    G_subtype_str = 'Not RSV'
+                    W_subtype_str = 'Not RSV'
+                
+                out.write(f",{G_subtype_str},{W_subtype_str}")
+
+                # step 8: Fetch G protein genotype from blast
+                if subtype_str != 'Not RSV':
+                    genotype_g_file = os.path.join(working_folder_name, cur_folder, 'Genotype', 'Genotype_G.txt')
+                    if os.path.isfile(genotype_g_file):
+                        G_subtype_str, blast_pct_identity, blast_alignment_length, starin = get_genotype_res(genotype_g_file)
+                    else:
+                        G_subtype_str = 'Not RSV'
+                else:
+                    G_subtype_str = 'Not RSV'
+                out.write(f",{G_subtype_str}")
+
+                # step 9: Fetch whole genome genotype from blast
+                if subtype_str != 'Not RSV':
+                    genotype_file = os.path.join(working_folder_name, cur_folder, 'Genotype', 'Genotype.txt')
+                    if os.path.isfile(genotype_file):
+                        W_subtype_str, blast_pct_identity, blast_alignment_length, starin = get_genotype_res(genotype_file)
+                        ##### fix later
+                        if int(blast_alignment_length) < 1500:
+                            W_subtype_str = 'Not RSV'
+                    else:
+                        W_subtype_str = 'Not RSV'
+                else:
+                    W_subtype_str = 'Not RSV'
+                out.write(f",{W_subtype_str}\n")
 
             else:
                 sample = cur_folder.split("/")[-1]
                 QC_str = f"{before['total_reads']},{before['q20_rate']},{before['q30_rate']},{after['total_reads']},{after['q20_rate']},{after['q30_rate']},{rate},"
                 map_str = f"0,0,100,0,"
                 subtype_str = 'Not RSV'
-                out.write(f"{sample},{QC_str}{map_str}{subtype_str},NA,Not RSV,,0,0,0,0,0,0,0,0,0,0,0\n")
+                out.write(f"{sample},{QC_str}{map_str}{subtype_str},NA,Not RSV,,0,0,0,0,0,0,0,0,0,0,0,{subtype_str},{subtype_str},{subtype_str},{subtype_str}\n")
+
+    # make F protein CSV report
+    F_report_A = report.replace('Report.csv', 'F_mutation_A_report.csv')
+    F_report_B = report.replace('Report.csv', 'F_mutation_B_report.csv')
+
+    F_sequence_key_position_A = sequence_file.replace('Sequence.fasta', 'F_protein_key_position_A.csv')
+    F_sequence_key_position_B = sequence_file.replace('Sequence.fasta', 'F_protein_key_position_B.csv')
+    extract_key_residue_fgene(F_sequence_A, os.path.join(reference_folder_name, 'Genotype_ref','RSV_A_F_Mutation.csv'), F_sequence_key_position_A)
+    extract_key_residue_fgene(F_sequence_B, os.path.join(reference_folder_name, 'Genotype_ref','RSV_B_F_Mutation.csv'), F_sequence_key_position_B)
+
+    with open(F_report_A, 'w') as f_a_out:
+        # write version info
+        version_info = f"Pipeline verions: {current_version}\n"
+        f_a_out.write(version_info)
+
+        # make header
+        mutation_file = os.path.join(reference_folder_name, 'Genotype_ref','RSV_A_F_Mutation.csv')
+        csv_header = ''
+        csv_pos = []
+        with open(mutation_file, 'r') as file:
+            for line in file:
+                csv_header += ',' + re.sub(',','',line.strip())
+                parts = line.strip().split(',')
+                csv_pos.append(parts[1])
+
+        f_a_out.write(csv_header + '\n')
+
+        # each line for a sample
+        for key, value in F_protein_dict_A.items():
+            csv_line = key
+            result_list = [''] * len(csv_pos)
+            for mutation in value:
+                match = re.search(r'\d+', mutation)  # Find the first sequence of digits
+                if match:
+                    number = match.group()
+                    index = csv_pos.index(number)
+                    mutation_str = mutation.replace('(Reported)','')
+                    result_list[index] = mutation_str
+
+            csv_line = csv_line + ',' + ','.join(result_list)
+            f_a_out.write(csv_line + '\n')
+
+
+    with open(F_report_B, 'w') as f_b_out:
+        # write version info
+        version_info = f"Pipeline verions: {current_version}\n"
+        f_b_out.write(version_info)
+        
+        # make header
+        mutation_file = os.path.join(reference_folder_name, 'Genotype_ref','RSV_B_F_Mutation.csv')
+        csv_header = ''
+        csv_pos = []
+        with open(mutation_file, 'r') as file:
+            for line in file:
+                csv_header += ',' + re.sub(',','',line.strip())
+                parts = line.strip().split(',')
+                csv_pos.append(parts[1])
+
+        f_b_out.write(csv_header + '\n')
+
+        # each line for a sample
+        for key, value in F_protein_dict_B.items():
+            csv_line = key
+            result_list = [''] * len(csv_pos)
+            for mutation in value:
+                match = re.search(r'\d+', mutation)  # Find the first sequence of digits
+                if match:
+                    number = match.group()
+                    index = csv_pos.index(number)
+                    mutation_str = mutation.replace('(Reported)','')
+                    result_list[index] = mutation_str
+
+            csv_line = csv_line + ',' + ','.join(result_list)
+            f_b_out.write(csv_line + '\n')
 
     return subtype_a_names, subtype_b_names
 
@@ -380,6 +511,13 @@ if __name__ == "__main__":
 
     print("Generating Pdf report...")
     generate_pdf_report(report, working_folder_name, mapres_folder, igv_cutoff)
+
+    ###################################################
+    ##      generate html report
+    ###################################################
+
+    print("Generating HTML report...")
+    generate_html_report(root_file_path, report, working_folder_name, mapres_folder, igv_cutoff)
 
     ###################################################
     ##      program finished

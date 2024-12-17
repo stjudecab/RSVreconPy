@@ -12,9 +12,15 @@ from reportlab.lib.colors import black
 from matplotlib.colors import LinearSegmentedColormap, BoundaryNorm
 from reportlab.lib import colors
 from reportlab.lib.units import inch
-from RSV_functions import parse_gff, find_gene_at_position, find_gff_files_in_path, get_genotype_res
+from RSV_functions import parse_gff, find_gene_at_position, find_gff_files_in_path, get_genotype_res, get_version
 from SNP import SNP_calling
 import seaborn as sns
+import base64
+
+def image_to_base64(image_path):
+    with open(image_path, "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+    return encoded_string
 
 class Line(Flowable):
     """Line flowable --- draws a line in a flowable"""
@@ -46,6 +52,36 @@ def color_gradient_matplotlib(value):
 def color_gradient_blue(value):
     """Return a color from green to red based on the input value (0 to 1)."""
     return colors.Color(1 - value, 1 - value, 1)
+
+def int_to_gradient_color(value):
+    """
+    Convert an integer between 0 and 100 to a gradient color between gray and green.
+
+    Parameters:
+    value (int): The input integer between 0 and 100.
+
+    Returns:
+    str: The hexadecimal color code representing the gradient color.
+    """
+    if not (0 <= value <= 100):
+        raise ValueError("Input value must be between 0 and 100")
+
+    # Define the RGB values for gray and green
+    gray_rgb = (211, 211, 211)  # Light Gray color
+    green_rgb = (144, 238, 144)     # Light Green color
+
+    # Calculate the interpolation factor
+    factor = value / 100.0
+
+    # Interpolate the RGB values
+    r = int(green_rgb[0] + factor * (gray_rgb[0] - green_rgb[0]))
+    g = int(green_rgb[1] + factor * (gray_rgb[1] - green_rgb[1]))
+    b = int(green_rgb[2] + factor * (gray_rgb[2] - green_rgb[2]))
+
+    # Convert the RGB values to a hexadecimal color code
+    hex_color = f'#{r:02x}{g:02x}{b:02x}'
+
+    return hex_color
 
 def percentage_to_number(percentage):
     return float(percentage.strip('%')) / 100
@@ -105,9 +141,80 @@ def make_coverage_heatmap(df, png_file):
     plt.savefig(png_file, dpi = 300, bbox_inches='tight')
     plt.close()
 
-# generate pdf report
-def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
+
+def array_to_html_table(array, header, color=None, table_id=None, table_class=None):
+    """
+    Convert a 2D array into an HTML table with optional ID and class.
+
+    Parameters:
+    array (list of lists): The 2D array to convert.
+    table_id (str): Optional ID for the table.
+    table_class (str): Optional class for the table.
+
+    Returns:
+    str: The HTML string representing the table.
+    """
+    # Start the HTML table with optional ID and class
+    id_attr = f' id="{table_id}"' if table_id else ''
+    class_attr = f' class="{table_class}"' if table_class else ''
+    html = f'<table border="1"{id_attr}{class_attr}>\n'
+
     
+    # make header
+    html += '  <thead>\n'
+    html += '  <tr>\n'
+    # Iterate over the cells in the row
+    for cell in header:
+        html += f'    <td>{cell}</td>\n'
+    html += '  </tr>\n'
+    html += '  </thead>\n'
+
+    # Iterate over the rows in the array
+    html += '  <tbody>\n'
+    for i, row in enumerate(array):
+        html += '  <tr>\n'
+        # Iterate over the cells in the row
+        for j, cell in enumerate(row):
+            # Determine the background color for the cell
+            bg_color = color[i][j] if color and i < len(color) and j < len(color[i]) else ''
+            style_attr = f' style="background-color: {bg_color};"' if bg_color else ''
+            html += f'    <td{style_attr}>{cell}</td>\n'
+        html += '  </tr>\n'
+    html += '  </tbody>\n'
+    # End the HTML table
+    html += '</table>'
+
+    return html
+
+def generate_empty_2d_array(array):
+    """
+    Generate a 2D array with the same dimensions as the input array, filled with empty strings.
+
+    Parameters:
+    array (list of lists): The input 2D array.
+
+    Returns:
+    list of lists: A new 2D array with the same dimensions, filled with empty strings.
+    """
+    # Determine the number of rows and columns in the input array
+    num_rows = len(array)
+    num_cols = len(array[0]) if num_rows > 0 else 0
+
+    # Create a new 2D array with the same dimensions, filled with empty strings
+    empty_array = [["" for _ in range(num_cols)] for _ in range(num_rows)]
+
+    return empty_array
+
+##########################################
+# generate pdf report
+##########################################
+
+def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
+    # get version info
+    current_script_path = os.path.abspath(__file__)
+    version_file_path = os.path.join(current_script_path, 'version.txt')
+    current_version = get_version(version_file_path)
+
     line_width = 440
 
     # make a temp folder under working folder
@@ -158,8 +265,8 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
     #spacer = Spacer(1, 12)  # width and height in points
     #elements.append(spacer)
 
-    table_info_text = "Subtypes of each reference are highlighted in different colors: <font color='red'>Subtype A</font> and <font color='blue'>Subtype B</font>"
-    table_info_text += "<br/> Genotype calling is based on <a href='https://nextstrain.org/rsv/a/genome'>Nextstrain (click for details), Data updated 2024-05-21</a><br/> Click the sample name to jump to the detail section<br/> "
+    table_info_text = f"Pipeline Verions: {current_version}<br/> Subtypes of each reference are highlighted in different colors: <font color='red'>Subtype A</font> and <font color='blue'>Subtype B</font>"
+    table_info_text += "<br/> Genotype calling is based on <a href='https://nextstrain.org/rsv/a/genome'><b>Nextstrain</b> and <b>Nextclade3</b>, Data updated 2024-05-21</a><br/> A clade lable with * indicates the clade of best blast hit strain due to negative results from NextClade3 <br/>Click the sample name to jump to the detail section<br/> "
     paragraph = Paragraph(table_info_text, styles['BodyText'])
     elements.append(paragraph)
     spacer = Spacer(1, 6)  # width and height in points
@@ -172,7 +279,7 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
     #df.iloc[:,8] = df.iloc[:,8].apply(lambda x: '{:.2%}'.format(x/100))
     #df.iloc[:,12] = df.iloc[:,12].apply(lambda x: '{:.2%}'.format(x/100))
 
-    df = df.iloc[:, [0, 7, 8, 12,13,14]] # name, QC rate, mapping rate, subtype
+    df = df.iloc[:, [0, 7, 8, 12,13,14, 27, 28, 29, 30, 22]] # name, QC rate, mapping rate, subtype, reference_accession, ref_subtype, Gtype, Wtype, Gtype_blast, Wtype_blast, G_cov
     data = df.values.tolist()
 
     custom_style = ParagraphStyle(
@@ -197,7 +304,7 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
         mapping_colors = [my_color]
 
         # plot
-        plt.figure(figsize=(7, 0.4))
+        plt.figure(figsize=(7, 0.3))
         plt.barh(x, y, color=mapping_colors)
         plt.xlim(0, 100)
 
@@ -221,7 +328,7 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
         plt.savefig(png_file, dpi = 300)
         plt.close()
 
-        cur_sample_png = Image(png_file, width=4.5*inch, height=0.25*inch)
+        cur_sample_png = Image(png_file, width=4*inch, height=0.2*inch)
 
         if cur_sample_subtype == 'Not RSV':
             png_file = os.path.join(file_path, 'Resource','error.png')
@@ -230,14 +337,31 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
                 png_file = os.path.join(file_path, 'Resource','correct.png')
             else:
                 png_file = os.path.join(file_path, 'Resource','warning.png')
-        sing_png = Image(png_file, width=0.2*inch, height=0.2*inch)
+        sign_png = Image(png_file, width=0.2*inch, height=0.2*inch)
         
         cur_sample_link = Paragraph(f"<a href='#{cur_sample_name}'>{cur_sample_name}</a>", custom_style)
-        data[row] = [cur_sample_link, data[row][1], cur_sample_png, data[row][3], sing_png]
+        
+        # genotype for whole genome
+        if data[row][7] in ['A','B']:
+            genotype_text = data[row][9] + '*'
+        else:
+            genotype_text = data[row][7]
+        
+        # genotype for G gene
+        if data[row][6] == 'unassigned':
+            g_genotype_text = data[row][8] + '*'
+        else:
+            g_genotype_text = data[row][6]
+        if data[row][10] < 20:
+            g_genotype_text = data[row][8]
+        if g_genotype_text == 'Low G coverage':
+            g_genotype_text = 'Low cov'
 
-    df_columns = ['Sample name', 'Pass QC', 'Mapping rate', 'Subtype', 'Sign']
+        data[row] = [cur_sample_link, data[row][1], cur_sample_png, genotype_text, g_genotype_text, sign_png]
+
+    df_columns = ['Sample name', 'Pass QC', 'Mapping rate', 'Clade', 'G-Clade', 'Sign']
     data.insert(0, df_columns)
-    col_widths = [1.5*inch, 0.7*inch, 4.7*inch, 0.9*inch, 0.4*inch]
+    col_widths = [1.5*inch, 0.7*inch, 4*inch, 0.8*inch, 0.8*inch, 0.4*inch]
 
     table = Table(data, colWidths = col_widths)
     #table._argW = [100,60,150,80]
@@ -271,6 +395,7 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
             value = data[row][col]
             value = value[0]
             style.add('BACKGROUND', (col,row), (col,row), color_dict[value])
+            style.add('BACKGROUND', (col + 1,row), (col + 1,row), color_dict[value])
 
     table.setStyle(style)
 
@@ -300,6 +425,10 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
     original_width, original_height = pil_img.size
     new_width = 480
     new_height = original_height * (new_width / original_width)
+    if new_height > 655:
+        new_height = 650
+        new_width = original_width * (new_height / original_height)
+
     img_heatmap = Image(png_file, width=new_width, height=new_height)
     img_heatmap.hAlign = 'LEFT'
     elements.append(img_heatmap)
@@ -376,8 +505,21 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
         subtitle = Paragraph('Genotype calls', styles['Heading4'])
         elements.append(subtitle)
 
-        #print(cur_folder)
-        genotype_text = df.loc[cur_folder][11]
+        # genotype for whole genome
+        if df.loc[cur_folder][27] in ['A','B']:
+            genotype_text = df.loc[cur_folder][29] + '*'
+        else:
+            genotype_text = df.loc[cur_folder][27]
+        
+        # genotype for G gene
+        if df.loc[cur_folder][26] == 'unassigned':
+            g_genotype_text = df.loc[cur_folder][28] + '*'
+        else:
+            g_genotype_text = df.loc[cur_folder][26]
+
+        if df.loc[cur_folder][22] < 20:
+            g_genotype_text = df.loc[cur_folder][28]
+
         F_protein_mutation_text = df.loc[cur_folder][14]
         if isinstance(F_protein_mutation_text, str):
             print(cur_folder)
@@ -391,56 +533,21 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
         if genotype_text == "Not RSV":
             genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','error.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  ' + genotype_text
         else:
-            genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','correct.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  ' + genotype_text + '(based on whole genome) <br/> <br/>'
+            cur_sample_map = int(df.loc[cur_folder][7])
+            if cur_sample_map > 80:
+                genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','correct.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  <b>' + genotype_text + '</b> (based on whole genome)'
+            else:
+                genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','warning.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  <b>' + genotype_text + '</b> (based on whole genome)'
+            
+            genotype_para += f";  <b>{g_genotype_text}</b> (based on G-ectodomain)<br/><br/>"
             #genotype_para += f"Genotype Resource:   <b><a href='https://nextstrain.org/rsv/a/genome'>Nextstrain (click for details), Data updated 2024-05-21</a></b>"
-            genotype_para += f"<b>F protein mutations:  {F_protein_mutation_text}</b> <br/>"
+            genotype_para += f"F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
 
         paragraph = Paragraph(genotype_para)
         
         spacer = Spacer(1, 4)  # width and height in points
         elements.append(spacer)
         elements.append(paragraph)
-
-        # most identical strains on GISAID and Next strain
-        if genotype_text == "Not RSV":
-            pass
-        else:
-            # blast hit of GISAID
-            blast_out_file = os.path.join(mapres_folder, cur_folder, 'Genotype', 'blastn_res_gisaid.tsv')
-            gisaid_name, blast_alignment_length, blast_pct_identity = get_best_blast_hit(blast_out_file)
-            gisaid_name = gisaid_name.split('|')
-            text = Paragraph(f"GISAID best hit: <b>{gisaid_name[0]}</b>, Identity: {blast_pct_identity}%, Alignment Length: {blast_alignment_length}")
-            elements.append(text)
-            
-            # blast hit of NextStrain
-            genotype_file = os.path.join(mapres_folder, cur_folder, 'Genotype', 'Genotype.txt')
-            subtype_str, blast_pct_identity, blast_alignment_length, nextstrain_name = get_genotype_res(genotype_file)
-            text = Paragraph(f"NextStrain best hit: <b>{nextstrain_name}</b>, Identity: {blast_pct_identity}%, Alignment Length: {blast_alignment_length}")
-            elements.append(text)
-
-        # tree figure for current strain
-        if genotype_text == "Not RSV":
-            pass
-        else:
-            # trees
-            tree_png_file = os.path.join(mapres_folder, cur_folder, 'Genotype','genotype.png')
-            pil_img = PILImage.open(tree_png_file)
-            original_width, original_height = pil_img.size
-            new_width = 400
-            new_height = original_height * (new_width / original_width)
-            img_tree = Image(tree_png_file, width=new_width, height=new_height)
-            img_tree.hAlign = 'CENTER'
-            elements.append(img_tree)
-
-        # ######################################## QC details
-        subtitle = Paragraph('QC Details', styles['Heading4'])
-        elements.append(subtitle)
-
-        data = [
-                ['','Total reads', 'Q20 pct', 'Q30 pct'],
-                ['Raw data', df.loc[cur_folder][0], float_to_percentage(df.loc[cur_folder][1]), float_to_percentage(df.loc[cur_folder][2])], 
-                ['Filtered data', df.loc[cur_folder][3], float_to_percentage(df.loc[cur_folder][4]), float_to_percentage(df.loc[cur_folder][5])]
-            ]
 
         style = TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # set background color for the first row to grey
@@ -455,6 +562,75 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
             ('BACKGROUND', (0, 1), (-1, -1), colors.beige),  # set background color for the other rows to beige
             ('GRID', (0,0), (-1,-1), 1, colors.black)  # set grid color to black and line width to 1
         ])
+
+        # most identical strains on GISAID and Next strain
+        if genotype_text == "Not RSV":
+            pass
+        else:
+            # blast hit of GISAID
+            blast_out_file = os.path.join(mapres_folder, cur_folder, 'Genotype', 'blastn_res_gisaid.tsv')
+            gisaid_name, blast_alignment_length_gisaid, blast_pct_identity_gisaid = get_best_blast_hit(blast_out_file)
+            gisaid_name = gisaid_name.split('|')
+            #text = Paragraph(f"GISAID best hit: <b>{gisaid_name[0]}</b>, Identity: {blast_pct_identity_gisaid}%, Alignment Length: {blast_alignment_length_gisaid}")
+            #elements.append(text)
+            
+            # blast hit of NextStrain
+            genotype_file = os.path.join(mapres_folder, cur_folder, 'Genotype', 'Genotype.txt')
+            subtype_str, blast_pct_identity_nextstrain, blast_alignment_length_nextstrain, nextstrain_name = get_genotype_res(genotype_file)
+            #text = Paragraph(f"NextStrain best hit: <b>{nextstrain_name}</b>, Identity: {blast_pct_identity_nextstrain}%, Alignment Length: {blast_alignment_length_nextstrain}")
+            #elements.append(text)
+
+            data = [
+                ['','Best hit','Identity(%)','Alignment Length'],
+                ['GISAID', gisaid_name[0], blast_pct_identity_gisaid, blast_alignment_length_gisaid],
+                ['NextStrain', nextstrain_name, blast_pct_identity_nextstrain, blast_alignment_length_nextstrain],
+            ]
+
+            table = Table(data)
+            table.setStyle(style)
+            elements.append(table)
+
+        # tree figure for current strain
+        if genotype_text == "Not RSV":
+            pass
+        else:
+            # trees
+            tree_png_file = os.path.join(mapres_folder, cur_folder, 'Genotype','genotype.png')
+            if os.path.exists(tree_png_file):
+                subtitle = Paragraph('Phylogenetic analysis: Whole genome', styles['Heading4'])
+                elements.append(subtitle)
+                
+                pil_img = PILImage.open(tree_png_file)
+                original_width, original_height = pil_img.size
+                new_width = 430
+                new_height = original_height * (new_width / original_width)
+                img_tree = Image(tree_png_file, width=new_width, height=new_height)
+                img_tree.hAlign = 'CENTER'
+                elements.append(img_tree)
+                elements.append(PageBreak())
+
+            tree_png_file = os.path.join(mapres_folder, cur_folder, 'Genotype','G_gene_genotype.png')
+            if os.path.exists(tree_png_file):
+                subtitle = Paragraph('Phylogenetic analysis: G-ectodomain', styles['Heading4'])
+                elements.append(subtitle)
+
+                pil_img = PILImage.open(tree_png_file)
+                original_width, original_height = pil_img.size
+                new_width = 480
+                new_height = original_height * (new_width / original_width)
+                img_tree = Image(tree_png_file, width=new_width, height=new_height)
+                img_tree.hAlign = 'CENTER'
+                elements.append(img_tree)
+
+        # ######################################## QC details
+        subtitle = Paragraph('QC Details', styles['Heading4'])
+        elements.append(subtitle)
+
+        data = [
+                ['','Total reads', 'Q20 pct', 'Q30 pct'],
+                ['Raw data', df.loc[cur_folder][0], float_to_percentage(df.loc[cur_folder][1]), float_to_percentage(df.loc[cur_folder][2])], 
+                ['Filtered data', df.loc[cur_folder][3], float_to_percentage(df.loc[cur_folder][4]), float_to_percentage(df.loc[cur_folder][5])]
+            ]
 
         table = Table(data, hAlign='LEFT')
         table.setStyle(style)
@@ -606,6 +782,345 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
 
     # build the doc
     doc.build(elements)
+
+##########################################
+# generate html report
+##########################################
+
+def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv_cutoff):
+    # get version info
+    current_script_path = os.path.abspath(__file__)
+    version_file_path = os.path.join(current_script_path, 'version.txt')
+    current_version = get_version(version_file_path)
+
+    sidebar_div = '<div class="sidebar">\n'
+    main_content_div = '<div class="main-content">\n'
+
+    # load template
+    template_file = os.path.join(file_path, 'template.html')
+    with open(template_file, 'r') as tem_handle:
+        html_report_str = tem_handle.read()
+
+    # set the temp folder under working folder
+    temp_folder = os.path.join(working_folder, 'Temp')
+    if not os.path.exists(temp_folder):
+        # Create the folder
+        exit(f"Folder '{temp_folder}' does not exists!")
+
+    # resource path and file path
+    html_report = os.path.join(working_folder, "Report.html")
+
+    ######################################################################
+    # section 1, title and Summary
+    ######################################################################
+    # make sidebar_div
+    sidebar_div += f"<ul><li><h2><a onclick=\"showSection('summary_section')\">Summary</a></h2></li></ul>\n"
+
+    title = "Detection of RSV from clinical samples"
+    
+    Logo = os.path.join(file_path, 'Resource','CAB.png')
+
+    table_info_text = f"Pipeline Verions: {current_version}<br/> Subtypes of each reference are highlighted in different colors: <font color='red'>Subtype A</font> and <font color='blue'>Subtype B</font>"
+    table_info_text += "<br/> Genotype calling is based on <a href='https://nextstrain.org/rsv/a/genome'  target=\"_blank\"><b>Nextstrain</b> and <b>Nextclade3</b>, Data updated 2024-05-21</a><br/> A clade lable with * indicates the clade of best blast hit strain due to negative results from NextClade3 <br/>Click the sample name to jump to the detail section<br/> "
+
+    main_content_div += '<div id="summary_section" class="content-section">'
+    main_content_div += f"<h1>{title}</h1>\n"
+    base64_string = image_to_base64(Logo)
+    main_content_div += f"<img src='data:image/png;base64,{base64_string}' alt=\"Logo\" width=1000px>\n"
+    main_content_div += f"<h2>Summary</h2>\n"
+    main_content_div += f"<p>{table_info_text}</p>\n"
+
+    # load table for summary section
+    df = pd.read_csv(csv_file, header=0)
+    df.iloc[:,7] = df.iloc[:,7].apply(lambda x: '{:.2%}'.format(x/100)) # QC rate
+
+    df = df.iloc[:, [0, 7, 8, 12,13,14, 27, 28, 29, 30, 22]] # name, QC rate, mapping rate, subtype, reference_accession, ref_subtype, Gtype, Wtype, Gtype_blast, Wtype_blast, G_cov
+    data = df.values.tolist()
+
+    for row in range(0, len(data)):
+        cur_sample_name = data[row][0]
+        cur_sample_map = data[row][2]
+        cur_sample_subtype = data[row][3]
+        ref_id = data[row][4]
+        ref_type = data[row][5]
+
+        cur_sample_png = os.path.join(temp_folder, cur_sample_name + '_mapping_figure.png')
+
+        if cur_sample_subtype == 'Not RSV':
+            sign_png = os.path.join(file_path, 'Resource','error.png')
+        else:
+            if int(cur_sample_map) > 80:
+                sign_png = os.path.join(file_path, 'Resource','correct.png')
+            else:
+                sign_png = os.path.join(file_path, 'Resource','warning.png')
+        
+        cur_sample_link = f"<a onclick=\"showSection('{cur_sample_name}')\">{cur_sample_name}</a>"
+        
+        # genotype for whole genome
+        if data[row][7] in ['A','B']:
+            genotype_text = data[row][9] + '*'
+        else:
+            genotype_text = data[row][7]
+        
+        # genotype for G gene
+        if data[row][6] == 'unassigned':
+            g_genotype_text = data[row][8] + '*'
+        else:
+            g_genotype_text = data[row][6]
+        if data[row][10] < 20:
+            g_genotype_text = data[row][8]
+        if g_genotype_text == 'Low G coverage':
+            g_genotype_text = 'Low cov'
+
+        mapping_fig_base64_string = image_to_base64(cur_sample_png)
+        mapping_fig = f"<img src='data:image/png;base64,{mapping_fig_base64_string}' alt=\"mapping_fig\" style='margin-top:0px;height:30px'>\n"
+        sign_fig_base64_string = image_to_base64(sign_png)
+        sign_fig = f"<img src='data:image/png;base64,{sign_fig_base64_string}' alt=\"sign_fig\" style='margin-top:0px;height:30px'>\n"
+
+        data[row] = [cur_sample_link, data[row][1], mapping_fig, genotype_text, g_genotype_text, sign_fig]
+
+    df_columns = ['Sample name', 'Pass QC', 'Mapping rate', 'Clade', 'G-Clade', 'Sign']
+    
+    # Set the background color of each cell based on its value
+    bg_color = generate_empty_2d_array(data)
+    color_dict = {'A': '#ffcccc', 'B': '#ccccff', 'N': '#d3d3d3'}
+    for row in range(0, len(data)):
+        col = 1
+        value = int(percentage_to_number(data[row][col]))
+        bg_color[row][col] = int_to_gradient_color(value)
+
+        col = 3
+        value = data[row][col]
+        value = value[0]
+        bg_color[row][col] = color_dict[value]
+        bg_color[row][col+1] = color_dict[value]
+
+
+    html_table = array_to_html_table(data, df_columns, color = bg_color, table_id = 'summary_table', table_class = 'summary_table_class')
+    main_content_div += f"{html_table}\n"
+
+    # coverage heatmap
+    main_content_div += f"<h2>Coverage by genes</h2>\n"
+
+    png_file = os.path.join(temp_folder, 'coverage_heatmap.png')
+    base64_string = image_to_base64(png_file)
+    main_content_div += f"<img src='data:image/png;base64,{base64_string}' alt=\"coverage_heatmap\" style='margin-top:0px;width:1500px'>\n"
+
+    # phylogenetic tree
+    tree_A_file = os.path.join(temp_folder, "RSV_A.png")
+    tree_B_file = os.path.join(temp_folder, "RSV_B.png")
+    if os.path.isfile(tree_A_file) or os.path.isfile(tree_B_file):
+        main_content_div += f"<h2>Phylogenetic Analysis</h2>\n"
+        main_content_div += f"<p>Phylogenetic trees are genertated using whole genome sequences.</p>\n"
+
+        # subtype A tree
+        if os.path.isfile(tree_A_file):
+            main_content_div += f"<h3>Subtype A</h3>\n"
+            base64_string = image_to_base64(tree_A_file)
+            main_content_div += f"<img src='data:image/png;base64,{base64_string}' alt=\"tree_A_file\" style='margin-top:0px;width:1500px'>\n"
+
+        # subtype B tree
+        if os.path.isfile(tree_B_file):
+            main_content_div += f"<h3>Subtype B</h3>\n"
+            base64_string = image_to_base64(tree_B_file)
+            main_content_div += f"<img src='data:image/png;base64,{base64_string}' alt=\"tree_B_file\" style='margin-top:0px;width:1500px'>\n"
+
+    main_content_div += '</div>\n'
+
+    ######################################################################
+    # section 3, Details for each sample
+    ######################################################################
+    sidebar_div += '<h2>Individual samples:</h2>\n'
+    sidebar_div += '<ul>\n'
+
+    df = pd.read_csv(csv_file, skiprows = 0, header=0, index_col=0)
+    Sample_folders = [f for f in os.listdir(mapres_folder) if os.path.isdir(os.path.join(mapres_folder, f))]
+    for cur_folder in sorted(Sample_folders):
+        if os.path.isfile(cur_folder):
+            continue
+        if cur_folder == "Temp":
+            continue
+        
+        section_id = cur_folder
+
+        sidebar_div += f"<li><a onclick=\"showSection('{section_id}')\">{section_id}</a></li>"
+        main_content_div += f"<div id=\"{section_id}\" class=\"content-section\">"
+
+        main_content_div += f"<h2>Sample: {section_id}</h2>\n"
+
+        # ######################################## genotype calling
+        main_content_div += f"<h3>Genotype calls</h3>\n"
+
+        # genotype for whole genome
+        if df.loc[cur_folder][27] in ['A','B']:
+            genotype_text = df.loc[cur_folder][29] + '*'
+        else:
+            genotype_text = df.loc[cur_folder][27]
+        
+        # genotype for G gene
+        if df.loc[cur_folder][26] == 'unassigned':
+            g_genotype_text = df.loc[cur_folder][28] + '*'
+        else:
+            g_genotype_text = df.loc[cur_folder][26]
+
+        if df.loc[cur_folder][22] < 20:
+            g_genotype_text = df.loc[cur_folder][28]
+
+        F_protein_mutation_text = df.loc[cur_folder][14]
+        if isinstance(F_protein_mutation_text, str):
+            print(cur_folder)
+            print(F_protein_mutation_text)
+            F_protein_mutation_text = F_protein_mutation_text.replace("|", ", ")
+            F_protein_mutation_text = F_protein_mutation_text.replace('(Reported)','')
+        else:
+            F_protein_mutation_text = ''
+            
+        if genotype_text == "Not RSV":
+            base64_string = image_to_base64(os.path.join(file_path, 'Resource','error.png'))
+            genotype_para  = f"<img src='data:image/png;base64,{base64_string}' style='margin-top:0px;width:30px'><b>{genotype_text}</b>"
+        else:
+            cur_sample_map = int(df.loc[cur_folder][7])
+            if cur_sample_map > 80:
+                base64_string = image_to_base64(os.path.join(file_path, 'Resource','correct.png'))
+            else:
+                base64_string = image_to_base64(os.path.join(file_path, 'Resource','warning.png'))
+            genotype_para  = f"<img src='data:image/png;base64,{base64_string}' style='margin-top:0px;width:30px'><b>{genotype_text}</b> (based on whole genome)"
+            
+
+            genotype_para += f";  <b>{g_genotype_text}</b> (based on G-ectodomain)<br/><br/>"
+            #genotype_para += f"Genotype Resource:   <b><a href='https://nextstrain.org/rsv/a/genome'>Nextstrain (click for details), Data updated 2024-05-21</a></b>"
+            genotype_para += f"F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
+
+        main_content_div += genotype_para
+
+
+        # most identical strains on GISAID and Next strain
+        if genotype_text == "Not RSV":
+            pass
+        else:
+            # blast hit of GISAID
+            blast_out_file = os.path.join(mapres_folder, cur_folder, 'Genotype', 'blastn_res_gisaid.tsv')
+            gisaid_name, blast_alignment_length_gisaid, blast_pct_identity_gisaid = get_best_blast_hit(blast_out_file)
+            gisaid_name = gisaid_name.split('|')
+            
+            # blast hit of NextStrain
+            genotype_file = os.path.join(mapres_folder, cur_folder, 'Genotype', 'Genotype.txt')
+            subtype_str, blast_pct_identity_nextstrain, blast_alignment_length_nextstrain, nextstrain_name = get_genotype_res(genotype_file)
+
+            data = [
+                ['GISAID', gisaid_name[0], blast_pct_identity_gisaid, blast_alignment_length_gisaid],
+                ['NextStrain', nextstrain_name, blast_pct_identity_nextstrain, blast_alignment_length_nextstrain],
+            ]
+
+            table_id = f"blast_table_{section_id}"
+            html_table = array_to_html_table(data, ['Database','Best hit','Identity(%)','Alignment Length'], color = None, table_id = table_id, table_class = 'blast_table_class')
+            main_content_div += f"{html_table}\n"
+
+        # tree figure for current strain
+        if genotype_text == "Not RSV":
+            pass
+        else:
+            # trees
+            tree_png_file = os.path.join(mapres_folder, cur_folder, 'Genotype','genotype.png')
+            if os.path.exists(tree_png_file):
+                main_content_div += f"<h3>Phylogenetic analysis: Whole genome</h3>\n"
+                base64_string = image_to_base64(tree_png_file)
+                main_content_div += f"<img src='data:image/png;base64,{base64_string}' alt=\"{section_id}\" style='margin-top:0px;width:1200px'>\n"
+
+            tree_png_file = os.path.join(mapres_folder, cur_folder, 'Genotype','G_gene_genotype.png')
+            if os.path.exists(tree_png_file):
+                main_content_div += f"<h3>Phylogenetic analysis: G-ectodomain</h3>\n"
+                base64_string = image_to_base64(tree_png_file)
+                main_content_div += f"<img src='data:image/png;base64,{base64_string}' alt=\"{section_id}\" style='margin-top:0px;width:1200px'>\n"
+
+        # ######################################## QC details
+        main_content_div += f"<h2>QC Details</h2>\n"
+
+        data = [
+                ['Raw data', df.loc[cur_folder][0], float_to_percentage(df.loc[cur_folder][1]), float_to_percentage(df.loc[cur_folder][2])], 
+                ['Filtered data', df.loc[cur_folder][3], float_to_percentage(df.loc[cur_folder][4]), float_to_percentage(df.loc[cur_folder][5])]
+            ]
+
+        table_id = f"qc_table_{section_id}"
+        html_table = array_to_html_table(data, ['Data type','Total reads', 'Q20 pct(%)', 'Q30 pct(%)'], color = None, table_id = table_id, table_class = 'qc_table_class')
+        main_content_div += f"{html_table}\n"
+
+        # ######################################## coverage summary
+        ref_genotype_text = df.loc[cur_folder][13]
+        if ref_genotype_text == "Not RSV":
+            pass
+        else:
+            main_content_div += f"<h2>Coverage summary</h2>\n"
+
+            reference_genome_path = os.path.join(mapres_folder, cur_folder, 'reference')
+            subfolders = [ f.name for f in os.scandir(reference_genome_path) if f.is_dir() ]
+            reference_genome_accession = subfolders[0]
+
+            ref_text = f"Reference genome:   <b><a href='https://www.ncbi.nlm.nih.gov/nuccore/{reference_genome_accession}'>{reference_genome_accession}, click for details</a></b>"
+            main_content_div += f"<p>{ref_text}</p>\n"
+            
+            # read wig file
+            wig_file = os.path.join(mapres_folder, cur_folder, 'mapping', 'alignments.cov.wig')
+            cov_df = pd.read_csv(wig_file, skiprows=3, delimiter='\t', index_col=0)
+            cov = cov_df.sum(axis=1)
+            cov_pos = cov_df.index.tolist()
+
+            # coverage details
+            cov_text = '<b>Genome size (BP):</b>   ' + str(max(cov_pos))
+            main_content_div += f"<p>{cov_text}</p>\n"
+            cov_text = '<b>20x coverage (BP):</b>   ' + str(count_greater_than_n(cov, 19)) + ' ('+ str(float_to_percentage(count_greater_than_n(cov, 19)/ max(cov_pos))) + ')'
+            main_content_div += f"<p>{cov_text}</p>\n"
+            cov_text = '<b>50x coverage (BP):</b>   ' + str(count_greater_than_n(cov, 49)) + ' ('+ str(float_to_percentage(count_greater_than_n(cov, 49)/ max(cov_pos))) + ')'
+            main_content_div += f"<p>{cov_text}</p>\n"
+            cov_text = '<b>100x coverage (BP):</b>   ' + str(count_greater_than_n(cov, 99)) + ' ('+ str(float_to_percentage(count_greater_than_n(cov, 99)/ max(cov_pos))) + ')'
+            main_content_div += f"<p>{cov_text}</p>\n"
+            cov_text = '<b>500x coverage (BP):</b>   ' + str(count_greater_than_n(cov, 499)) + ' ('+ str(float_to_percentage(count_greater_than_n(cov, 499)/ max(cov_pos))) + ')'
+            main_content_div += f"<p>{cov_text}</p>\n"
+            cov_text = '<b>Average sequencing depth:</b>   ' +  str(int(sum(cov)/len(cov)))
+            main_content_div += f"<p>{cov_text}</p>\n"
+           
+            cov_title_text = f"The coverage plot is under <b>Log scale</b>, the red and blue lines indicate coverage = 50 and 500 <br/>"
+            main_content_div += f"<p>{cov_title_text}</p>\n"
+            png_file = os.path.join(temp_folder, cur_folder + '_coverage_figure.png')
+            base64_string = image_to_base64(png_file)
+            main_content_div += f"<img src='data:image/png;base64,{base64_string}' alt=\"{section_id}\" style='margin-top:0px;width:1500px'>\n"
+
+        # ######################################## SNP section
+        if "Not RSV" in (genotype_text, ref_genotype_text):
+            pass
+        else:
+            main_content_div += f"<h2>SNP details</h2>\n"
+            # figure
+            png_file = os.path.join(temp_folder, cur_folder + '_snp_figure.png')
+            base64_string = image_to_base64(png_file)
+            main_content_div += f"<img src='data:image/png;base64,{base64_string}' alt=\"{section_id}\" style='margin-top:0px;width:1500px'>\n"
+
+            # table
+            cutoff = 0.2
+            gff_file = find_gff_files_in_path(os.path.join(mapres_folder, cur_folder, 'reference'))
+            gff_path = os.path.join(mapres_folder, cur_folder, 'reference',gff_file[0])
+            table_data = SNP_calling(wig_file, cutoff, genotype_text, gff_path, temp_folder, cur_folder, igv_cutoff)
+            
+            header = table_data.pop(0)
+            table_id = f"snp_table_{section_id}"
+            html_table = array_to_html_table(table_data, header, color = None, table_id = table_id, table_class = 'snp_table_class')
+            main_content_div += f"{html_table}\n"
+
+
+        main_content_div += '</div>\n'  # close div for current sample
+
+    # close div, finish the html file
+
+    sidebar_div += '</ul></div>'    # close ul and div for sidebar
+    main_content_div += '</div>'    # close div for main content
+    main_content_div += '</body></html>'    # end of body and html
+
+    # generate html report
+    html_report = os.path.join(working_folder, "Report.html")
+    with open(html_report, 'w') as report:
+        report.write(html_report_str)
+        report.write(sidebar_div)
+        report.write(main_content_div)
 
 #csv_file = '../RSV_run/3083501/Report/Report.csv'
 #working_folder = '../RSV_run/3083501/Report'

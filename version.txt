@@ -1,0 +1,4 @@
+0.1.1
+# Develop log
+# v0.1.0    Initial release of RSV pipeline
+# v0.1.1    1) implemented version control function, 2) Added two new mutations into RSV B list: I64T+K65E and N208D

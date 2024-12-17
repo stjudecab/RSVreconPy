@@ -1,5 +1,11 @@
 import os
 import glob
+import json
+import re
+import sys
+import shutil
+import subprocess
+import fileinput
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -211,7 +217,7 @@ def generate_empty_2d_array(array):
 
 def generate_csv_fasta(report, sequence_file, reference_folder_name, working_folder_name, sequence_file_a, sequence_file_b, igv_cutoff):
     # get version info
-    current_script_path = os.path.abspath(__file__)
+    current_script_path = os.path.dirname(os.path.abspath(__file__))
     version_file_path = os.path.join(current_script_path, 'version.txt')
     current_version = get_version(version_file_path)
 
@@ -627,14 +633,13 @@ def generate_phylogenetic_tree(root_file_path, reference_folder_name, working_fo
     # job done!
     return True
 
-
 ##########################################
 # generate pdf report
 ##########################################
 
 def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
     # get version info
-    current_script_path = os.path.abspath(__file__)
+    current_script_path = os.path.dirname(os.path.abspath(__file__))
     version_file_path = os.path.join(current_script_path, 'version.txt')
     current_version = get_version(version_file_path)
 
@@ -696,7 +701,7 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
     elements.append(spacer)
 
     # load table for summary section
-    df = pd.read_csv(csv_file, header=0)
+    df = pd.read_csv(csv_file, skiprows = 1)
     # Format the column as percentages
     df.iloc[:,7] = df.iloc[:,7].apply(lambda x: '{:.2%}'.format(x/100)) # QC rate
     #df.iloc[:,8] = df.iloc[:,8].apply(lambda x: '{:.2%}'.format(x/100))
@@ -838,7 +843,7 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
     subtitle_cov_section = Paragraph("Coverage by genes", styles['Heading2'])
     elements.append(subtitle_cov_section)
 
-    df = pd.read_csv(csv_file, header=0)
+    df = pd.read_csv(csv_file, skiprows = 1)
     plot_df = df.iloc[:, [16,17,18,19,20,21,22,23,24,25,26]]
     plot_df.index = df.iloc[:,0]
     png_file = os.path.join(temp_folder, 'coverage_heatmap.png')
@@ -906,7 +911,7 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
     subtitle_summary_section = Paragraph("Details", styles['Heading2'])
     elements.append(subtitle_summary_section)
 
-    df = pd.read_csv(csv_file, skiprows = 0, header=0, index_col=0)
+    df = pd.read_csv(csv_file, skiprows = 1, index_col=0)
     Sample_folders = [f for f in os.listdir(mapres_folder) if os.path.isdir(os.path.join(mapres_folder, f))]
     sample_count = 0
     for cur_folder in sorted(Sample_folders):
@@ -1212,7 +1217,7 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
 
 def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv_cutoff):
     # get version info
-    current_script_path = os.path.abspath(__file__)
+    current_script_path = os.path.dirname(os.path.abspath(__file__))
     version_file_path = os.path.join(current_script_path, 'version.txt')
     current_version = get_version(version_file_path)
 
@@ -1254,7 +1259,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
     main_content_div += f"<p>{table_info_text}</p>\n"
 
     # load table for summary section
-    df = pd.read_csv(csv_file, header=0)
+    df = pd.read_csv(csv_file, skiprows=1)
     df.iloc[:,7] = df.iloc[:,7].apply(lambda x: '{:.2%}'.format(x/100)) # QC rate
 
     df = df.iloc[:, [0, 7, 8, 12,13,14, 27, 28, 29, 30, 22]] # name, QC rate, mapping rate, subtype, reference_accession, ref_subtype, Gtype, Wtype, Gtype_blast, Wtype_blast, G_cov
@@ -1356,7 +1361,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
     sidebar_div += '<h2>Individual samples:</h2>\n'
     sidebar_div += '<ul>\n'
 
-    df = pd.read_csv(csv_file, skiprows = 0, header=0, index_col=0)
+    df = pd.read_csv(csv_file, skiprows = 1, index_col=0)
     Sample_folders = [f for f in os.listdir(mapres_folder) if os.path.isdir(os.path.join(mapres_folder, f))]
     for cur_folder in sorted(Sample_folders):
         if os.path.isfile(cur_folder):

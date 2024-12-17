@@ -1,23 +1,15 @@
 #!/usr/bin/env python3
 
 import os
-import json
-import re
 import sys
 import argparse
-import subprocess
-import glob
-import fileinput
 from yaml import safe_load
-import pandas as pd
-import shutil
 
 
 ###################################################
 ##      load packages and functions
 ###################################################
 
-from RSV_functions import get_sub_folders, elements_not_in_array, pct_sum, determine_subtype, processIGV, get_genotype_res,extract_gene_seq, detect_F_mutation, extract_key_residue_fgene, extract_gene_covarage, translate_nt_to_aa, get_version
 from Report_functions import generate_pdf_report, generate_html_report, generate_csv_fasta, generate_phylogenetic_tree
 
 ###################################################

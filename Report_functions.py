@@ -584,7 +584,7 @@ def generate_phylogenetic_tree(root_file_path, reference_folder_name, working_fo
             files = glob.glob(os.path.join(addtional_results, '*.fa'))
             #print(files)
             # open a new file for writing
-            with open(sequence_file_b, 'a') as seq_file, open(tree_annotation_file, 'a') as anno_file:
+            with open(sequence_file, 'a') as seq_file, open(tree_annotation_file, 'a') as anno_file:
                 for filename in files:
                     # open the file for reading
                     with open(filename, 'r') as file:

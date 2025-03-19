@@ -131,8 +131,8 @@ for sample_id in sorted(sample_dict.keys()):
 
     root_file_path = os.path.dirname(os.path.realpath(__file__))
     log_file = os.path.join(log_folder_name, sample_id + '.log')
-    errlog_file = os.path.join(log_folder_name, sample_id + '.errlog')
-    bsub_command = f"bsub -q priority -P CAB -J STAR_Mapping_{sample_id} -M 2G -n {star_ThreadN} -oo {log_file} -eo {errlog_file} \"python {root_file_path}/Mapping.py {sample_id} \'{mapres_folder_name}\' \'{original_read1}\' \'{original_read2}\' \'{reference_folder_name}\' {star_ThreadN} {igv_cutoff}\""
+    errlog_file = os.path.join(log_folder_name, sample_id + '.err.log')
+    bsub_command = f"bsub -q priority -P CAB -J STAR_Mapping_{sample_id} -n {star_ThreadN} -R 'rusage[mem=50001]' -oo {log_file} -eo {errlog_file} \"python {root_file_path}/Mapping.py {sample_id} \'{mapres_folder_name}\' \'{original_read1}\' \'{original_read2}\' \'{reference_folder_name}\' {star_ThreadN} {igv_cutoff}\""
     #print(bsub_command)
     subprocess.run(bsub_command, shell = True)
 

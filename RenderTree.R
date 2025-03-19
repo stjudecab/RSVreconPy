@@ -35,14 +35,14 @@ p <- p +
   geom_tippoint(aes(color = Clade, shape = Type, size = Type)) + 
   geom_treescale(linesize=1.5, color='black', x = max_x*0.8) + 
   theme(legend.position = 'right', legend.background = element_rect(), legend.key = element_blank(), legend.key.size = unit(0.8, 'cm'), legend.text = element_text(size = 15), title = element_text(size = 15)) + 
-  xlim(0, max_x*1.5) + 
+  xlim(0, max_x*1.8) + 
   scale_color_manual(values = color_set) + scale_shape_manual(values = c(20,17)) + scale_size_manual(values = c(7,9))
 # save tree to PNG
 if(num_strain > 30)
 {
   size_factor = sqrt( num_strain / 30 )
-  ggsave(plot = p, filename = fig_name, width = 13*size_factor, height = 15*size_factor)
+  ggsave(plot = p, filename = fig_name, width = 15*size_factor, height = 15*size_factor)
 } else {
-  ggsave(plot = p, filename = fig_name, width = 13*1.2, height = 15*1.2)
+  ggsave(plot = p, filename = fig_name, width = 15*1.2, height = 15*1.2)
 }
 

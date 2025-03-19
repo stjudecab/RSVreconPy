@@ -5,10 +5,10 @@ import sys
 import subprocess
 import pandas as pd
 import shutil
-from Genotyping import genotype_call_whole_genome
-from RSV_functions import determine_subtype, processIGV
+from Genotyping import genotype_call_whole_genome, genotype_call_G_protein
+from RSV_functions import determine_subtype, processIGV, fetch_record_from_JSON
 
-def sample_mapping(sample_id, working_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN, igv_cutoff, testMode):
+def sample_mapping(sample_id, working_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN, igv_cutoff, run_eachstep):
     # skip Undetermined reads
     if "Undetermined" in sample_id:
         return
@@ -32,13 +32,9 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
     log_file = os.path.join(log_cur_folder, 'fastp_log.txt')
 
     cmd = f"fastp -i \"{original_read1}\" -I \"{original_read2}\" -o {read1_trim} -O {read2_trim} &> {log_file}"
-    if testMode is True:
-        print(cmd)
-    else:
-        print(cmd)
+    print(cmd)
+    if run_eachstep['fastp'] is True:
         subprocess.run(cmd, shell=True, cwd=cur_folder)
-
-    #print("######################\nFinish Quality trimming . \n######################")
 
     ##############################################################################
     ### step 2    KMA and building reference
@@ -53,24 +49,10 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
     kma_out = os.path.join(kma_folder, sample_id)
     log_file = os.path.join(log_cur_folder, 'kma_log.txt')
 
-    '''
-    kma_cmd = [
-        'kma',
-        '-ipe', read1_trim, read2_trim,
-        '-o', kma_out,
-        '-t_db', kma_db,
-        '-1t1', 
-        '-t', str(star_ThreadN),
-        '-mrs','0.9',
-        '-mq','50'
-    ]
-    '''
-
     kma_cmd = f"kma -ipe {read1_trim} {read2_trim} -o {kma_out} -t_db {kma_db} -1t1 -t 3 -mrs 0.9 -mq 50 &> {log_file}"
-    if testMode is True:
-        print(kma_cmd)
-    else:   
-        print(kma_cmd) 
+    print(kma_cmd)
+
+    if run_eachstep['kma'] is True:
         subprocess.run(kma_cmd, shell=True, cwd=cur_folder)
 
     # read info from KMA results
@@ -80,33 +62,31 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
     Selected_ref_name = kma_df.iloc[0, 0]
     #print(Selected_ref_name)
 
-    # build reference
-    original_fasta_file = os.path.join(reference_folder_name, 'Seq', Selected_ref_name + '.fasta')
-    original_gff_file = os.path.join(reference_folder_name, 'Seq', Selected_ref_name + '.gff')
+    # fetch GFF and FASTA for reference strain
+    ref_gff_file = os.path.join(reference_folder_name, 'RSV_reference_GFF.json')
+    ref_fasta_file = os.path.join(reference_folder_name, 'RSV_reference_FASTA.json')
+    original_gff = fetch_record_from_JSON(Selected_ref_name, ref_gff_file)
+    original_fasta = fetch_record_from_JSON(Selected_ref_name, ref_fasta_file)
 
+    # create output folder
     ref_folder = os.path.join(cur_folder, 'reference')
     if not os.path.exists(ref_folder):
         os.mkdir(ref_folder)
-    ref_output_dir = os.path.join(ref_folder, Selected_ref_name)
+
+    # write selected reference
     new_fasta_file = os.path.join(ref_folder, Selected_ref_name + '.fasta')
     new_gff_file = os.path.join(ref_folder, Selected_ref_name + '.gff')
-    shutil.copy(original_fasta_file, new_fasta_file)
-    shutil.copy(original_gff_file, new_gff_file)
-    '''
-    star_command = [
-        'STAR',
-        '--runMode', 'genomeGenerate',
-        '--genomeFastaFiles', new_fasta_file,
-        '--genomeDir', ref_output_dir,
-        '--runThreadN', str(star_ThreadN)
-    ]
-    '''
+    with open(new_fasta_file, 'w') as fasta:
+        fasta.write(original_fasta)
+    with open(new_gff_file, 'w') as fasta:
+        fasta.write(original_gff)
+
+    ref_output_dir = os.path.join(ref_folder, Selected_ref_name)
     log_file = os.path.join(log_cur_folder, 'star_build_genome_log.txt')
     star_command = f"STAR --runMode genomeGenerate --genomeFastaFiles {new_fasta_file} --genomeDir {ref_output_dir} --runThreadN 1 --genomeSAindexNbases 6 --sjdbGTFtagExonParentTranscript {new_gff_file}  &> {log_file}"
-    if testMode is True:
-        print(star_command)
-    else:   
-        print(star_command)
+    print(star_command)
+
+    if run_eachstep['star_index'] is True:
         subprocess.run(star_command, shell=True, cwd=cur_folder)
 
     ##############################################################################
@@ -117,75 +97,42 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
     map_folder = os.path.join(cur_folder, 'mapping')
     if not os.path.exists(map_folder):
         os.mkdir(map_folder)
-    '''
-    cmd_mapping = [
-        'STAR',
-        '--runThreadN', str(star_ThreadN),
-        '--genomeDir', ref_output_dir, 
-        '--outSAMtype', 'BAM',
-        'SortedByCoordinate',
-        '--readFilesIn', read1_trim, read2_trim,
-        '--outFileNamePrefix', map_folder + '/'
-    ]
-    '''
 
     log_file = os.path.join(log_cur_folder, 'star_mapping_log.txt')
     cmd_mapping = f"STAR --runThreadN {star_ThreadN} --genomeDir {ref_output_dir} --outSAMtype BAM SortedByCoordinate --readFilesIn {read1_trim} {read2_trim} --limitBAMsortRAM 12884901888 --outFileNamePrefix {map_folder}/ &> {log_file}"
-    if testMode is True:
-        print(cmd_mapping)
-    else:
-        print(cmd_mapping)
+    print(cmd_mapping)
+
+    if run_eachstep['star'] is True:
         subprocess.run(cmd_mapping, shell=True, cwd=cur_folder)
 
-    #print("######################\nFinish STAR mapping . \n######################")
-    
     ##############################################################################
     ## step 4    index and Count using Samtools and IGVtools 
     ##############################################################################
     print(f"\t######################\tStep 4 Index and Count ...                        \t######################")
 
-    '''
-    cmd_index = [
-        'samtools',
-        'index', 'Aligned.sortedByCoord.out.bam'
-    ]
-    '''
     log_file = os.path.join(log_cur_folder, 'samtools_log.txt')
     cmd_index = f"samtools index Aligned.sortedByCoord.out.bam &> {log_file}"
-    if testMode is True:
-        print(cmd_index)
-    else: 
-        print(cmd_index)
+    print(cmd_index)
+
+    if run_eachstep['samtools'] is True:
         subprocess.run(cmd_index, shell=True, cwd=map_folder)
 
-    '''
-    cmd_count = [
-        'igvtools', 
-        'count',
-         '-z', '5', 
-         '-w', '1',
-        '--bases', 
-        'Aligned.sortedByCoord.out.bam',
-        'alignments.cov.wig', 
-        new_fasta_file
-    ]
-    '''
+
     log_file = os.path.join(log_cur_folder, 'igvtools_log.txt')
     cmd_count = f"igvtools count -z 5 -w 1 --bases Aligned.sortedByCoord.out.bam alignments.cov.wig {new_fasta_file} &> {log_file}"
-    if testMode is True:
-        print(cmd_count)
-    else:
-        print(cmd_count) 
+    print(cmd_count)
+
+    if run_eachstep['igvtools'] is True:
         subprocess.run(cmd_count, shell=True, cwd=map_folder)
 
     ##############################################################################
-    ## step 5    Genotyping call using whole genome
+    ## step 5    Assemble sequence, Genotyping call using whole genome and G sequence
     ##############################################################################
     print(f"\t######################\tStep 5 Calling genotypes ...                      \t######################")
 
     # assemble genomic sequence
     wig_file = os.path.join(cur_folder, 'mapping', 'alignments.cov.wig')
-    genome_sequence = processIGV(wig_file, int(igv_cutoff))
+    genome_sequence = processIGV(wig_file, new_fasta_file, int(igv_cutoff))
     query_file_path = os.path.join(cur_folder, 'sequence.fasta')
     with open(query_file_path, 'w') as fasta:
         fasta.write('>' + sample_id + "\n" + genome_sequence + "\n")
@@ -199,6 +146,10 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
     subtype_str = determine_subtype(kma_out_file, reference_folder_name, 10)
     print(subtype_str)
 
+    root_file_path = os.path.dirname(os.path.realpath(__file__))
+    render_file = os.path.join(root_file_path, 'RenderTree.R')
+    
+    ## genotype using whole genome (Dumb method)
     if "SubtypeA" in subtype_str:
         ref_db_path = os.path.join(reference_folder_name, 'Genotype_ref', 'BlastDB', 'RSVA')
         meta_file_path = os.path.join(reference_folder_name, 'Genotype_ref', 'metadata_A.tsv')
@@ -208,18 +159,37 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
     else:
         return
 
-    root_file_path = os.path.dirname(os.path.realpath(__file__))
-    render_file = os.path.join(root_file_path, 'RenderTree.R')
+    print(f"genotype_call_whole_genome {query_file_path} {ref_db_path} {genotype_folder} {reference_folder_name} {render_file}")
+    if run_eachstep['genotype_whole_genome'] is True:
+        genotype_call_whole_genome(query_file_path, ref_db_path, meta_file_path, genotype_folder, reference_folder_name, render_file)
 
-    genotype_call_whole_genome(query_file_path, ref_db_path, meta_file_path, genotype_folder, reference_folder_name, render_file)
+    ## genotype using G protein (Dumb method)
+    ref_db_path = os.path.join(reference_folder_name, 'Genotype_ref', 'G_genotype', 'G_subtype')
+    print(f"genotype_call_G_protein {query_file_path} {ref_db_path} {genotype_folder} {reference_folder_name} {render_file}")
+    if run_eachstep['genotype_G_gene'] is True:
+        genotype_call_G_protein(query_file_path, ref_db_path, genotype_folder, reference_folder_name, render_file)
 
-    # blast query against GISAID
+    ## blast query against GISAID
     blast_out_file = os.path.join(genotype_folder, 'blastn_res_gisaid.tsv')
     ref_db_path = os.path.join(reference_folder_name, 'Genotype_ref', 'GISAIDDB', 'GISAID')
     cmd = f"blastn -query {query_file_path} -db {ref_db_path} -out {blast_out_file} -outfmt 6 -num_threads 1 -evalue 1e-10 -perc_identity 90"
     print(cmd)
-    subprocess.run(cmd, shell=True, cwd=genotype_folder)
+    if run_eachstep['blast_gisaid'] is True:
+        subprocess.run(cmd, shell=True, cwd=genotype_folder)
 
+    ## genotype using whole genome using NextClade (Trust this one)
+    if "SubtypeA" in subtype_str:
+        ref_db_path = os.path.join(reference_folder_name, 'NextClade', 'rsv_a')
+    elif "SubtypeB" in subtype_str:
+        ref_db_path = os.path.join(reference_folder_name, 'NextClade', 'rsv_b')
+    else:
+        return
+    output_folder = os.path.join(genotype_folder, 'NextClade')
+    nextclade_cmd = f"nextclade3 run --input-dataset {ref_db_path} --output-all={output_folder} {query_file_path}"
+    print(nextclade_cmd)
+    if run_eachstep['nextclade'] is True:
+        subprocess.run(nextclade_cmd, shell=True, cwd=genotype_folder)
+    
 
 if __name__ == "__main__":
     sample_id = sys.argv[1]
@@ -229,8 +199,19 @@ if __name__ == "__main__":
     reference_folder_name = sys.argv[5]
     star_ThreadN = sys.argv[6]
     igv_cutoff = sys.argv[7]
-    testMode = False
-
+    
+    run_eachstep = {
+        "fastp":True, 
+        "kma":True,
+        "star_index":True,
+        "star":True,
+        "samtools":True,
+        "igvtools":True,
+        "genotype_whole_genome":True,
+        "genotype_G_gene":True,
+        "blast_gisaid":True,
+        "nextclade":True
+    }
     #print(sys.argv)
 
-    sample_mapping(sample_id, working_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN, igv_cutoff, testMode)
+    sample_mapping(sample_id, working_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN, igv_cutoff, run_eachstep)

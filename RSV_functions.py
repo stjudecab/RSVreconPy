@@ -1,11 +1,21 @@
 import os
 import re
+import json
 from io import StringIO
 import subprocess
 import pandas as pd
 from Bio import SeqIO
 from Bio.Align import PairwiseAligner
 from Bio.Seq import Seq
+
+
+# fetch record from JSON
+def fetch_record_from_JSON(file_id, json_file):
+    """Fetches the record by unique ID from the JSON file."""
+    with open(json_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    
+    return data.get(file_id, "Record not found")
 
 # get sub folders for a dir
 def get_sub_folders(folder_path):

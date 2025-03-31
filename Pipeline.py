@@ -66,6 +66,8 @@ check_tool_availability_res += check_tool_availability(tool)
 check_tool_availability_res += check_tool_availability('kma')
 # Check for blastn
 check_tool_availability_res += check_tool_availability('blastn')
+# Check for mafft
+check_tool_availability_res += check_tool_availability('mafft')
 
 
 if check_tool_availability_res > 0:

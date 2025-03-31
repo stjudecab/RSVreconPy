@@ -1,11 +1,13 @@
 import os
 import re
 import json
+from io import StringIO
 import subprocess
 import pandas as pd
 from Bio import SeqIO
 from Bio.Align import PairwiseAligner
 from Bio.Seq import Seq
+
 
 # fetch record from JSON
 def fetch_record_from_JSON(file_id, json_file):
@@ -83,8 +85,6 @@ def determine_subtype(kma_out_file, reference_folder_name, cutoff=90):
     kma_df = kma_df.sort_values('Score', ascending=False)
     Selected_ref_name = kma_df.iloc[0, 0]
     template_identity = kma_df.iloc[0, 4]
-    Selected_ref_name = re.sub(' ','',Selected_ref_name)
-    #template_identity = re.sub(' ','',template_identity)
 
     info_table = os.path.join(reference_folder_name, 'RSV.csv')
     info_df = pd.read_csv(info_table, delimiter=',', index_col=0)
@@ -283,24 +283,55 @@ def extract_gene_seq_old(assembled_sequence_file, reference_sequence_file, gff_f
 
 def detect_F_mutation(assembled_f_protein_sequence, mutation_file):
     # load mutation table
-    df = pd.read_csv(mutation_file, index_col=1, header=None)
-    df.columns = ['original', 'alternative']
+    single_mutation_index = []
+    single_mutation_array = []
+    co_mutation_array = []
+    with open(mutation_file, 'r') as file:
+        for line in file:
+            cur_line = line.strip()
+            if "+" in cur_line:
+                # co-mutations
+                ele = cur_line.split('+')
+                co_mutation_array.append(ele)
+            else:
+                # single mutations
+                ele = cur_line.split(',')
+                if len(ele) == 3:
+                    single_mutation_array.append([ele[0], ele[2]])
+                    single_mutation_index.append(ele[1])
 
-    # strart screening
     screen_res = []
-    for position in list(df.index):
-        aa_cur_seq = assembled_f_protein_sequence[position - 1]
-        if aa_cur_seq in df.loc[position]['original']:
+    # strart screening single mutations
+    single_mutation_df = pd.DataFrame(single_mutation_array, index = single_mutation_index, columns = ['original', 'alternative'])
+    for position in list(single_mutation_df.index):
+        aa_cur_seq = assembled_f_protein_sequence[int(position) - 1]
+        if aa_cur_seq in single_mutation_df.loc[position]['original']:
             next
         else:
             #print(f"{df.loc[position]['original']}{position}{aa_cur_seq}")
             if aa_cur_seq == 'X':
                 pass
-            elif aa_cur_seq in df.loc[position]['alternative']:
-                screen_res.append([f"{df.loc[position]['original']}{position}{aa_cur_seq}", 'Reported'])
+            elif aa_cur_seq in single_mutation_df.loc[position]['alternative']:
+                screen_res.append([f"{single_mutation_df.loc[position]['original']}{position}{aa_cur_seq}", 'Reported'])
             else:
-                screen_res.append([f"{df.loc[position]['original']}{position}{aa_cur_seq}", 'Novel'])
-        
+                screen_res.append([f"{single_mutation_df.loc[position]['original']}{position}{aa_cur_seq}", 'Novel'])
+    
+    # strart screening co-mutations
+    for ele in co_mutation_array:
+        co_mutation_names = []
+        detect_sign = 1
+        for mutations in ele:
+            cur_mutation_name = mutations.replace(",", "")
+            co_mutation_names.append(cur_mutation_name)
+            sub_ele = mutations.split(',')
+            aa_cur_seq = assembled_f_protein_sequence[int(sub_ele[1]) - 1]
+            if aa_cur_seq not in sub_ele[2]:
+                detect_sign = 0
+                break
+        if detect_sign == 1:
+            co_mutation_name = '+'.join(co_mutation_names)
+            screen_res.append([co_mutation_name, 'Reported'])
+
     return screen_res
 
 def extract_key_residue_fgene(fasta, key_mutation_file, output_csv):
@@ -315,18 +346,24 @@ def extract_key_residue_fgene(fasta, key_mutation_file, output_csv):
     seq_df.columns = range(1, seq_df.shape[1] + 1)  # Rename columns to start from 1
 
     # Step 2: Read the CSV file and extract positions
-    data = pd.read_csv(key_mutation_file, header=None, names=["Residue", "Position", "Substitutions"])
+    # Read the file content and replace multiple line separators
+    with open(key_mutation_file, 'r') as file:
+        content = file.read().replace('+', '\n')
+    cleaned_file = StringIO(content)
+
+    data = pd.read_csv(cleaned_file, header=None, names=["Residue", "Position", "Substitutions"])
     positions = data["Position"].astype(int).tolist()   # Extract positions as a list of integers
 
     # Step 3: Subset the DataFrame to keep only specified positions
-    seq_df = seq_df[positions]
+    unique_sorted_positions = sorted(set(positions))
+    seq_df = seq_df[unique_sorted_positions]
 
     # Step 4: Write the subset DataFrame to a CSV file
     seq_df.to_csv(output_csv, index=True, header=True)
 
+
 def read_wig(wig_file):
-    cov_df = pd.read_csv(wig_file, skiprows=3, delimiter='\t', index_col=0, header=None)
-    cov_df = cov_df.iloc[:, :5]
+    cov_df = pd.read_csv(wig_file, skiprows=3, delimiter='\t', index_col=0, header=None, usecols=range(6))
     column_names = ['A', 'C', 'G','T','N']
     cov_df.columns = column_names
     cov = cov_df.sum(axis=1)
@@ -361,6 +398,7 @@ def fetch_file_by_type(folder, pattern):
 
 def get_version(version_file):
     with open(version_file, "r") as file:
-    # Read the first line
-    first_line = file.readline().strip()  # strip() removes leading/trailing whitespace
-    return first_line
+        # Read the first line
+        first_line = file.readline().strip()  # strip() removes leading/trailing whitespace
+        return first_line
+

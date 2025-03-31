@@ -91,7 +91,7 @@ def genotype_call_whole_genome(query_file_path, ref_db_path, meta_file_path, out
         subprocess.run(cmd, shell=True, cwd=output_path)
 
         # make multiple sequence alignment
-        cmd = f"muscle -in {merge_sequence_file} -out {merge_alignment_file} &> genotype_muscle_log.txt"
+        cmd = f"mafft {merge_sequence_file} > {merge_alignment_file} 2> genotype_mafft_log.txt"
         subprocess.run(cmd, shell=True, cwd=output_path)
 
         # make phylogenetic tree
@@ -190,7 +190,7 @@ def genotype_call_G_protein(query_file_path, ref_db_path, output_path, reference
         subprocess.run(cmd, shell=True, cwd=output_path)
 
         # make multiple sequence alignment
-        cmd = f"muscle -in {merge_sequence_file} -out {merge_alignment_file} &> G_gene_genotype_muscle_log.txt"
+        cmd = f"mafft {merge_sequence_file} > {merge_alignment_file} 2> G_gene_genotype_mafft_log.txt"
         subprocess.run(cmd, shell=True, cwd=output_path)
 
         # make phylogenetic tree

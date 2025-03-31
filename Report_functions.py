@@ -548,7 +548,7 @@ def generate_phylogenetic_tree(root_file_path, reference_folder_name, working_fo
             subprocess.run(cmd, shell=True, cwd=Temp_folder_name)
 
             # make multiple sequence alignment
-            cmd = f"muscle -in {merge_sequence_file} -out {merge_alignment_file} &> subtypeA_muscle_log.txt"
+            cmd = f"mafft {merge_sequence_file} > {merge_alignment_file} 2> subtypeA_mafft_log.txt"
             subprocess.run(cmd, shell=True, cwd=Temp_folder_name)
 
             # make phylogenetic tree
@@ -617,7 +617,7 @@ def generate_phylogenetic_tree(root_file_path, reference_folder_name, working_fo
             subprocess.run(cmd, shell=True, cwd=Temp_folder_name)
 
             # make multiple sequence alignment
-            cmd = f"muscle -in {merge_sequence_file} -out {merge_alignment_file} &> subtypeB_muscle_log.txt"
+            cmd = f"mafft {merge_sequence_file} > {merge_alignment_file} 2> subtypeB_mafft_log.txt"
             subprocess.run(cmd, shell=True, cwd=Temp_folder_name)
 
             # make phylogenetic tree
@@ -934,21 +934,21 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
         elements.append(subtitle)
 
         # genotype for whole genome
-        if df.loc[cur_folder][27] in ['A','B']:
-            genotype_text = df.loc[cur_folder][29] + '*'
+        if df.loc[cur_folder,df.columns[27]] in ['A','B']:
+            genotype_text = df.loc[cur_folder,df.columns[29]] + '*'
         else:
-            genotype_text = df.loc[cur_folder][27]
+            genotype_text = df.loc[cur_folder,df.columns[27]]
         
         # genotype for G gene
-        if df.loc[cur_folder][26] == 'unassigned':
-            g_genotype_text = df.loc[cur_folder][28] + '*'
+        if df.loc[cur_folder,df.columns[26]] == 'unassigned':
+            g_genotype_text = df.loc[cur_folder,df.columns[28]] + '*'
         else:
-            g_genotype_text = df.loc[cur_folder][26]
+            g_genotype_text = df.loc[cur_folder,df.columns[26]]
 
-        if df.loc[cur_folder][22] < 20:
-            g_genotype_text = df.loc[cur_folder][28]
+        if df.loc[cur_folder,df.columns[22]] < 20:
+            g_genotype_text = df.loc[cur_folder,df.columns[28]]
 
-        F_protein_mutation_text = df.loc[cur_folder][14]
+        F_protein_mutation_text = df.loc[cur_folder,df.columns[14]]
         if isinstance(F_protein_mutation_text, str):
             print(cur_folder)
             print(F_protein_mutation_text)
@@ -961,7 +961,7 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
         if genotype_text == "Not RSV":
             genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','error.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  ' + genotype_text
         else:
-            cur_sample_map = int(df.loc[cur_folder][7])
+            cur_sample_map = int(df.loc[cur_folder,df.columns[7]])
             if cur_sample_map > 80:
                 genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','correct.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  <b>' + genotype_text + '</b> (based on whole genome)'
             else:
@@ -1056,8 +1056,8 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
 
         data = [
                 ['','Total reads', 'Q20 pct', 'Q30 pct'],
-                ['Raw data', df.loc[cur_folder][0], float_to_percentage(df.loc[cur_folder][1]), float_to_percentage(df.loc[cur_folder][2])], 
-                ['Filtered data', df.loc[cur_folder][3], float_to_percentage(df.loc[cur_folder][4]), float_to_percentage(df.loc[cur_folder][5])]
+                ['Raw data', df.loc[cur_folder,df.columns[0]], float_to_percentage(df.loc[cur_folder,df.columns[1]]), float_to_percentage(df.loc[cur_folder,df.columns[2]])], 
+                ['Filtered data', df.loc[cur_folder,df.columns[3]], float_to_percentage(df.loc[cur_folder,df.columns[4]]), float_to_percentage(df.loc[cur_folder,df.columns[5]])]
             ]
 
         table = Table(data, hAlign='LEFT')
@@ -1070,7 +1070,7 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
         else:
             elements.append(PageBreak())
 
-        ref_genotype_text = df.loc[cur_folder][13]
+        ref_genotype_text = df.loc[cur_folder,df.columns[13]]
         if ref_genotype_text == "Not RSV":
             pass
         else:
@@ -1380,21 +1380,21 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
         main_content_div += f"<h3>Genotype calls</h3>\n"
 
         # genotype for whole genome
-        if df.loc[cur_folder][27] in ['A','B']:
-            genotype_text = df.loc[cur_folder][29] + '*'
+        if df.loc[cur_folder,df.columns[27]] in ['A','B']:
+            genotype_text = df.loc[cur_folder,df.columns[29]] + '*'
         else:
-            genotype_text = df.loc[cur_folder][27]
+            genotype_text = df.loc[cur_folder,df.columns[27]]
         
         # genotype for G gene
-        if df.loc[cur_folder][26] == 'unassigned':
-            g_genotype_text = df.loc[cur_folder][28] + '*'
+        if df.loc[cur_folder,df.columns[26]] == 'unassigned':
+            g_genotype_text = df.loc[cur_folder,df.columns[28]] + '*'
         else:
-            g_genotype_text = df.loc[cur_folder][26]
+            g_genotype_text = df.loc[cur_folder,df.columns[26]]
 
-        if df.loc[cur_folder][22] < 20:
-            g_genotype_text = df.loc[cur_folder][28]
+        if df.loc[cur_folder,df.columns[22]] < 20:
+            g_genotype_text = df.loc[cur_folder,df.columns[28]]
 
-        F_protein_mutation_text = df.loc[cur_folder][14]
+        F_protein_mutation_text = df.loc[cur_folder,df.columns[14]]
         if isinstance(F_protein_mutation_text, str):
             print(cur_folder)
             print(F_protein_mutation_text)
@@ -1407,7 +1407,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
             base64_string = image_to_base64(os.path.join(file_path, 'Resource','error.png'))
             genotype_para  = f"<img src='data:image/png;base64,{base64_string}' style='margin-top:0px;width:30px'><b>{genotype_text}</b>"
         else:
-            cur_sample_map = int(df.loc[cur_folder][7])
+            cur_sample_map = int(df.loc[cur_folder,df.columns[7]])
             if cur_sample_map > 80:
                 base64_string = image_to_base64(os.path.join(file_path, 'Resource','correct.png'))
             else:
@@ -1465,8 +1465,8 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
         main_content_div += f"<h2>QC Details</h2>\n"
 
         data = [
-                ['Raw data', df.loc[cur_folder][0], float_to_percentage(df.loc[cur_folder][1]), float_to_percentage(df.loc[cur_folder][2])], 
-                ['Filtered data', df.loc[cur_folder][3], float_to_percentage(df.loc[cur_folder][4]), float_to_percentage(df.loc[cur_folder][5])]
+                ['Raw data', df.loc[cur_folder,df.columns[0]], float_to_percentage(df.loc[cur_folder,df.columns[1]]), float_to_percentage(df.loc[cur_folder,df.columns[2]])], 
+                ['Filtered data', df.loc[cur_folder,df.columns[3]], float_to_percentage(df.loc[cur_folder,df.columns[4]]), float_to_percentage(df.loc[cur_folder,df.columns[5]])]
             ]
 
         table_id = f"qc_table_{section_id}"
@@ -1474,7 +1474,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
         main_content_div += f"{html_table}\n"
 
         # ######################################## coverage summary
-        ref_genotype_text = df.loc[cur_folder][13]
+        ref_genotype_text = df.loc[cur_folder, df.columns[13]]
         if ref_genotype_text == "Not RSV":
             pass
         else:

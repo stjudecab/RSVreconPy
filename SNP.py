@@ -24,7 +24,7 @@ def SNP_calling(wig_file, cutoff, genotype_text, gff_path, out_path, prefix_name
         genome_xticks = [70,800,1600,2700,3550,4366,5000,6300,7650,8400,11500]
         gene_names = ['NS1','NS2','N','P','M','SH','G','F','M2-1','M2-2','L']
 
-    cov_df = pd.read_csv(wig_file, skiprows=3, delimiter='\t', index_col=0, header=None)
+    cov_df = pd.read_csv(wig_file, skiprows=3, delimiter='\t', index_col=0, header=None, usecols=range(6))
     column_names = ['A', 'C', 'G','T','N']
     cov_df.columns = column_names
     cov = cov_df.sum(axis=1)

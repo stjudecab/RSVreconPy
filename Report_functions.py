@@ -23,6 +23,53 @@ from SNP import SNP_calling
 import seaborn as sns
 import base64
 
+def read_star_log(log_file):
+    cur_map_hash = {}
+    with open(log_file, 'r') as fh:
+        for line in fh:
+            if '|' in line:
+                tmp_line = line
+                tmp_line = re.sub(r'[\s%:]', '', tmp_line)
+                tmp_arr = tmp_line.split('|')
+                cur_map_hash[tmp_arr[0]] = tmp_arr[1]
+
+    # Step 3: output info to a CSV
+    map_str = f"{cur_map_hash['Uniquelymappedreads']}, \
+    {pct_sum(cur_map_hash['ofreadsmappedtomultipleloci'], cur_map_hash['ofreadsmappedtotoomanyloci'])}, \
+    {pct_sum(cur_map_hash['ofreadsunmappedtoomanymismatches'], cur_map_hash['ofreadsunmappedtooshort'], cur_map_hash['ofreadsunmappedother'])}, \
+    {cur_map_hash['ofchimericreads']}"
+
+    return map_str
+
+def parse_flagstat(flagstat_file):
+    with open(flagstat_file, 'r') as f:
+        lines = [line.strip() for line in f.readlines()]
+    
+    # Extract key metrics
+    metrics = {}
+    for line in lines:
+        if 'in total' in line:
+            metrics['total_reads'] = int(line.split('+')[0].strip())
+        elif 'primary mapped' in line:
+            metrics['primary_mapped'] = int(line.split('+')[0].strip())
+        elif 'mapped (' in line and 'primary' not in line:
+            metrics['total_mapped'] = int(line.split('+')[0].strip())
+        elif 'supplementary' in line:
+            metrics['supplementary'] = int(line.split('+')[0].strip())
+    
+    # Calculate percentages
+    total = metrics['total_reads']
+    results = [
+        (metrics['primary_mapped'] / total) * 100,        # Uniquely mapped
+        ((metrics['total_mapped'] - metrics['primary_mapped']) / total) * 100,  # Multi-mapped
+        ((total - metrics['total_mapped']) / total) * 100,  # Unmapped
+        (metrics['supplementary'] / total) * 100          # Chimeric
+    ]
+    
+    # Format as comma-separated string with 2 decimal places
+    return ",".join([f"{x:.2f}" for x in results])
+
+
 def image_to_base64(image_path):
     with open(image_path, "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
@@ -264,22 +311,13 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
             after = decoded_json['summary']['after_filtering']
 
             # Step 2: collect mapping info
-            cur_map_log_file = os.path.join(working_folder_name, cur_folder, 'mapping', 'Log.final.out')
-            if os.path.exists(cur_map_log_file):
-                cur_map_hash = {}
-                with open(cur_map_log_file, 'r') as fh:
-                    for line in fh:
-                        if '|' in line:
-                            tmp_line = line
-                            tmp_line = re.sub(r'[\s%:]', '', tmp_line)
-                            tmp_arr = tmp_line.split('|')
-                            cur_map_hash[tmp_arr[0]] = tmp_arr[1]
-
+            flagstat_file = os.path.join(working_folder_name, cur_folder, 'mapping', 'flagstat.txt')
+            if os.path.exists(flagstat_file):
                 # Step 3: output info to a CSV
                 rate = after['total_reads'] / before['total_reads'] * 100
                 QC_str = f"{before['total_reads']},{before['q20_rate']},{before['q30_rate']},{after['total_reads']},{after['q20_rate']},{after['q30_rate']},{rate}"
 
-                map_str = f"{cur_map_hash['Uniquelymappedreads']},{pct_sum(cur_map_hash['ofreadsmappedtomultipleloci'], cur_map_hash['ofreadsmappedtotoomanyloci'])},{pct_sum(cur_map_hash['ofreadsunmappedtoomanymismatches'], cur_map_hash['ofreadsunmappedtooshort'], cur_map_hash['ofreadsunmappedother'])},{cur_map_hash['ofchimericreads']}"
+                map_str = parse_flagstat(flagstat_file)
 
                 # reference subtype
                 genotype_file = os.path.join(working_folder_name, cur_folder, 'Genotype', 'Genotype.txt')
@@ -694,7 +732,7 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
     #elements.append(spacer)
 
     table_info_text = f"Pipeline Verions: {current_version}<br/> Subtypes of each reference are highlighted in different colors: <font color='red'>Subtype A</font> and <font color='blue'>Subtype B</font>"
-    table_info_text += "<br/> Genotype calling is based on <a href='https://nextstrain.org/rsv/a/genome'><b>Nextstrain</b> and <b>Nextclade3</b>, Data updated 2024-05-21</a><br/> A clade lable with * indicates the clade of best blast hit strain due to negative results from NextClade3 <br/>Click the sample name to jump to the detail section<br/> "
+    table_info_text += "<br/> Genotype calling is based on <a href='https://nextstrain.org/rsv/a/genome'><b>Nextstrain</b> and <b>Nextclade3</b>, Data updated 2024-08-01</a><br/> A clade lable with * indicates the clade of best blast hit strain due to negative results from NextClade3 <br/>Click the sample name to jump to the detail section<br/> "
     paragraph = Paragraph(table_info_text, styles['BodyText'])
     elements.append(paragraph)
     spacer = Spacer(1, 6)  # width and height in points
@@ -968,7 +1006,7 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
                 genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','warning.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  <b>' + genotype_text + '</b> (based on whole genome)'
             
             genotype_para += f";  <b>{g_genotype_text}</b> (based on G-ectodomain)<br/><br/>"
-            #genotype_para += f"Genotype Resource:   <b><a href='https://nextstrain.org/rsv/a/genome'>Nextstrain (click for details), Data updated 2024-05-21</a></b>"
+            #genotype_para += f"Genotype Resource:   <b><a href='https://nextstrain.org/rsv/a/genome'>Nextstrain (click for details), Data updated 2024-08-01</a></b>"
             genotype_para += f"F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
 
         paragraph = Paragraph(genotype_para)
@@ -1077,10 +1115,7 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
             subtitle = Paragraph('Coverage summary', styles['Heading4'])
             elements.append(subtitle)
 
-            reference_genome_path = os.path.join(mapres_folder, cur_folder, 'reference')
-            subfolders = [ f.name for f in os.scandir(reference_genome_path) if f.is_dir() ]
-            reference_genome_accession = subfolders[0]
-
+            reference_genome_accession = df.loc[cur_folder,df.columns[12]]
             ref_text = f"Reference genome:   <b><a href='https://www.ncbi.nlm.nih.gov/nuccore/{reference_genome_accession}'>{reference_genome_accession}, click for details</a></b>"
             wig_file = os.path.join(mapres_folder, cur_folder, 'mapping', 'alignments.cov.wig')
 
@@ -1249,7 +1284,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
     Logo = os.path.join(file_path, 'Resource','CAB.png')
 
     table_info_text = f"Pipeline Verions: {current_version}<br/> Subtypes of each reference are highlighted in different colors: <font color='red'>Subtype A</font> and <font color='blue'>Subtype B</font>"
-    table_info_text += "<br/> Genotype calling is based on <a href='https://nextstrain.org/rsv/a/genome'  target=\"_blank\"><b>Nextstrain</b> and <b>Nextclade3</b>, Data updated 2024-05-21</a><br/> A clade lable with * indicates the clade of best blast hit strain due to negative results from NextClade3 <br/>Click the sample name to jump to the detail section<br/> "
+    table_info_text += "<br/> Genotype calling is based on <a href='https://nextstrain.org/rsv/a/genome'  target=\"_blank\"><b>Nextstrain</b> and <b>Nextclade3</b>, Data updated 2024-08-01</a><br/> A clade lable with * indicates the clade of best blast hit strain due to negative results from NextClade3 <br/>Click the sample name to jump to the detail section<br/> "
 
     main_content_div += '<div id="summary_section" class="content-section">'
     main_content_div += f"<h1>{title}</h1>\n"
@@ -1416,7 +1451,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
             
 
             genotype_para += f";  <b>{g_genotype_text}</b> (based on G-ectodomain)<br/><br/>"
-            #genotype_para += f"Genotype Resource:   <b><a href='https://nextstrain.org/rsv/a/genome'>Nextstrain (click for details), Data updated 2024-05-21</a></b>"
+            #genotype_para += f"Genotype Resource:   <b><a href='https://nextstrain.org/rsv/a/genome'>Nextstrain (click for details), Data updated 2024-08-01</a></b>"
             genotype_para += f"F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
 
         main_content_div += genotype_para
@@ -1480,10 +1515,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
         else:
             main_content_div += f"<h2>Coverage summary</h2>\n"
 
-            reference_genome_path = os.path.join(mapres_folder, cur_folder, 'reference')
-            subfolders = [ f.name for f in os.scandir(reference_genome_path) if f.is_dir() ]
-            reference_genome_accession = subfolders[0]
-
+            reference_genome_accession = df.loc[cur_folder,df.columns[12]]
             ref_text = f"Reference genome:   <b><a href='https://www.ncbi.nlm.nih.gov/nuccore/{reference_genome_accession}'>{reference_genome_accession}, click for details</a></b>"
             main_content_div += f"<p>{ref_text}</p>\n"
             

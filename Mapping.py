@@ -82,15 +82,15 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
         fasta.write(original_gff)
 
     ref_output_dir = os.path.join(ref_folder, Selected_ref_name)
-    log_file = os.path.join(log_cur_folder, 'star_build_genome_log.txt')
-    star_command = f"STAR --runMode genomeGenerate --genomeFastaFiles {new_fasta_file} --genomeDir {ref_output_dir} --runThreadN 1 --genomeSAindexNbases 6 --sjdbGTFtagExonParentTranscript {new_gff_file}  &> {log_file}"
+    log_file = os.path.join(log_cur_folder, 'bwa_build_genome_log.txt')
+    star_command = f"bwa index -p {ref_output_dir} {new_fasta_file} &> {log_file}"
     print(star_command)
 
     if run_eachstep['star_index'] is True:
         subprocess.run(star_command, shell=True, cwd=cur_folder)
 
     ##############################################################################
-    ## step 3    STAR mapping
+    ## step 3    reads mapping
     ##############################################################################
     print(f"\t######################\tStep 3 mapping ...                                \t######################")
 
@@ -98,28 +98,45 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
     if not os.path.exists(map_folder):
         os.mkdir(map_folder)
 
-    log_file = os.path.join(log_cur_folder, 'star_mapping_log.txt')
-    cmd_mapping = f"STAR --runThreadN {star_ThreadN} --genomeDir {ref_output_dir} --outSAMtype BAM SortedByCoordinate --readFilesIn {read1_trim} {read2_trim} --limitBAMsortRAM 12884901888 --outFileNamePrefix {map_folder}/ &> {log_file}"
+    log_file = os.path.join(log_cur_folder, 'mapping_log.txt')
+    sam_file = os.path.join(map_folder, 'sample_aligned.sam')
+    cmd_mapping = f"bwa mem -t {star_ThreadN} {ref_output_dir} {read1_trim} {read2_trim} > {sam_file} 2> {log_file}"
     print(cmd_mapping)
 
     if run_eachstep['star'] is True:
         subprocess.run(cmd_mapping, shell=True, cwd=cur_folder)
 
     ##############################################################################
-    ## step 4    index and Count using Samtools and IGVtools 
+    ## step 4    index using Samtools
     ##############################################################################
     print(f"\t######################\tStep 4 Index and Count ...                        \t######################")
 
     log_file = os.path.join(log_cur_folder, 'samtools_log.txt')
-    cmd_index = f"samtools index Aligned.sortedByCoord.out.bam &> {log_file}"
+    bam_file = os.path.join(map_folder, 'sample_aligned.bam')
+    flagstat_file = os.path.join(map_folder, 'flagstat.txt')
+    sort_bam_file = os.path.join(map_folder, 'sample_sorted.bam')
+    cmd_2bam = f"samtools view -@ {star_ThreadN} -Sb {sam_file} > {bam_file}"
+    print(cmd_2bam)
+    cmd_sort = f"samtools sort -@ {star_ThreadN} -o {sort_bam_file} {bam_file}"
+    print(cmd_sort)
+    cmd_stat = f"samtools flagstat {sort_bam_file} > {flagstat_file}"
+    print(cmd_stat)
+    cmd_index = f"samtools index {sort_bam_file} &> {log_file}"
     print(cmd_index)
 
     if run_eachstep['samtools'] is True:
+        subprocess.run(cmd_2bam, shell=True, cwd=map_folder)
+        subprocess.run(cmd_sort, shell=True, cwd=map_folder)
+        subprocess.run(cmd_stat, shell=True, cwd=map_folder)
         subprocess.run(cmd_index, shell=True, cwd=map_folder)
 
+    ##############################################################################
+    ## step 4.5    Count using IGVtools 
+    ##############################################################################
 
     log_file = os.path.join(log_cur_folder, 'igvtools_log.txt')
-    cmd_count = f"igvtools count -z 5 -w 1 --bases Aligned.sortedByCoord.out.bam alignments.cov.wig {new_fasta_file} &> {log_file}"
+    wig_file = os.path.join(map_folder, 'alignments.cov.wig')
+    cmd_count = f"igvtools count -z 5 -w 1 --bases {sort_bam_file} {wig_file} {new_fasta_file} &> {log_file}"
     print(cmd_count)
 
     if run_eachstep['igvtools'] is True:
@@ -131,7 +148,6 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
     print(f"\t######################\tStep 5 Calling genotypes ...                      \t######################")
 
     # assemble genomic sequence
-    wig_file = os.path.join(cur_folder, 'mapping', 'alignments.cov.wig')
     genome_sequence = processIGV(wig_file, new_fasta_file, int(igv_cutoff))
     query_file_path = os.path.join(cur_folder, 'sequence.fasta')
     with open(query_file_path, 'w') as fasta:

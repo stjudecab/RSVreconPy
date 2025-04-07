@@ -675,7 +675,7 @@ def generate_phylogenetic_tree(root_file_path, reference_folder_name, working_fo
 # generate pdf report
 ##########################################
 
-def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
+def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_cutoff):
     # get version info
     current_script_path = os.path.dirname(os.path.abspath(__file__))
     version_file_path = os.path.join(current_script_path, 'version.txt')
@@ -693,7 +693,6 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
         print(f"Using existing folder '{temp_folder}' for temporary files.")
 
     # resource path and file path
-    file_path = os.path.dirname(os.path.realpath(__file__))
     Logo = os.path.join(file_path, 'Resource','CAB.png')
     pdf_report = os.path.join(working_folder, "Report.pdf")
 
@@ -741,7 +740,7 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
     # load table for summary section
     df = pd.read_csv(csv_file, skiprows = 1)
     # Format the column as percentages
-    df.iloc[:,7] = df.iloc[:,7].apply(lambda x: '{:.2%}'.format(x/100)) # QC rate
+    df.iloc[:,7] = df.iloc[:,7] / 100 # QC rate
     #df.iloc[:,8] = df.iloc[:,8].apply(lambda x: '{:.2%}'.format(x/100))
     #df.iloc[:,12] = df.iloc[:,12].apply(lambda x: '{:.2%}'.format(x/100))
 
@@ -823,7 +822,7 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
         if g_genotype_text == 'Low G coverage':
             g_genotype_text = 'Low cov'
 
-        data[row] = [cur_sample_link, data[row][1], cur_sample_png, genotype_text, g_genotype_text, sign_png]
+        data[row] = [cur_sample_link, f'{data[row][1]:.2%}', cur_sample_png, genotype_text, g_genotype_text, sign_png]
 
     df_columns = ['Sample name', 'Pass QC', 'Mapping rate', 'Clade', 'G-Clade', 'Sign']
     data.insert(0, df_columns)
@@ -1183,7 +1182,8 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
             ax_cov.set_xticks([])  # Set the positions for the ticks
             ax_cov.set_yscale('log')    # Set Y scale to log
 
-            ax_cov.axhline(y=50, color='red', linestyle='--')
+            ax_cov.axhline(y=10, color='red', linestyle='--')
+            ax_cov.axhline(y=50, color='green', linestyle='--')
             ax_cov.axhline(y=500, color='blue', linestyle='--')
 
             gs2 = gridspec.GridSpecFromSubplotSpec(2, 1, subplot_spec=gs[1], hspace=0.05)
@@ -1208,7 +1208,7 @@ def generate_pdf_report(csv_file, working_folder, mapres_folder, igv_cutoff):
             plt.close()
 
             img_cov = Image(png_file, width=600, height=200)
-            cov_title_text = f"The coverage plot is under <b>Log scale</b>, the red and blue lines indicate coverage = 50 and 500 <br/>"
+            cov_title_text = f"The coverage plot is under <b>Log scale</b>, the red, green and blue lines indicate coverage = 10, 50 and 500 <br/>"
             paragraph = Paragraph(cov_title_text, styles['BodyText'])
             elements.append(paragraph)
             elements.append(img_cov)
@@ -1295,7 +1295,8 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
 
     # load table for summary section
     df = pd.read_csv(csv_file, skiprows=1)
-    df.iloc[:,7] = df.iloc[:,7].apply(lambda x: '{:.2%}'.format(x/100)) # QC rate
+    df.iloc[:,7] = df.iloc[:,7] / 100
+    #df.iloc[:,7] = df.iloc[:,7].apply(lambda x: '{:.2%}'.format(x/100)) # QC rate
 
     df = df.iloc[:, [0, 7, 8, 12,13,14, 27, 28, 29, 30, 22]] # name, QC rate, mapping rate, subtype, reference_accession, ref_subtype, Gtype, Wtype, Gtype_blast, Wtype_blast, G_cov
     data = df.values.tolist()
@@ -1340,7 +1341,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
         sign_fig_base64_string = image_to_base64(sign_png)
         sign_fig = f"<img src='data:image/png;base64,{sign_fig_base64_string}' alt=\"sign_fig\" style='margin-top:0px;height:30px'>\n"
 
-        data[row] = [cur_sample_link, data[row][1], mapping_fig, genotype_text, g_genotype_text, sign_fig]
+        data[row] = [cur_sample_link, f'{data[row][1]:.2%}', mapping_fig, genotype_text, g_genotype_text, sign_fig]
 
     df_columns = ['Sample name', 'Pass QC', 'Mapping rate', 'Clade', 'G-Clade', 'Sign']
     

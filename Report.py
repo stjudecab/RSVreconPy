@@ -39,8 +39,14 @@ if __name__ == "__main__":
     reference_folder_name = config['REFERENCE_DIR']
     working_folder_name = config['OUTPUT_DIR']
 
-    star_ThreadN = config.get('STAR_THREAD_N', 16)
-    igv_cutoff = config.get('IGV_CUTOFF', 50)
+    star_ThreadN = config.get('THREAD_N', 2)
+    igv_cutoff = config.get('COV_CUTOFF', 50)
+
+    addtional_results_path = os.path.join(working_folder_name, '..', 'consensus')
+    if os.path.exists(addtional_results_path):
+        pass
+    else:
+        addtional_results_path = None
 
     ###################################################
     ##      setup working dir
@@ -70,11 +76,6 @@ if __name__ == "__main__":
     ###################################################
 
     print("Generating tree ...")
-    addtional_results_path = os.path.join(working_folder_name, '..', 'consensus')
-    if os.path.exists(addtional_results_path):
-        pass
-    else:
-        addtional_results_path = None
     generate_phylogenetic_tree(root_file_path, reference_folder_name, working_folder_name, subtype_a_names, subtype_b_names, Temp_folder_name, addtional_results_path)
 
     ###################################################
@@ -82,7 +83,7 @@ if __name__ == "__main__":
     ###################################################
 
     print("Generating Pdf report...")
-    generate_pdf_report(report, working_folder_name, mapres_folder, igv_cutoff)
+    generate_pdf_report(root_file_path, report, working_folder_name, mapres_folder, igv_cutoff)
 
     ###################################################
     ##      generate html report

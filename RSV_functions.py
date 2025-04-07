@@ -1,13 +1,90 @@
 import os
 import re
 import json
+import shutil
 from io import StringIO
 import subprocess
 import pandas as pd
 from Bio import SeqIO
 from Bio.Align import PairwiseAligner
 from Bio.Seq import Seq
+from collections import defaultdict
 
+# detect sequencing files
+def detect_sequencing_files(data_folder):
+    """
+    Detect sequencing files in a directory, compatible with various common naming conventions
+    
+    Args:
+        data_folder: Path to the directory containing sequencing files
+        
+    Returns:
+        A dictionary where keys are sample IDs and values are lists containing R1 and R2 file paths
+    """
+    data_folder = os.path.normpath(data_folder)
+    sample_dict = defaultdict(list)
+    
+    # Supported sequencing file extensions
+    extensions = ('.fastq.gz', '.fq.gz', '.fastq', '.fq')
+    
+    # Common paired-end sequencing file naming patterns
+    patterns = [
+        # Format: sample_R1.fastq.gz, sample_R2.fastq.gz
+        re.compile(r'(.+)_R?([12])[_.].*'),
+        # Format: sample.1.fastq.gz, sample.2.fastq.gz
+        re.compile(r'(.+)\.([12])\..*'),
+        # Format: sample_1.fastq.gz, sample_2.fastq.gz
+        re.compile(r'(.+)_([12])\..*'),
+        # Format: sample-read1.fastq.gz, sample-read2.fastq.gz
+        re.compile(r'(.+)[_-]read?([12])[_.].*'),
+        # Format: sample_S1_L001_R1_001.fastq.gz (Illumina format)
+        re.compile(r'(.+)_S\d+_L\d+_R?([12])_\d+.*')
+    ]
+    
+    with os.scandir(data_folder) as entries:
+        for entry in entries:
+            if entry.name.endswith(extensions) and entry.is_file():
+                file = entry.name
+                file_path = os.path.join(data_folder, file)
+                
+                # Try to match against various naming patterns
+                matched = False
+                for pattern in patterns:
+                    match = pattern.fullmatch(file)
+                    if match:
+                        sample_id = match.group(1)
+                        read_num = match.group(2)
+                        
+                        # Ensure read_num is either 1 or 2
+                        if read_num not in ['1', '2']:
+                            continue
+                            
+                        # Initialize sample entry if not exists
+                        if sample_id not in sample_dict:
+                            sample_dict[sample_id] = [None, None]
+                        
+                        # Store file path
+                        sample_dict[sample_id][int(read_num)-1] = file_path
+                        matched = True
+                        break
+                
+                # Fallback to original method if no patterns matched
+                if not matched:
+                    if '_R1' in file or '_1.' in file:
+                        sample_id = re.split(r'_R1|_1\.', file)[0]
+                        if sample_id not in sample_dict:
+                            sample_dict[sample_id] = [None, None]
+                        sample_dict[sample_id][0] = file_path
+                    elif '_R2' in file or '_2.' in file:
+                        sample_id = re.split(r'_R2|_2\.', file)[0]
+                        if sample_id not in sample_dict:
+                            sample_dict[sample_id] = [None, None]
+                        sample_dict[sample_id][1] = file_path
+    
+    # Remove incomplete samples (only R1 or only R2 present)
+    complete_samples = {k: v for k, v in sample_dict.items() if all(v)}
+    
+    return complete_samples
 
 # fetch record from JSON
 def fetch_record_from_JSON(file_id, json_file):
@@ -97,20 +174,50 @@ def determine_subtype(kma_out_file, reference_folder_name, cutoff=90):
 
 # check tool availability
 def check_tool_availability(tool_name):
+    # First check if the tool exists in PATH
+    if shutil.which(tool_name) is None:
+        print(f"{tool_name} is not installed or not in system PATH.")
+        return 1
+    
+    # Special handling for BWA
+    if tool_name.lower() == "bwa":
+        try:
+            # BWA shows version info when run without arguments (to stderr)
+            result = subprocess.run([tool_name], check=False,
+                                  stdout=subprocess.PIPE, 
+                                  stderr=subprocess.PIPE,
+                                  text=True)
+            if "version" in result.stderr.lower():
+                print(f"{tool_name} is available.")
+                return 0
+            raise Exception("BWA didn't show version info")
+        except:
+            print(f"{tool_name} is present but couldn't verify version info.")
+            return 1
+    
+    # For all other tools
     try:
-        # Use subprocess to run the command with the "--version" flag
-        subprocess.run([tool_name, '--version'], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # First try with no arguments
+        subprocess.run([tool_name], check=True, 
+                      stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         print(f"{tool_name} is available.")
         return 0
     except:
+        pass
+    
+    # If that fails, try various version/help flags
+    for flag in ['--version', '-v', '-h', '--help', '-V', 'version']:
         try:
-            # Use subprocess to run the command with the "-h" flag
-            subprocess.run([tool_name, '-h'], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            print(f"{tool_name} is available.")
+            subprocess.run([tool_name, flag], check=True,
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            print(f"{tool_name} is available (responded to {flag}).")
             return 0
         except:
-            print(f"{tool_name} is not available. Please install it and try again.")
-            return 1
+            continue
+    
+    print(f"{tool_name} is present but couldn't verify it works properly.")
+    return 1
+
 
 # translate RNA sequence to DNA
 def rna_to_dna(rna_seq):

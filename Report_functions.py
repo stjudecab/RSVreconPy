@@ -18,7 +18,7 @@ from reportlab.lib.colors import black
 from matplotlib.colors import LinearSegmentedColormap, BoundaryNorm
 from reportlab.lib import colors
 from reportlab.lib.units import inch
-from RSV_functions import parse_gff, find_gene_at_position, find_gff_files_in_path, get_genotype_res, get_version, get_sub_folders, elements_not_in_array, pct_sum, determine_subtype, processIGV, extract_gene_seq, detect_F_mutation, extract_key_residue_fgene, extract_gene_covarage, translate_nt_to_aa, get_version
+from RSV_functions import parse_gff, find_gene_at_position, find_gff_files_in_path, get_genotype_res, get_version, get_sub_folders, elements_not_in_array, pct_sum, determine_subtype, processIGV, extract_gene_seq, detect_F_mutation, extract_key_residue_fgene, extract_gene_covarage, translate_nt_to_aa, get_date
 from SNP import SNP_calling
 import seaborn as sns
 import base64
@@ -680,6 +680,7 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
     current_script_path = os.path.dirname(os.path.abspath(__file__))
     version_file_path = os.path.join(current_script_path, 'version.txt')
     current_version = get_version(version_file_path)
+    current_version_date = get_date(version_file_path)
 
     line_width = 440
 
@@ -731,7 +732,7 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
     #elements.append(spacer)
 
     table_info_text = f"Pipeline Verions: {current_version}<br/> Subtypes of each reference are highlighted in different colors: <font color='red'>Subtype A</font> and <font color='blue'>Subtype B</font>"
-    table_info_text += "<br/> Genotype calling is based on <a href='https://nextstrain.org/rsv/a/genome'><b>Nextstrain</b> and <b>Nextclade3</b>, Data updated 2024-08-01</a><br/> A clade lable with * indicates the clade of best blast hit strain due to negative results from NextClade3 <br/>Click the sample name to jump to the detail section<br/> "
+    table_info_text += f"<br/> Genotype calling is based on <a href='https://nextstrain.org/rsv/a/genome'><b>Nextstrain</b> and <b>Nextclade3</b>, Data updated {current_version_date}</a><br/> A clade lable with * indicates the clade of best blast hit strain due to negative results from NextClade3 <br/>Click the sample name to jump to the detail section<br/> "
     paragraph = Paragraph(table_info_text, styles['BodyText'])
     elements.append(paragraph)
     spacer = Spacer(1, 6)  # width and height in points
@@ -1255,6 +1256,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
     current_script_path = os.path.dirname(os.path.abspath(__file__))
     version_file_path = os.path.join(current_script_path, 'version.txt')
     current_version = get_version(version_file_path)
+    current_version_date = get_date(version_file_path)
 
     sidebar_div = '<div class="sidebar">\n'
     main_content_div = '<div class="main-content">\n'
@@ -1284,7 +1286,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
     Logo = os.path.join(file_path, 'Resource','CAB.png')
 
     table_info_text = f"Pipeline Verions: {current_version}<br/> Subtypes of each reference are highlighted in different colors: <font color='red'>Subtype A</font> and <font color='blue'>Subtype B</font>"
-    table_info_text += "<br/> Genotype calling is based on <a href='https://nextstrain.org/rsv/a/genome'  target=\"_blank\"><b>Nextstrain</b> and <b>Nextclade3</b>, Data updated 2024-08-01</a><br/> A clade lable with * indicates the clade of best blast hit strain due to negative results from NextClade3 <br/>Click the sample name to jump to the detail section<br/> "
+    table_info_text += f"<br/> Genotype calling is based on <a href='https://nextstrain.org/rsv/a/genome'  target=\"_blank\"><b>Nextstrain</b> and <b>Nextclade3</b>, Data updated {current_version_date}</a><br/> A clade lable with * indicates the clade of best blast hit strain due to negative results from NextClade3 <br/>Click the sample name to jump to the detail section<br/> "
 
     main_content_div += '<div id="summary_section" class="content-section">'
     main_content_div += f"<h1>{title}</h1>\n"

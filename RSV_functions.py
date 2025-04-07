@@ -509,3 +509,10 @@ def get_version(version_file):
         first_line = file.readline().strip()  # strip() removes leading/trailing whitespace
         return first_line
 
+def get_date(version_file):
+    with open(version_file, "r") as file:
+        # Read the first line
+        first_line = file.readline().strip()  # strip() removes leading/trailing whitespace
+        second_line = file.readline().strip()  # strip() removes leading/trailing whitespace
+        return second_line
+

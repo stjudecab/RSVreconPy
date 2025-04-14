@@ -45,7 +45,7 @@ We use `conda` to manage all dependencies. Please install `conda` and 'mamba'
 
 Please check conda website for a comprehansive instruction: https://www.anaconda.com/docs/getting-started/miniconda/install
 
-**Install Mamba (recommended)** 
+**Install Mamba (recommended, it's much faster than conda)** 
 
 Installing mamba
 
@@ -78,8 +78,8 @@ REFERENCE_DIR: /path/to/reference/sequences  # Please download our pre-built ref
 OUTPUT_DIR: /path/to/output/directory        # please specify a output folder path
 
 # Performance parameters
-THREAD_N: 2                     # Threads per sample
-MAX_CONCURRENT_JOBS: 10          # Parallel samples to process
+THREAD_N: 2                     # Threads per sample, for BWA-MEM
+MAX_CONCURRENT_JOBS: 10         # Parallel samples to process, notice: THREAD_N * MAX_CONCURRENT_JOBS should < than your number of CPUs
 
 # Analysis parameters
 TOOL: BWA                       # Currently only BWA supported
@@ -90,19 +90,22 @@ RSV_NEXT_PIPE_RES: /path/to/additional/results  # We allow users to compare RSVr
 ```
 
 ## Quick Start
-1. Edit `config.yaml` with your paths
-2. Run pipeline:
+### 1. Edit `config.yaml` with your paths
+### 2. Run pipeline:
 
 ```bash
 # export path to your PATH
 export PATH=/path/to/your/RSVrecon/folder:$PATH
+# activate conda env
+conda activate RSVreconEnv
 ```
-### local mode
+
 ```bash
+# if you're on your local server
 python Pipeline.py config.yaml
-```
-### job submission mode (using LSF as example)
-```bash
+
+# If you're on HPC (using LSF as example)
+# number of CPUs requested should >= THREAD_N * MAX_CONCURRENT_JOBS
 bsub -n 20 -R "rusage[mem=10001]" -P CAB -J RSV -q priority -cwd $(pwd -P) "python Pipeline.py config.yaml"
 ```
 

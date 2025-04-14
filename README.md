@@ -65,7 +65,6 @@ module load mamba
 #### B. Setup Env for RSVrecon
 ```bash
 bash Set_env.sh
-conda activate RSVreconEnv
 ```
 
 ## Configuration

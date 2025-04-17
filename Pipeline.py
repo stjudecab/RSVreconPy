@@ -107,6 +107,21 @@ if not os.path.exists(mapres_folder_name):
     os.mkdir(mapres_folder_name)
 
 ###################################################
+##      download latest NextClade reference database
+###################################################
+db_path = os.path.join(reference_folder_name, 'NextClade','rsv_a')
+nextclade_cmd = f"nextclade3 dataset get --name rsv_a --output-dir {db_path}"
+#print(nextclade_cmd)
+subprocess.run(nextclade_cmd, shell=True)
+
+db_path = os.path.join(reference_folder_name, 'NextClade','rsv_b')
+nextclade_cmd = f"nextclade3 dataset get --name rsv_b --output-dir {db_path}"
+#print(nextclade_cmd)
+subprocess.run(nextclade_cmd, shell=True)
+
+print(f"Latest database downloaded from RSV A and RSV B\n")
+
+###################################################
 ##      start process with concurrent execution
 ###################################################
 def run_mapping(sample_id, mapres_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN, igv_cutoff):
@@ -114,11 +129,11 @@ def run_mapping(sample_id, mapres_folder_name, original_read1, original_read2, r
     root_file_path = os.path.dirname(os.path.realpath(__file__))
     log_file = os.path.join(log_folder_name, sample_id + '.log')
     errlog_file = os.path.join(log_folder_name, sample_id + '.err.log')
-    bsub_command = f"python {root_file_path}/Mapping.py {sample_id} '{mapres_folder_name}' '{original_read1}' '{original_read2}' '{reference_folder_name}' {star_ThreadN} {igv_cutoff}"
+    job_command = f"python {root_file_path}/Mapping.py {sample_id} '{mapres_folder_name}' '{original_read1}' '{original_read2}' '{reference_folder_name}' {star_ThreadN} {igv_cutoff}"
     
     # Redirect output to log files
     with open(log_file, 'w') as log, open(errlog_file, 'w') as errlog:
-        process = subprocess.run(bsub_command, shell=True, stdout=log, stderr=errlog)
+        process = subprocess.run(job_command, shell=True, stdout=log, stderr=errlog)
     
     return sample_id, process.returncode
 

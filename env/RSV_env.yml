@@ -31,6 +31,6 @@ dependencies:
   - bioconda::nextclade
   - bioconda::samtools=1.18
   - bioconda::blast=2.14.1
-  - bioconda::star=2.7.11a
+  - bioconda::bwa
   - bioconda::mafft=7.505
   - bioconda::fasttree=2.1.11

@@ -180,10 +180,10 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
         genotype_call_whole_genome(query_file_path, ref_db_path, meta_file_path, genotype_folder, reference_folder_name, render_file)
 
     ## genotype using G protein (Dumb method)
-    ref_db_path = os.path.join(reference_folder_name, 'Genotype_ref', 'G_genotype', 'G_subtype')
-    print(f"genotype_call_G_protein {query_file_path} {ref_db_path} {genotype_folder} {reference_folder_name} {render_file}")
-    if run_eachstep['genotype_G_gene'] is True:
-        genotype_call_G_protein(query_file_path, ref_db_path, genotype_folder, reference_folder_name, render_file)
+    #ref_db_path = os.path.join(reference_folder_name, 'Genotype_ref', 'G_genotype', 'G_subtype')
+    #print(f"genotype_call_G_protein {query_file_path} {ref_db_path} {genotype_folder} {reference_folder_name} {render_file}")
+    #if run_eachstep['genotype_G_gene'] is True:
+    #    genotype_call_G_protein(query_file_path, ref_db_path, genotype_folder, reference_folder_name, render_file)
 
     ## blast query against GISAID
     blast_out_file = os.path.join(genotype_folder, 'blastn_res_gisaid.tsv')

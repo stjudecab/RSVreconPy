@@ -195,6 +195,16 @@ def check_tool_availability(tool_name):
             print(f"{tool_name} is present but couldn't verify version info.")
             return 1
     
+    # If that fails, try various version/help flags
+    for flag in ['--version', '-v', '-h', '--help', '-V', 'version']:
+        try:
+            subprocess.run([tool_name, flag], check=True,
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            print(f"{tool_name} is available (responded to {flag}).")
+            return 0
+        except:
+            continue
+
     # For all other tools
     try:
         # First try with no arguments
@@ -205,15 +215,6 @@ def check_tool_availability(tool_name):
     except:
         pass
     
-    # If that fails, try various version/help flags
-    for flag in ['--version', '-v', '-h', '--help', '-V', 'version']:
-        try:
-            subprocess.run([tool_name, flag], check=True,
-                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            print(f"{tool_name} is available (responded to {flag}).")
-            return 0
-        except:
-            continue
     
     print(f"{tool_name} is present but couldn't verify it works properly.")
     return 1

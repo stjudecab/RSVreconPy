@@ -275,7 +275,7 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
     CSV_header += "Subtype,reference_accession,ref_subtype,"
     CSV_header += "F protein mutations,"
     CSV_header += "NS1_cov,NS2_cov,N_cov,P_cov,M_cov,SH_cov,G_cov,F_cov,M2-1_cov,M2-2_cov,L_cov,"
-    CSV_header += "G-protein Clade(NextClade),Whole Genome Clade(NextClade),G-protein Clade(Blast),Whole Genome Clade(Blast)"
+    CSV_header += "Whole Genome Clade(NextClade),Whole Genome Clade(Blast)"
 
     subtype_a_names = []
     subtype_b_names = []
@@ -411,18 +411,18 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
                     G_subtype_str = 'Not RSV'
                     W_subtype_str = 'Not RSV'
                 
-                out.write(f",{G_subtype_str},{W_subtype_str}")
+                out.write(f",{W_subtype_str}")
 
                 # step 8: Fetch G protein genotype from blast
-                if subtype_str != 'Not RSV':
-                    genotype_g_file = os.path.join(working_folder_name, cur_folder, 'Genotype', 'Genotype_G.txt')
-                    if os.path.isfile(genotype_g_file):
-                        G_subtype_str, blast_pct_identity, blast_alignment_length, starin = get_genotype_res(genotype_g_file)
-                    else:
-                        G_subtype_str = 'Not RSV'
-                else:
-                    G_subtype_str = 'Not RSV'
-                out.write(f",{G_subtype_str}")
+                #if subtype_str != 'Not RSV':
+                #    genotype_g_file = os.path.join(working_folder_name, cur_folder, 'Genotype', 'Genotype_G.txt')
+                #    if os.path.isfile(genotype_g_file):
+                #        G_subtype_str, blast_pct_identity, blast_alignment_length, starin = get_genotype_res(genotype_g_file)
+                #    else:
+                #        G_subtype_str = 'Not RSV'
+                #else:
+                #    G_subtype_str = 'Not RSV'
+                #out.write(f",{G_subtype_str}")
 
                 # step 9: Fetch whole genome genotype from blast
                 if subtype_str != 'Not RSV':
@@ -443,7 +443,7 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
                 QC_str = f"{before['total_reads']},{before['q20_rate']},{before['q30_rate']},{after['total_reads']},{after['q20_rate']},{after['q30_rate']},{rate},"
                 map_str = f"0,0,100,0,"
                 subtype_str = 'Not RSV'
-                out.write(f"{sample},{QC_str}{map_str}{subtype_str},NA,Not RSV,,0,0,0,0,0,0,0,0,0,0,0,{subtype_str},{subtype_str},{subtype_str},{subtype_str}\n")
+                out.write(f"{sample},{QC_str}{map_str}{subtype_str},NA,Not RSV,,0,0,0,0,0,0,0,0,0,0,0,{subtype_str},{subtype_str}\n")
 
     # make F protein CSV report
     F_report_A = report.replace('Report.csv', 'F_mutation_A_report.csv')
@@ -745,7 +745,7 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
     #df.iloc[:,8] = df.iloc[:,8].apply(lambda x: '{:.2%}'.format(x/100))
     #df.iloc[:,12] = df.iloc[:,12].apply(lambda x: '{:.2%}'.format(x/100))
 
-    df = df.iloc[:, [0, 7, 8, 12,13,14, 27, 28, 29, 30, 22]] # name, QC rate, mapping rate, subtype, reference_accession, ref_subtype, Gtype, Wtype, Gtype_blast, Wtype_blast, G_cov
+    df = df.iloc[:, [0, 7, 8, 12,13,14, 27, 28, 22]] # name, QC rate, mapping rate, subtype, reference_accession, ref_subtype, Gtype, Wtype, Gtype_blast, Wtype_blast, G_cov
     data = df.values.tolist()
 
     custom_style = ParagraphStyle(
@@ -814,20 +814,20 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
             genotype_text = data[row][7]
         
         # genotype for G gene
-        if data[row][6] == 'unassigned':
-            g_genotype_text = data[row][8] + '*'
-        else:
-            g_genotype_text = data[row][6]
-        if data[row][10] < 20:
-            g_genotype_text = data[row][8]
-        if g_genotype_text == 'Low G coverage':
-            g_genotype_text = 'Low cov'
+        #if data[row][6] == 'unassigned':
+        #    g_genotype_text = data[row][8] + '*'
+        #else:
+        #    g_genotype_text = data[row][6]
+        #if data[row][10] < 20:
+        #    g_genotype_text = data[row][8]
+        #if g_genotype_text == 'Low G coverage':
+        #    g_genotype_text = 'Low cov'
 
-        data[row] = [cur_sample_link, f'{data[row][1]:.2%}', cur_sample_png, genotype_text, g_genotype_text, sign_png]
+        data[row] = [cur_sample_link, f'{data[row][1]:.2%}', cur_sample_png, genotype_text, sign_png]
 
-    df_columns = ['Sample name', 'Pass QC', 'Mapping rate', 'Clade', 'G-Clade', 'Sign']
+    df_columns = ['Sample name', 'Pass QC', 'Mapping rate', 'Clade', 'Sign']
     data.insert(0, df_columns)
-    col_widths = [1.5*inch, 0.7*inch, 4*inch, 0.8*inch, 0.8*inch, 0.4*inch]
+    col_widths = [1.5*inch, 0.7*inch, 4*inch, 0.8*inch, 0.4*inch]
 
     table = Table(data, colWidths = col_widths)
     #table._argW = [100,60,150,80]
@@ -877,7 +877,7 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
     ######################################################################
     # section 1.5, coverage heatmap
     ######################################################################
-    elements.append(PageBreak())
+    #elements.append(PageBreak())
     subtitle_cov_section = Paragraph("Coverage by genes", styles['Heading2'])
     elements.append(subtitle_cov_section)
 
@@ -972,19 +972,18 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
         elements.append(subtitle)
 
         # genotype for whole genome
-        if df.loc[cur_folder,df.columns[27]] in ['A','B']:
-            genotype_text = df.loc[cur_folder,df.columns[29]] + '*'
+        if df.loc[cur_folder,df.columns[26]] in ['A','B']:
+            genotype_text = df.loc[cur_folder,df.columns[27]] + '*'
         else:
-            genotype_text = df.loc[cur_folder,df.columns[27]]
+            genotype_text = df.loc[cur_folder,df.columns[26]]
         
         # genotype for G gene
-        if df.loc[cur_folder,df.columns[26]] == 'unassigned':
-            g_genotype_text = df.loc[cur_folder,df.columns[28]] + '*'
-        else:
-            g_genotype_text = df.loc[cur_folder,df.columns[26]]
-
-        if df.loc[cur_folder,df.columns[22]] < 20:
-            g_genotype_text = df.loc[cur_folder,df.columns[28]]
+        #if df.loc[cur_folder,df.columns[26]] == 'unassigned':
+        #    g_genotype_text = df.loc[cur_folder,df.columns[28]] + '*'
+        #else:
+        #    g_genotype_text = df.loc[cur_folder,df.columns[26]]
+        #if df.loc[cur_folder,df.columns[22]] < 20:
+        #    g_genotype_text = df.loc[cur_folder,df.columns[28]]
 
         F_protein_mutation_text = df.loc[cur_folder,df.columns[14]]
         if isinstance(F_protein_mutation_text, str):
@@ -1001,11 +1000,11 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
         else:
             cur_sample_map = int(df.loc[cur_folder,df.columns[7]])
             if cur_sample_map > 80:
-                genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','correct.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  <b>' + genotype_text + '</b> (based on whole genome)'
+                genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','correct.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  <b>' + genotype_text + '</b>'
             else:
-                genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','warning.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  <b>' + genotype_text + '</b> (based on whole genome)'
+                genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','warning.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  <b>' + genotype_text + '</b>'
             
-            genotype_para += f";  <b>{g_genotype_text}</b> (based on G-ectodomain)<br/><br/>"
+            #genotype_para += f";  <b>{g_genotype_text}</b> (based on G-ectodomain)<br/><br/>"
             #genotype_para += f"Genotype Resource:   <b><a href='https://nextstrain.org/rsv/a/genome'>Nextstrain (click for details), Data updated 2024-08-01</a></b>"
             genotype_para += f"F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
 
@@ -1075,18 +1074,18 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
                 elements.append(img_tree)
                 elements.append(PageBreak())
 
-            tree_png_file = os.path.join(mapres_folder, cur_folder, 'Genotype','G_gene_genotype.png')
-            if os.path.exists(tree_png_file):
-                subtitle = Paragraph('Phylogenetic analysis: G-ectodomain', styles['Heading4'])
-                elements.append(subtitle)
-
-                pil_img = PILImage.open(tree_png_file)
-                original_width, original_height = pil_img.size
-                new_width = 480
-                new_height = original_height * (new_width / original_width)
-                img_tree = Image(tree_png_file, width=new_width, height=new_height)
-                img_tree.hAlign = 'CENTER'
-                elements.append(img_tree)
+            #tree_png_file = os.path.join(mapres_folder, cur_folder, 'Genotype','G_gene_genotype.png')
+            #if os.path.exists(tree_png_file):
+            #    subtitle = Paragraph('Phylogenetic analysis: G-ectodomain', styles['Heading4'])
+            #    elements.append(subtitle)
+            #
+            #   pil_img = PILImage.open(tree_png_file)
+            #    original_width, original_height = pil_img.size
+            #    new_width = 480
+            #    new_height = original_height * (new_width / original_width)
+            #    img_tree = Image(tree_png_file, width=new_width, height=new_height)
+            #    img_tree.hAlign = 'CENTER'
+            #    elements.append(img_tree)
 
         # ######################################## QC details
         subtitle = Paragraph('QC Details', styles['Heading4'])
@@ -1103,11 +1102,6 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
         elements.append(table)
 
         # ######################################## coverage summary
-        if genotype_text == "Not RSV":
-            pass
-        else:
-            elements.append(PageBreak())
-
         ref_genotype_text = df.loc[cur_folder,df.columns[13]]
         if ref_genotype_text == "Not RSV":
             pass
@@ -1300,7 +1294,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
     df.iloc[:,7] = df.iloc[:,7] / 100
     #df.iloc[:,7] = df.iloc[:,7].apply(lambda x: '{:.2%}'.format(x/100)) # QC rate
 
-    df = df.iloc[:, [0, 7, 8, 12,13,14, 27, 28, 29, 30, 22]] # name, QC rate, mapping rate, subtype, reference_accession, ref_subtype, Gtype, Wtype, Gtype_blast, Wtype_blast, G_cov
+    df = df.iloc[:, [0, 7, 8, 12,13,14, 27, 28, 22]] # name, QC rate, mapping rate, subtype, reference_accession, ref_subtype, Gtype, Wtype, Gtype_blast, Wtype_blast, G_cov
     data = df.values.tolist()
 
     for row in range(0, len(data)):
@@ -1329,23 +1323,23 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
             genotype_text = data[row][7]
         
         # genotype for G gene
-        if data[row][6] == 'unassigned':
-            g_genotype_text = data[row][8] + '*'
-        else:
-            g_genotype_text = data[row][6]
-        if data[row][10] < 20:
-            g_genotype_text = data[row][8]
-        if g_genotype_text == 'Low G coverage':
-            g_genotype_text = 'Low cov'
+        #if data[row][6] == 'unassigned':
+        #    g_genotype_text = data[row][8] + '*'
+        #else:
+        #    g_genotype_text = data[row][6]
+        #if data[row][10] < 20:
+        #    g_genotype_text = data[row][8]
+        #if g_genotype_text == 'Low G coverage':
+        #    g_genotype_text = 'Low cov'
 
         mapping_fig_base64_string = image_to_base64(cur_sample_png)
         mapping_fig = f"<img src='data:image/png;base64,{mapping_fig_base64_string}' alt=\"mapping_fig\" style='margin-top:0px;height:30px'>\n"
         sign_fig_base64_string = image_to_base64(sign_png)
         sign_fig = f"<img src='data:image/png;base64,{sign_fig_base64_string}' alt=\"sign_fig\" style='margin-top:0px;height:30px'>\n"
 
-        data[row] = [cur_sample_link, f'{data[row][1]:.2%}', mapping_fig, genotype_text, g_genotype_text, sign_fig]
+        data[row] = [cur_sample_link, f'{data[row][1]:.2%}', mapping_fig, genotype_text, sign_fig]
 
-    df_columns = ['Sample name', 'Pass QC', 'Mapping rate', 'Clade', 'G-Clade', 'Sign']
+    df_columns = ['Sample name', 'Pass QC', 'Mapping rate', 'Clade',  'Sign']
     
     # Set the background color of each cell based on its value
     bg_color = generate_empty_2d_array(data)
@@ -1418,19 +1412,18 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
         main_content_div += f"<h3>Genotype calls</h3>\n"
 
         # genotype for whole genome
-        if df.loc[cur_folder,df.columns[27]] in ['A','B']:
-            genotype_text = df.loc[cur_folder,df.columns[29]] + '*'
+        if df.loc[cur_folder,df.columns[26]] in ['A','B']:
+            genotype_text = df.loc[cur_folder,df.columns[27]] + '*'
         else:
-            genotype_text = df.loc[cur_folder,df.columns[27]]
+            genotype_text = df.loc[cur_folder,df.columns[26]]
         
         # genotype for G gene
-        if df.loc[cur_folder,df.columns[26]] == 'unassigned':
-            g_genotype_text = df.loc[cur_folder,df.columns[28]] + '*'
-        else:
-            g_genotype_text = df.loc[cur_folder,df.columns[26]]
-
-        if df.loc[cur_folder,df.columns[22]] < 20:
-            g_genotype_text = df.loc[cur_folder,df.columns[28]]
+        #if df.loc[cur_folder,df.columns[26]] == 'unassigned':
+        #    g_genotype_text = df.loc[cur_folder,df.columns[28]] + '*'
+        #else:
+        #    g_genotype_text = df.loc[cur_folder,df.columns[26]]
+        #if df.loc[cur_folder,df.columns[22]] < 20:
+        #    g_genotype_text = df.loc[cur_folder,df.columns[28]]
 
         F_protein_mutation_text = df.loc[cur_folder,df.columns[14]]
         if isinstance(F_protein_mutation_text, str):
@@ -1450,10 +1443,10 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
                 base64_string = image_to_base64(os.path.join(file_path, 'Resource','correct.png'))
             else:
                 base64_string = image_to_base64(os.path.join(file_path, 'Resource','warning.png'))
-            genotype_para  = f"<img src='data:image/png;base64,{base64_string}' style='margin-top:0px;width:30px'><b>{genotype_text}</b> (based on whole genome)"
+            genotype_para  = f"<img src='data:image/png;base64,{base64_string}' style='margin-top:0px;width:30px'><b>{genotype_text}</b>"
             
 
-            genotype_para += f";  <b>{g_genotype_text}</b> (based on G-ectodomain)<br/><br/>"
+            #genotype_para += f";  <b>{g_genotype_text}</b> (based on G-ectodomain)<br/><br/>"
             #genotype_para += f"Genotype Resource:   <b><a href='https://nextstrain.org/rsv/a/genome'>Nextstrain (click for details), Data updated 2024-08-01</a></b>"
             genotype_para += f"F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
 
@@ -1493,11 +1486,11 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
                 base64_string = image_to_base64(tree_png_file)
                 main_content_div += f"<img src='data:image/png;base64,{base64_string}' alt=\"{section_id}\" style='margin-top:0px;width:1200px'>\n"
 
-            tree_png_file = os.path.join(mapres_folder, cur_folder, 'Genotype','G_gene_genotype.png')
-            if os.path.exists(tree_png_file):
-                main_content_div += f"<h3>Phylogenetic analysis: G-ectodomain</h3>\n"
-                base64_string = image_to_base64(tree_png_file)
-                main_content_div += f"<img src='data:image/png;base64,{base64_string}' alt=\"{section_id}\" style='margin-top:0px;width:1200px'>\n"
+            #tree_png_file = os.path.join(mapres_folder, cur_folder, 'Genotype','G_gene_genotype.png')
+            #if os.path.exists(tree_png_file):
+            #    main_content_div += f"<h3>Phylogenetic analysis: G-ectodomain</h3>\n"
+            #    base64_string = image_to_base64(tree_png_file)
+            #    main_content_div += f"<img src='data:image/png;base64,{base64_string}' alt=\"{section_id}\" style='margin-top:0px;width:1200px'>\n"
 
         # ######################################## QC details
         main_content_div += f"<h2>QC Details</h2>\n"

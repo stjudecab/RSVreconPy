@@ -745,7 +745,7 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
     #df.iloc[:,8] = df.iloc[:,8].apply(lambda x: '{:.2%}'.format(x/100))
     #df.iloc[:,12] = df.iloc[:,12].apply(lambda x: '{:.2%}'.format(x/100))
 
-    df = df.iloc[:, [0, 7, 8, 12,13,14, 27, 28, 22]] # name, QC rate, mapping rate, subtype, reference_accession, ref_subtype, Gtype, Wtype, Gtype_blast, Wtype_blast, G_cov
+    df = df.iloc[:, [0, 7, 8, 12,13,14, 27, 28, 22]] # name, QC rate, mapping rate, subtype, reference_accession, ref_subtype, Wtype, Wtype_blast, G_cov
     data = df.values.tolist()
 
     custom_style = ParagraphStyle(
@@ -808,10 +808,10 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
         cur_sample_link = Paragraph(f"<a href='#{cur_sample_name}'>{cur_sample_name}</a>", custom_style)
         
         # genotype for whole genome
-        if data[row][7] in ['A','B']:
-            genotype_text = data[row][9] + '*'
+        if data[row][6] in ['A','B']:
+            genotype_text = data[row][7] + '*'
         else:
-            genotype_text = data[row][7]
+            genotype_text = data[row][6]
         
         # genotype for G gene
         #if data[row][6] == 'unassigned':
@@ -1294,7 +1294,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
     df.iloc[:,7] = df.iloc[:,7] / 100
     #df.iloc[:,7] = df.iloc[:,7].apply(lambda x: '{:.2%}'.format(x/100)) # QC rate
 
-    df = df.iloc[:, [0, 7, 8, 12,13,14, 27, 28, 22]] # name, QC rate, mapping rate, subtype, reference_accession, ref_subtype, Gtype, Wtype, Gtype_blast, Wtype_blast, G_cov
+    df = df.iloc[:, [0, 7, 8, 12,13,14, 27, 28, 22]] # name, QC rate, mapping rate, subtype, reference_accession, ref_subtype, Wtype, Wtype_blast, G_cov
     data = df.values.tolist()
 
     for row in range(0, len(data)):
@@ -1317,10 +1317,10 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
         cur_sample_link = f"<a onclick=\"showSection('{cur_sample_name}')\">{cur_sample_name}</a>"
         
         # genotype for whole genome
-        if data[row][7] in ['A','B']:
-            genotype_text = data[row][9] + '*'
+        if data[row][6] in ['A','B']:
+            genotype_text = data[row][7] + '*'
         else:
-            genotype_text = data[row][7]
+            genotype_text = data[row][6]
         
         # genotype for G gene
         #if data[row][6] == 'unassigned':

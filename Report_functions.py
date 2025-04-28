@@ -1000,13 +1000,13 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
         else:
             cur_sample_map = int(df.loc[cur_folder,df.columns[7]])
             if cur_sample_map > 80:
-                genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','correct.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  <b>' + genotype_text + '</b>'
+                genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','correct.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  <b> ' + genotype_text + ' </b>'
             else:
-                genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','warning.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  <b>' + genotype_text + '</b>'
+                genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','warning.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  <b> ' + genotype_text + ' </b>'
             
             #genotype_para += f";  <b>{g_genotype_text}</b> (based on G-ectodomain)<br/><br/>"
             #genotype_para += f"Genotype Resource:   <b><a href='https://nextstrain.org/rsv/a/genome'>Nextstrain (click for details), Data updated 2024-08-01</a></b>"
-            genotype_para += f"F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
+            genotype_para += f"<br/>F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
 
         paragraph = Paragraph(genotype_para)
         
@@ -1448,7 +1448,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
 
             #genotype_para += f";  <b>{g_genotype_text}</b> (based on G-ectodomain)<br/><br/>"
             #genotype_para += f"Genotype Resource:   <b><a href='https://nextstrain.org/rsv/a/genome'>Nextstrain (click for details), Data updated 2024-08-01</a></b>"
-            genotype_para += f"F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
+            genotype_para += f"<br/>F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
 
         main_content_div += genotype_para
 

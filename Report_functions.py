@@ -567,7 +567,7 @@ def generate_phylogenetic_tree(root_file_path, reference_folder_name, working_fo
                                 #print(seq_name)
                                 if seq_name in subtype_a_names:
                                     seq_file.write(f'>{seq_name}|NEXT_RSV\n')
-                                    text = f"{seq_name},In-house,Query\n{seq_name}|NEXT_RSV,NEXT_RSV,Query\n"
+                                    text = f"{seq_name},RSVrecon,Query\n{seq_name}|NEXT_RSV,NEXT_RSV,Query\n"
                                     anno_file.write(text)
                                 else:
                                     break
@@ -636,7 +636,7 @@ def generate_phylogenetic_tree(root_file_path, reference_folder_name, working_fo
                                 #print(seq_name)
                                 if seq_name in subtype_b_names:
                                     seq_file.write(f'>{seq_name}|NEXT_RSV\n')
-                                    text = f"{seq_name},In-house,Query\n{seq_name}|NEXT_RSV,NEXT_RSV,Query\n"
+                                    text = f"{seq_name},RSVrecon,Query\n{seq_name}|NEXT_RSV,NEXT_RSV,Query\n"
                                     anno_file.write(text)
                                 else:
                                     break

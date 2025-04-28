@@ -270,8 +270,8 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
 
     # create output CSV
     CSV_header = f"Pipeline verions: {current_version}\n"
-    CSV_header += "Sample name,before_filtering_total_reads,before_filtering_q20_rate,before_filtering_q30_rate,after_filtering_total_reads,after_filtering_q20_rate,after_filtering_q30_rate,QC rate,"
-    CSV_header += "Uniquely mapped reads(%),MULTI-MAPPING READS(%),UNMAPPED READS(%),CHIMERIC READS(%),"
+    CSV_header += "Sample name,before_filtering_total_reads, before_filtering_q20_rate, before_filtering_q30_rate, after_filtering_total_reads, after_filtering_q20_rate, after_filtering_q30_rate, QC rate,"
+    CSV_header += "Uniquely mapped reads %,MULTI-MAPPING READS %,UNMAPPED READS%,CHIMERIC READS%,"
     CSV_header += "Subtype,reference_accession,ref_subtype,"
     CSV_header += "F protein mutations,"
     CSV_header += "NS1_cov,NS2_cov,N_cov,P_cov,M_cov,SH_cov,G_cov,F_cov,M2-1_cov,M2-2_cov,L_cov,"
@@ -405,10 +405,10 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
                 if subtype_str != 'Not RSV':
                     nextclade_file = os.path.join(working_folder_name, cur_folder, 'Genotype', 'NextClade', 'nextclade.tsv')
                     df = pd.read_csv(nextclade_file, index_col=0, header=0, sep='\t')
-                    #G_subtype_str = df.iloc[0,2]
-                    W_subtype_str = df.loc[0,'clade']
+                    G_subtype_str = df.iloc[0,2]
+                    W_subtype_str = df.iloc[0,1]
                 else:
-                    #G_subtype_str = 'Not RSV'
+                    G_subtype_str = 'Not RSV'
                     W_subtype_str = 'Not RSV'
                 
                 out.write(f",{W_subtype_str}")
@@ -741,9 +741,11 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
     # load table for summary section
     df = pd.read_csv(csv_file, skiprows = 1)
     # Format the column as percentages
-    df.loc[:,'QC rate'] = df.loc[:,'QC rate'] / 100 # QC rate
+    df.iloc[:,7] = df.iloc[:,7] / 100 # QC rate
+    #df.iloc[:,8] = df.iloc[:,8].apply(lambda x: '{:.2%}'.format(x/100))
+    #df.iloc[:,12] = df.iloc[:,12].apply(lambda x: '{:.2%}'.format(x/100))
 
-    df = df.loc[:, ['Sample name', 'QC rate', 'Uniquely mapped reads(%)', 'Subtype','reference_accession','ref_subtype', 'Whole Genome Clade(NextClade)', 'Whole Genome Clade(Blast)', 'G_cov']]
+    df = df.iloc[:, [0, 7, 8, 12,13,14, 27, 28, 22]] # name, QC rate, mapping rate, subtype, reference_accession, ref_subtype, Wtype, Wtype_blast, G_cov
     data = df.values.tolist()
 
     custom_style = ParagraphStyle(
@@ -880,8 +882,8 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
     elements.append(subtitle_cov_section)
 
     df = pd.read_csv(csv_file, skiprows = 1)
-    plot_df = df.loc[:, ["NS1_cov","NS2_cov","N_cov","P_cov","M_cov","SH_cov","G_cov","F_cov","M2-1_cov","M2-2_cov","L_cov"]]
-    plot_df.index = df.loc[:,'Sample name']
+    plot_df = df.iloc[:, [16,17,18,19,20,21,22,23,24,25,26]]
+    plot_df.index = df.iloc[:,0]
     png_file = os.path.join(temp_folder, 'coverage_heatmap.png')
     make_coverage_heatmap(plot_df, png_file)
 
@@ -985,8 +987,8 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
 
         F_protein_mutation_text = df.loc[cur_folder,df.columns[14]]
         if isinstance(F_protein_mutation_text, str):
-            print(cur_folder)
-            print(F_protein_mutation_text)
+            #print(cur_folder)
+            #print(F_protein_mutation_text)
             F_protein_mutation_text = F_protein_mutation_text.replace("|", ", ")
             F_protein_mutation_text = F_protein_mutation_text.replace('(Reported)','')
         else:
@@ -1289,9 +1291,10 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
 
     # load table for summary section
     df = pd.read_csv(csv_file, skiprows=1)
-    df.loc[:,'QC rate'] = df.loc[:,'QC rate'] / 100 # QC rate
+    df.iloc[:,7] = df.iloc[:,7] / 100
+    #df.iloc[:,7] = df.iloc[:,7].apply(lambda x: '{:.2%}'.format(x/100)) # QC rate
 
-    df = df.loc[:, ['Sample name', 'QC rate', 'Uniquely mapped reads(%)', 'Subtype','reference_accession','ref_subtype', 'Whole Genome Clade(NextClade)', 'Whole Genome Clade(Blast)', 'G_cov']]
+    df = df.iloc[:, [0, 7, 8, 12,13,14, 27, 28, 22]] # name, QC rate, mapping rate, subtype, reference_accession, ref_subtype, Wtype, Wtype_blast, G_cov
     data = df.values.tolist()
 
     for row in range(0, len(data)):
@@ -1424,8 +1427,8 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
 
         F_protein_mutation_text = df.loc[cur_folder,df.columns[14]]
         if isinstance(F_protein_mutation_text, str):
-            print(cur_folder)
-            print(F_protein_mutation_text)
+            #print(cur_folder)
+            #print(F_protein_mutation_text)
             F_protein_mutation_text = F_protein_mutation_text.replace("|", ", ")
             F_protein_mutation_text = F_protein_mutation_text.replace('(Reported)','')
         else:

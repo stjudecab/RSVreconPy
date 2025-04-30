@@ -1006,7 +1006,7 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
             
             #genotype_para += f";  <b>{g_genotype_text}</b> (based on G-ectodomain)<br/><br/>"
             #genotype_para += f"Genotype Resource:   <b><a href='https://nextstrain.org/rsv/a/genome'>Nextstrain (click for details), Data updated 2024-08-01</a></b>"
-            genotype_para += f"<br/>F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
+            genotype_para += f"<br/><br/>F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
 
         paragraph = Paragraph(genotype_para)
         
@@ -1448,7 +1448,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
 
             #genotype_para += f";  <b>{g_genotype_text}</b> (based on G-ectodomain)<br/><br/>"
             #genotype_para += f"Genotype Resource:   <b><a href='https://nextstrain.org/rsv/a/genome'>Nextstrain (click for details), Data updated 2024-08-01</a></b>"
-            genotype_para += f"<br/>F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
+            genotype_para += f"<br/><br/>F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
 
         main_content_div += genotype_para
 

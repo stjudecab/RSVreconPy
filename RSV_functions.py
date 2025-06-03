@@ -5,6 +5,7 @@ import shutil
 from io import StringIO
 import subprocess
 import pandas as pd
+import numpy as np
 from Bio import SeqIO
 from Bio.Align import PairwiseAligner
 from Bio.Seq import Seq
@@ -158,6 +159,21 @@ def processIGV(file_name, ref_file, cutoff):
 
 # determine the subtype
 def determine_subtype(kma_out_file, reference_folder_name, cutoff=90):
+    kma_best_match = find_best_reference(kma_out_file)
+    Selected_ref_name = kma_best_match['best_reference']
+    template_identity = kma_best_match['best_template_identity']
+
+    info_table = os.path.join(reference_folder_name, 'RSV.csv')
+    info_df = pd.read_csv(info_table, delimiter=',', index_col=0)
+    subtype = info_df.loc[Selected_ref_name,'Subtype']
+
+    if float(template_identity) > cutoff:
+        return f"{subtype},{Selected_ref_name},{subtype}"
+    else:
+        return f"Not RSV,{Selected_ref_name},{subtype}"
+
+# determine the subtype
+def determine_subtype_old(kma_out_file, reference_folder_name, cutoff=90):
     kma_df = pd.read_csv(kma_out_file, sep='\t')
     kma_df = kma_df.sort_values('Score', ascending=False)
     Selected_ref_name = kma_df.iloc[0, 0]
@@ -517,3 +533,69 @@ def get_date(version_file):
         second_line = file.readline().strip()  # strip() removes leading/trailing whitespace
         return second_line
 
+def find_best_reference(kma_results_file, output_file=None):
+    """
+    Analyze KMA results and identify the best reference genome based on multiple criteria.
+    
+    Args:
+        kma_results_file (str): Path to the KMA results file
+        output_file (str, optional): Path to save the analysis results. Defaults to None.
+    
+    Returns:
+        dict: Dictionary containing the best reference and analysis results
+    """
+    # Read KMA results file
+    try:
+        df = pd.read_csv(kma_results_file, sep='\t')
+    except Exception as e:
+        print(f"Error reading KMA results file: {e}")
+        return None
+    
+    if df.empty:
+        print("No results found in the KMA file.")
+        return None
+    
+    # Apply log1p transformation to Score
+    df['Score_log1p'] = np.log1p(df['Score'])
+
+    # Calculate composite score (you can adjust weights as needed)
+    weights = {
+        'Score_log1p': 0.3,
+        'Template_Identity': 0.25,
+        'Template_Coverage': 0.25,
+        'Depth': 0.2
+    }
+    
+    # Normalize each column and calculate weighted score
+    for col in weights:
+        if col in df.columns:
+            df[col + '_norm'] = (df[col] - df[col].min()) / (df[col].max() - df[col].min())
+    
+    df['Composite_Score'] = sum(df[col + '_norm'] * weight for col, weight in weights.items())
+    
+    # Sort by composite score (descending)
+    df_sorted = df.sort_values('Composite_Score', ascending=False)
+    
+    # Get the best reference
+    best_ref = df_sorted.iloc[0]
+    
+    # Prepare results
+    results = {
+        'best_reference': best_ref['#Template'],
+        'best_score': best_ref['Score'],
+        'best_template_identity': best_ref['Template_Identity'],
+        'best_template_coverage': best_ref['Template_Coverage'],
+        'best_depth': best_ref['Depth'],
+        'composite_score': best_ref['Composite_Score'],
+        'all_results': df_sorted.to_dict('records')
+    }
+    
+    # Save results if output file is specified
+    if output_file:
+        try:
+            df_sorted.to_csv(output_file, index=False, sep='\t')
+            print(f"Results saved to {output_file}")
+        except Exception as e:
+            print(f"Error saving results: {e}")
+    
+    return results

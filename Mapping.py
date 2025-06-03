@@ -6,7 +6,7 @@ import subprocess
 import pandas as pd
 import shutil
 from Genotyping import genotype_call_whole_genome, genotype_call_G_protein
-from RSV_functions import determine_subtype, processIGV, fetch_record_from_JSON
+from RSV_functions import determine_subtype, processIGV, fetch_record_from_JSON, find_best_reference
 
 def sample_mapping(sample_id, working_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN, igv_cutoff, run_eachstep):
     # skip Undetermined reads
@@ -57,9 +57,9 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
 
     # read info from KMA results
     kma_out_file = kma_out + '.res'
-    kma_df = pd.read_csv(kma_out_file, sep='\t')
-    kma_df = kma_df.sort_values('Score', ascending=False)
-    Selected_ref_name = kma_df.iloc[0, 0]
+    kma_out_parse_file = kma_out + '_parse.res'
+    kma_best_match = find_best_reference(kma_out_file, kma_out_parse_file)
+    Selected_ref_name = kma_best_match['best_reference']
     #print(Selected_ref_name)
 
     # fetch GFF and FASTA for reference strain

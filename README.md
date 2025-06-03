@@ -37,6 +37,9 @@ Unzip the package:
 gunzip RSVrecon-main.zip
 cd RSVrecon-main
 ```
+#### 1.1: Download reference database
+Download the pre-built reference database and unzip it to a location that you have read/write permission
+https://github.com/stjudecab/RSVreconPy/releases/download/Pre-release/Reference.zip
 
 ### 2. Set Up Environment
 We use `conda` to manage all dependencies. Please install `conda` and 'mamba' 
@@ -73,7 +76,7 @@ Example `config.yaml`:
 ```yaml
 # Required paths
 DATA_DIR: /path/to/input/fastq_files         # Please put all your paired-FASTQ files under this input folder
-REFERENCE_DIR: /path/to/reference/sequences  # Please download our pre-built reference here, unzip it (and put it under RSVrecon folder), then paste the path of reference here 
+REFERENCE_DIR: /path/to/reference/sequences  # Please download our pre-built reference, unzip it, then paste the path here. Make sure you have both read and write permission
 OUTPUT_DIR: /path/to/output/directory        # please specify a output folder path
 
 # Performance parameters

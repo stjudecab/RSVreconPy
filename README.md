@@ -167,5 +167,5 @@ dependencies:
 - Pipeline errors → Check `log/*.err.log` files
 - Memory issues → Reduce `MAX_CONCURRENT_JOBS`
 
-
-
+## Citation
+Our preprint is on-line at [bioRxiv](https://www.biorxiv.org/content/10.1101/2025.06.03.657184v1)

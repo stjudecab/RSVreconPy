@@ -92,8 +92,30 @@ RSV_NEXT_PIPE_RES: /path/to/additional/results  # We allow users to compare RSVr
 ```
 
 ## Quick Start
-### 1. Edit `config.yaml` with your paths
-### 2. Run pipeline:
+### 1. Download test dataset and prebuilt reference 
+Download test dataset from [here](https://github.com/stjudecab/test_datasets/tree/rsvrecon)
+
+Download the pre-built reference database from [here](https://github.com/stjudecab/RSVreconPy/releases/download/Pre-release/Reference.zip)
+### 2. Edit `config.yaml` with your paths
+Here is an example:
+```yaml
+# Required paths
+DATA_DIR: /path/to/input/fastq_files         # Please put all your paired-FASTQ files under this input folder
+REFERENCE_DIR: /path/to/reference/sequences  # Please download our pre-built reference, unzip it, then paste the path here. Make sure you have both read and write permission
+OUTPUT_DIR: /path/to/output/directory        # please specify a output folder path
+
+# Performance parameters
+THREAD_N: 2                     # Threads per sample, for BWA-MEM
+MAX_CONCURRENT_JOBS: 10         # Parallel samples to process, notice: THREAD_N * MAX_CONCURRENT_JOBS should < than your number of CPUs
+
+# Analysis parameters
+TOOL: BWA                       # Currently only BWA supported
+COV_CUTOFF: 50                  # Coverage cutoff threshold
+
+# Optional
+RSV_NEXT_PIPE_RES: /path/to/additional/results  # We allow users to compare RSVrecon with RSV-NEXT-PIPE results. Please specify the "consensus" folder of RSV-NEXT-PIPE output for the same batch of data.
+```
+### 3. Run pipeline:
 
 ```bash
 # export path to your PATH

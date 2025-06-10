@@ -5,6 +5,8 @@
 ![R](https://img.shields.io/badge/R-4.3-green)
 ![License](https://img.shields.io/badge/license-MIT-orange)
 
+Please visit our [nextflow implementation](https://github.com/stjudecab/rsvrecon) if you're familar with ![image](https://www.nextflow.io/img/nextflow.svg).
+
 ## Table of Contents
 - [Features](#features)
 - [Installation](#installation)

@@ -93,7 +93,7 @@ RSV_NEXT_PIPE_RES: /path/to/additional/results  # We allow users to compare RSVr
 
 ## Quick Start
 ### 1. Download test dataset and prebuilt reference 
-Download test dataset from [here](https://github.com/stjudecab/test_datasets/tree/rsvrecon)
+Download test dataset from [here](https://github.com/stjudecab/test_datasets/tree/rsvrecon). FastQ files are under "fastqs" folder.
 
 Download the pre-built reference database from [here](https://github.com/stjudecab/RSVreconPy/releases/download/Pre-release/Reference.zip)
 ### 2. Edit `config.yaml` with your paths

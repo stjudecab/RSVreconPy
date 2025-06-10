@@ -126,11 +126,11 @@ conda activate RSVreconEnv
 
 ```bash
 # if you're on your local server
-python Pipeline.py config.yaml
+python rsvrecon_pipeline.py config.yaml
 
 # If you're on HPC (using LSF as example)
 # number of CPUs requested should >= THREAD_N * MAX_CONCURRENT_JOBS
-bsub -n 20 -R "rusage[mem=10001]" -P CAB -J RSV -q priority -cwd $(pwd -P) "python Pipeline.py config.yaml"
+bsub -n 20 -R "rusage[mem=10001]" -P CAB -J RSV -q priority -cwd $(pwd -P) "python rsvrecon_pipeline.py config.yaml"
 ```
 
 ## Output

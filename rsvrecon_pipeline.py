@@ -61,7 +61,7 @@ if tool not in ['BWA']:
 ###################################################
 ##      Check tools' availability
 ###################################################
-print(f"######################\tStep 0 Checking tools' availability ... \t######################")
+print(f"######################\tStep 1 Checking tools' availability ... \t######################")
 check_tool_availability_res = 0
 # Check for IGVtools
 check_tool_availability_res += check_tool_availability("igvtools")
@@ -81,9 +81,9 @@ check_tool_availability_res += check_tool_availability('mafft')
 if check_tool_availability_res > 0:
     sys.exit()
 
-print(f"######################\tStep 0  PASSED ...                      \t######################")
+#print(f"######################\tStep 0  PASSED ...                      \t######################")
 
-print(f"######################\tStep 1  process for each sample ...     \t######################")
+print(f"######################\tStep 2  process each sample ...         \t######################")
 
 ###################################################
 ##      read input data
@@ -220,6 +220,8 @@ print(f"All mapping jobs are completed! Total: {completed}/{total_samples}")
 ##      Aggregate results and generate reports
 ###################################################
 
+print(f"######################\tStep 3  Aggregate results ...           \t######################")
+
 root_file_path = os.path.dirname(os.path.realpath(__file__))
 Temp_folder_name = os.path.join(working_folder_name, 'Temp')
 if not os.path.exists(Temp_folder_name):
@@ -251,10 +253,7 @@ generate_html_report(root_file_path, report, working_folder_name, mapres_folder,
 
 print("Report and sequences have been generated!")
 
-
-
-
-
+print(f"######################\tSuccessfully completed!                 \t######################")
 
 
 

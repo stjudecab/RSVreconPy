@@ -985,7 +985,7 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
 
         F_protein_mutation_text = df.loc[cur_folder,df.columns[14]]
         if isinstance(F_protein_mutation_text, str):
-            print(cur_folder)
+            #print(cur_folder)
             #print(F_protein_mutation_text)
             F_protein_mutation_text = F_protein_mutation_text.replace("|", ", ")
             F_protein_mutation_text = F_protein_mutation_text.replace('(Reported)','')
@@ -1424,7 +1424,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
 
         F_protein_mutation_text = df.loc[cur_folder,df.columns[14]]
         if isinstance(F_protein_mutation_text, str):
-            print(cur_folder)
+            #print(cur_folder)
             #print(F_protein_mutation_text)
             F_protein_mutation_text = F_protein_mutation_text.replace("|", ", ")
             F_protein_mutation_text = F_protein_mutation_text.replace('(Reported)','')

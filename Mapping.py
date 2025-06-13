@@ -27,8 +27,8 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
     ##############################################################################
     print(f"\t######################\tStep 1 Quality check and trimming using fastp ... \t######################")
 
-    read1_trim = "reads_trimed_R1.fastq"
-    read2_trim = "reads_trimed_R2.fastq"
+    read1_trim = os.path.join(cur_folder, "reads_trimed_R1.fastq")
+    read2_trim = os.path.join(cur_folder, "reads_trimed_R2.fastq")
     log_file = os.path.join(log_cur_folder, 'fastp_log.txt')
 
     cmd = f"fastp -i \"{original_read1}\" -I \"{original_read2}\" -o {read1_trim} -O {read2_trim} &> {log_file}"
@@ -86,7 +86,7 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
     star_command = f"bwa index -p {ref_output_dir} {new_fasta_file} &> {log_file}"
     print(star_command)
 
-    if run_eachstep['star_index'] is True:
+    if run_eachstep['index'] is True:
         subprocess.run(star_command, shell=True, cwd=cur_folder)
 
     ##############################################################################
@@ -103,7 +103,7 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
     cmd_mapping = f"bwa mem -t {star_ThreadN} {ref_output_dir} {read1_trim} {read2_trim} > {sam_file} 2> {log_file}"
     print(cmd_mapping)
 
-    if run_eachstep['star'] is True:
+    if run_eachstep['align'] is True:
         subprocess.run(cmd_mapping, shell=True, cwd=cur_folder)
 
     ##############################################################################
@@ -219,8 +219,8 @@ if __name__ == "__main__":
     run_eachstep = {
         "fastp":True, 
         "kma":True,
-        "star_index":True,
-        "star":True,
+        "index":True,
+        "align":True,
         "samtools":True,
         "igvtools":True,
         "genotype_whole_genome":True,

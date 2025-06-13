@@ -5,6 +5,8 @@
 ![R](https://img.shields.io/badge/R-4.3-green)
 ![License](https://img.shields.io/badge/license-MIT-orange)
 
+Please visit our [nextflow implementation](https://github.com/stjudecab/rsvrecon) if you're familar with ![image](https://www.nextflow.io/img/nextflow.svg).
+
 ## Table of Contents
 - [Features](#features)
 - [Installation](#installation)
@@ -93,7 +95,7 @@ RSV_NEXT_PIPE_RES: /path/to/additional/results  # We allow users to compare RSVr
 
 ## Quick Start
 ### 1. Download test dataset and prebuilt reference 
-Download test dataset from [here](https://github.com/stjudecab/test_datasets/tree/rsvrecon)
+Download test dataset from [here](https://github.com/stjudecab/test_datasets/tree/rsvrecon). FastQ files are under "fastqs" folder.
 
 Download the pre-built reference database from [here](https://github.com/stjudecab/RSVreconPy/releases/download/Pre-release/Reference.zip)
 ### 2. Edit `config.yaml` with your paths
@@ -126,11 +128,11 @@ conda activate RSVreconEnv
 
 ```bash
 # if you're on your local server
-python Pipeline.py config.yaml
+python rsvrecon_pipeline.py config.yaml
 
 # If you're on HPC (using LSF as example)
 # number of CPUs requested should >= THREAD_N * MAX_CONCURRENT_JOBS
-bsub -n 20 -R "rusage[mem=10001]" -P CAB -J RSV -q priority -cwd $(pwd -P) "python Pipeline.py config.yaml"
+bsub -n 20 -R "rusage[mem=10001]" -P CAB -J RSV -q priority -cwd $(pwd -P) "python rsvrecon_pipeline.py config.yaml"
 ```
 
 ## Output

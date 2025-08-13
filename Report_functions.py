@@ -440,6 +440,7 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
 
             else:
                 sample = cur_folder.split("/")[-1]
+                rate = after['total_reads'] / before['total_reads'] * 100
                 QC_str = f"{before['total_reads']},{before['q20_rate']},{before['q30_rate']},{after['total_reads']},{after['q20_rate']},{after['q30_rate']},NA,"
                 map_str = f"0,0,100,0,"
                 subtype_str = 'Not RSV'

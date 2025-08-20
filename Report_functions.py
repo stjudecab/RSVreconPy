@@ -22,6 +22,7 @@ from RSV_functions import parse_gff, find_gene_at_position, find_gff_files_in_pa
 from SNP import SNP_calling
 import seaborn as sns
 import base64
+from datetime import datetime
 
 def read_star_log(log_file):
     cur_map_hash = {}
@@ -258,6 +259,64 @@ def generate_empty_2d_array(array):
 
     return empty_array
 
+def qc_call(row,
+            uniq_map_cutoff=70,
+            unmapped_cutoff=25,
+            chimeric_cutoff=10,
+            genes_ge30_required=9,
+            min_reads=5000,
+            uniq_map_low=20,
+            min_genes_ge10=2,
+            f_cutoff=50,
+            g_cutoff=50,
+            l_cutoff=30,
+            gene_cols = ["NS1_cov","NS2_cov","N_cov","P_cov","M_cov",
+             "SH_cov","G_cov","F_cov","M2-1_cov","M2-2_cov","L_cov"]):
+    """
+    Apply QC rules for RSV assembly with adjustable cutoffs.
+    """
+
+    # Missing subtype or clade → Not available
+    if (pd.isna(row.get("Subtype")) or str(row["Subtype"]).strip() == "" or
+        pd.isna(row.get("Whole Genome Clade(NextClade)")) or str(row["Whole Genome Clade(NextClade)"]).strip() == ""):
+        return ("Not available", "Missing subtype or clade assignment")
+
+    # Coverage counts
+    genes_ge_30 = sum(row[g] >= 30 for g in gene_cols)
+    genes_ge_10 = sum(row[g] >= 10 for g in gene_cols)
+
+    # Mapping QC
+    uniq_ok = row["Uniquely mapped reads(%)"] >= uniq_map_cutoff
+    unmapped_ok = row["UNMAPPED READS(%)"] <= unmapped_cutoff
+    chimeric_ok = row["CHIMERIC READS(%)"] <= chimeric_cutoff
+
+    # Key gene coverage
+    f_ok = row["F_cov"] >= f_cutoff
+    g_ok = row["G_cov"] >= g_cutoff
+    l_ok = row["L_cov"] >= l_cutoff
+
+    # Good
+    if uniq_ok and unmapped_ok and chimeric_ok and genes_ge_30 >= genes_ge30_required and f_ok and g_ok and l_ok:
+        return ("Good",
+                f">={uniq_map_cutoff}% uniquely mapped, <={unmapped_cutoff}% unmapped, <={chimeric_cutoff}% chimeric; "
+                f">={genes_ge30_required}/11 genes >=30x incl. F>={f_cutoff}x, G>={g_cutoff}x, L>={l_cutoff}x")
+
+    # Not available
+    if row["after_filtering_total_reads"] < min_reads or row["Uniquely mapped reads(%)"] < uniq_map_low or genes_ge_10 <= min_genes_ge10:
+        return ("Insufficient Data", "Insufficient usable data (low reads/mapping or gene coverage)")
+
+    # Poor (list reasons)
+    reasons = []
+    if not uniq_ok: reasons.append(f"Uniquely mapped <{uniq_map_cutoff}%")
+    if not unmapped_ok: reasons.append(f"Unmapped >{unmapped_cutoff}%")
+    if not chimeric_ok: reasons.append(f"Chimeric >{chimeric_cutoff}%")
+    if genes_ge_30 < genes_ge30_required: reasons.append(f"{11-genes_ge_30} genes <30x")
+    if not f_ok: reasons.append(f"F <{f_cutoff}x")
+    if not g_ok: reasons.append(f"G <{g_cutoff}x")
+    if not l_ok: reasons.append(f"L <{l_cutoff}x")
+
+    return ("Needs Attention", "; ".join(reasons))
+
 ##########################################
 # generate CSV report
 ##########################################
@@ -441,7 +500,7 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
             else:
                 sample = cur_folder.split("/")[-1]
                 rate = after['total_reads'] / before['total_reads'] * 100
-                QC_str = f"{before['total_reads']},{before['q20_rate']},{before['q30_rate']},{after['total_reads']},{after['q20_rate']},{after['q30_rate']},NA,"
+                QC_str = f"{before['total_reads']},{before['q20_rate']},{before['q30_rate']},{after['total_reads']},{after['q20_rate']},{after['q30_rate']},{rate},"
                 map_str = f"0,0,100,0,"
                 subtype_str = 'Not RSV'
                 out.write(f"{sample},{QC_str}{map_str}{subtype_str},NA,Not RSV,,0,0,0,0,0,0,0,0,0,0,0,{subtype_str},{subtype_str}\n")
@@ -519,6 +578,26 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
 
             csv_line = csv_line + ',' + ','.join(result_list)
             f_b_out.write(csv_line + '\n')
+
+
+    # QC call
+    df = pd.read_csv(report,  skiprows=1)
+
+    # --- Apply QC ---
+    qc = df.apply(qc_call, axis=1, result_type="expand")
+    df["Overall_Quality"] = qc[0]
+    df["QC_Reason"] = qc[1]
+
+    # --- Save result ---
+    with open(report, "w") as f:
+        # Write one line of text first
+        now = datetime.now()
+        today_str = now.strftime("%Y-%m-%d")
+        f.write(f"Pipeline verions: {current_version},Reported on: {today_str}\n")
+        
+    # Append the DataFrame
+    df.to_csv(report, mode = 'a', index=False)
+
 
     return subtype_a_names, subtype_b_names
 
@@ -732,7 +811,10 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
     #spacer = Spacer(1, 12)  # width and height in points
     #elements.append(spacer)
 
-    table_info_text = f"Pipeline Verions: {current_version}<br/> Subtypes of each reference are highlighted in different colors: <font color='red'>Subtype A</font> and <font color='blue'>Subtype B</font>"
+    now = datetime.now()
+    today_str = now.strftime("%Y-%m-%d")
+
+    table_info_text = f"Pipeline Verions: {current_version}, Reported on: {today_str}<br/> Subtypes of each reference are highlighted in different colors: <font color='red'>Subtype A</font> and <font color='blue'>Subtype B</font>"
     table_info_text += f"<br/> Genotype calling is based on <a href='https://nextstrain.org/rsv/a/genome'><b>Nextstrain</b> and <b>Nextclade3</b>, Data updated {current_version_date}</a><br/> A clade lable with * indicates the clade of best blast hit strain due to negative results from NextClade3 <br/>Click the sample name to jump to the detail section<br/> "
     paragraph = Paragraph(table_info_text, styles['BodyText'])
     elements.append(paragraph)
@@ -744,7 +826,7 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
     # Format the column as percentages
     df.loc[:,'QC rate'] = df.loc[:,'QC rate'] / 100 # QC rate
 
-    df = df.loc[:, ['Sample name', 'QC rate', 'Uniquely mapped reads(%)', 'Subtype','reference_accession','ref_subtype', 'Whole Genome Clade(NextClade)', 'Whole Genome Clade(Blast)', 'G_cov']]
+    df = df.loc[:, ['Sample name', 'QC rate', 'Uniquely mapped reads(%)', 'Subtype','reference_accession','ref_subtype', 'Whole Genome Clade(NextClade)', 'Whole Genome Clade(Blast)', 'G_cov', 'Overall_Quality']]
     data = df.values.tolist()
 
     custom_style = ParagraphStyle(
@@ -795,13 +877,20 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
 
         cur_sample_png = Image(png_file, width=4*inch, height=0.2*inch)
 
-        if cur_sample_subtype == 'Not RSV':
-            png_file = os.path.join(file_path, 'Resource','error.png')
+        #if cur_sample_subtype == 'Not RSV':
+        #    png_file = os.path.join(file_path, 'Resource','error.png')
+        #else:
+        #    if int(cur_sample_map) > 80:
+        #        png_file = os.path.join(file_path, 'Resource','correct.png')
+        #    else:
+        #        png_file = os.path.join(file_path, 'Resource','warning.png')
+
+        if df.at[row, "Overall_Quality"] == "Good":
+            png_file = os.path.join(file_path, 'Resource','correct.png')
+        elif df.at[row, "Overall_Quality"] == "Needs Attention":
+            png_file = os.path.join(file_path, 'Resource','warning.png')
         else:
-            if int(cur_sample_map) > 80:
-                png_file = os.path.join(file_path, 'Resource','correct.png')
-            else:
-                png_file = os.path.join(file_path, 'Resource','warning.png')
+            png_file = os.path.join(file_path, 'Resource','error.png')
         sign_png = Image(png_file, width=0.2*inch, height=0.2*inch)
         
         cur_sample_link = Paragraph(f"<a href='#{cur_sample_name}'>{cur_sample_name}</a>", custom_style)
@@ -986,7 +1075,7 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
 
         F_protein_mutation_text = df.loc[cur_folder,df.columns[14]]
         if isinstance(F_protein_mutation_text, str):
-            #print(cur_folder)
+            print(cur_folder)
             #print(F_protein_mutation_text)
             F_protein_mutation_text = F_protein_mutation_text.replace("|", ", ")
             F_protein_mutation_text = F_protein_mutation_text.replace('(Reported)','')
@@ -994,18 +1083,28 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
             F_protein_mutation_text = ''
             
         fig_size = '20'
-        if genotype_text == "Not RSV":
-            genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','error.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  ' + genotype_text
+        
+        if df.loc[cur_folder, "Overall_Quality"] == "Good":
+            genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','correct.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  <b> ' + genotype_text + ' </b>'
+        elif df.loc[cur_folder, "Overall_Quality"] == "Needs Attention":
+            genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','warning.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  <b> ' + genotype_text + ' </b>'
         else:
-            cur_sample_map = int(df.loc[cur_folder,df.columns[7]])
-            if cur_sample_map > 80:
-                genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','correct.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  <b> ' + genotype_text + ' </b>'
-            else:
-                genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','warning.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  <b> ' + genotype_text + ' </b>'
+            genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','error.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  ' + genotype_text
+
+        #if genotype_text == "Not RSV":
+        #    genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','error.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  ' + genotype_text
+        #else:
+        #    cur_sample_map = int(df.loc[cur_folder,df.columns[7]])
+        #    if cur_sample_map > 80:
+        #        genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','correct.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  <b> ' + genotype_text + ' </b>'
+        #   else:
+        #        genotype_para  = '<img src="' + os.path.join(file_path, 'Resource','warning.png') + '" valign="middle" width="' + fig_size + '" height="' + fig_size + '"/>  <b> ' + genotype_text + ' </b>'
             
             #genotype_para += f";  <b>{g_genotype_text}</b> (based on G-ectodomain)<br/><br/>"
             #genotype_para += f"Genotype Resource:   <b><a href='https://nextstrain.org/rsv/a/genome'>Nextstrain (click for details), Data updated 2024-08-01</a></b>"
-            genotype_para += f"<br/><br/>F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
+        qc_reason = df.loc[cur_folder, "QC_Reason"]
+        genotype_para += f"<br/><br/>Mapping QC details:  {qc_reason}"
+        genotype_para += f"<br/><br/>F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
 
         paragraph = Paragraph(genotype_para)
         
@@ -1254,6 +1353,9 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
     sidebar_div = '<div class="sidebar">\n'
     main_content_div = '<div class="main-content">\n'
 
+    now = datetime.now()
+    today_str = now.strftime("%Y-%m-%d")
+
     # load template
     template_file = os.path.join(file_path, 'template.html')
     with open(template_file, 'r') as tem_handle:
@@ -1278,7 +1380,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
     
     Logo = os.path.join(file_path, 'Resource','CAB.png')
 
-    table_info_text = f"Pipeline Verions: {current_version}<br/> Subtypes of each reference are highlighted in different colors: <font color='red'>Subtype A</font> and <font color='blue'>Subtype B</font>"
+    table_info_text = f"Pipeline Verions: {current_version}, Reported on: {today_str}<br/> Subtypes of each reference are highlighted in different colors: <font color='red'>Subtype A</font> and <font color='blue'>Subtype B</font>"
     table_info_text += f"<br/> Genotype calling is based on <a href='https://nextstrain.org/rsv/a/genome'  target=\"_blank\"><b>Nextstrain</b> and <b>Nextclade3</b>, Data updated {current_version_date}</a><br/> A clade lable with * indicates the clade of best blast hit strain due to negative results from NextClade3 <br/>Click the sample name to jump to the detail section<br/> "
 
     main_content_div += '<div id="summary_section" class="content-section">'
@@ -1292,7 +1394,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
     df = pd.read_csv(csv_file, skiprows=1)
     df.loc[:,'QC rate'] = df.loc[:,'QC rate'] / 100 # QC rate
 
-    df = df.loc[:, ['Sample name', 'QC rate', 'Uniquely mapped reads(%)', 'Subtype','reference_accession','ref_subtype', 'Whole Genome Clade(NextClade)', 'Whole Genome Clade(Blast)', 'G_cov']]
+    df = df.loc[:, ['Sample name', 'QC rate', 'Uniquely mapped reads(%)', 'Subtype','reference_accession','ref_subtype', 'Whole Genome Clade(NextClade)', 'Whole Genome Clade(Blast)', 'G_cov', 'Overall_Quality']]
     data = df.values.tolist()
 
     for row in range(0, len(data)):
@@ -1304,13 +1406,20 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
 
         cur_sample_png = os.path.join(temp_folder, cur_sample_name + '_mapping_figure.png')
 
-        if cur_sample_subtype == 'Not RSV':
-            sign_png = os.path.join(file_path, 'Resource','error.png')
+        #if cur_sample_subtype == 'Not RSV':
+        #    sign_png = os.path.join(file_path, 'Resource','error.png')
+        #else:
+        #    if int(cur_sample_map) > 80:
+        #        sign_png = os.path.join(file_path, 'Resource','correct.png')
+        #    else:
+        #        sign_png = os.path.join(file_path, 'Resource','warning.png')
+
+        if df.at[row, "Overall_Quality"] == "Good":
+            sign_png = os.path.join(file_path, 'Resource','correct.png')
+        elif df.at[row, "Overall_Quality"] == "Needs Attention":
+            sign_png = os.path.join(file_path, 'Resource','warning.png')
         else:
-            if int(cur_sample_map) > 80:
-                sign_png = os.path.join(file_path, 'Resource','correct.png')
-            else:
-                sign_png = os.path.join(file_path, 'Resource','warning.png')
+            sign_png = os.path.join(file_path, 'Resource','error.png')
         
         cur_sample_link = f"<a onclick=\"showSection('{cur_sample_name}')\">{cur_sample_name}</a>"
         
@@ -1425,7 +1534,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
 
         F_protein_mutation_text = df.loc[cur_folder,df.columns[14]]
         if isinstance(F_protein_mutation_text, str):
-            #print(cur_folder)
+            print(cur_folder)
             #print(F_protein_mutation_text)
             F_protein_mutation_text = F_protein_mutation_text.replace("|", ", ")
             F_protein_mutation_text = F_protein_mutation_text.replace('(Reported)','')
@@ -1441,12 +1550,21 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
                 base64_string = image_to_base64(os.path.join(file_path, 'Resource','correct.png'))
             else:
                 base64_string = image_to_base64(os.path.join(file_path, 'Resource','warning.png'))
-            genotype_para  = f"<img src='data:image/png;base64,{base64_string}' style='margin-top:0px;width:30px'><b>{genotype_text}</b>"
-            
+        
+        if df.loc[cur_folder, "Overall_Quality"] == "Good":
+            base64_string = image_to_base64(os.path.join(file_path, 'Resource','correct.png'))
+        elif df.loc[cur_folder, "Overall_Quality"] == "Needs Attention":
+            base64_string = image_to_base64(os.path.join(file_path, 'Resource','warning.png'))
+        else:
+            base64_string = image_to_base64(os.path.join(file_path, 'Resource','error.png'))
 
-            #genotype_para += f";  <b>{g_genotype_text}</b> (based on G-ectodomain)<br/><br/>"
-            #genotype_para += f"Genotype Resource:   <b><a href='https://nextstrain.org/rsv/a/genome'>Nextstrain (click for details), Data updated 2024-08-01</a></b>"
-            genotype_para += f"<br/><br/>F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
+        genotype_para  = f"<img src='data:image/png;base64,{base64_string}' style='margin-top:0px;width:30px'><b>{genotype_text}</b>"
+            
+        qc_reason = df.loc[cur_folder, "QC_Reason"]
+        genotype_para += f"<br/><br/>Mapping QC details:  {qc_reason}"
+        #genotype_para += f";  <b>{g_genotype_text}</b> (based on G-ectodomain)<br/><br/>"
+        #genotype_para += f"Genotype Resource:   <b><a href='https://nextstrain.org/rsv/a/genome'>Nextstrain (click for details), Data updated 2024-08-01</a></b>"
+        genotype_para += f"<br/><br/>F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
 
         main_content_div += genotype_para
 

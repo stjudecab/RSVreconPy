@@ -1,6 +1,7 @@
-0.1.2
+0.1.3
 2025-04-01
 # Develop log
-# v0.1.0    Initial release of RSV pipeline
+# v0.1.0 	Initial release of RSV pipeline
 # v0.1.1    1) implemented version control function, 2) Added two new mutations into RSV B list: I64T+K65E and N208D
-# v0.1.2   update reference DB for genotyping, remove G-genotype to keep consistent with latest research (https://github.com/nextstrain/nextclade_data/blob/e98678b93b8cd0b9ad8f5c4228653aeb171f657d/data/nextstrain/rsv/b/EPI_ISL_1653999/CHANGELOG.md)
+# v0.1.2    update reference DB for genotyping, remove G-genotype to keep consistent with latest research (https://github.com/nextstrain/nextclade_data/blob/e98678b93b8cd0b9ad8f5c4228653aeb171f657d/data/nextstrain/rsv/b/EPI_ISL_1653999/CHANGELOG.md)
+# v0.1.3    updated QC call functions. Now give a overall rate of sample quality, with reason reported in all three report formats.

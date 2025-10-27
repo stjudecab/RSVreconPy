@@ -117,7 +117,7 @@ def pct_sum(*args):
     return total
 
 # assemble sequences from IGV counts
-def processIGV(file_name, ref_file, cutoff):
+def processIGV(file_name, ref_file, cutoff, cutoff_low):
     # Load the ref genome sequence
     ref_genome_record = next(SeqIO.parse(ref_file, "fasta"))
     ref_genome_sequence = str(ref_genome_record.seq)
@@ -144,7 +144,7 @@ def processIGV(file_name, ref_file, cutoff):
                     if cov >= cutoff:   # for high confidance position
                         max_key = max(count_dict, key=count_dict.get)
                         sequence_array[pos] = max_key
-                    elif cov > 10 and any(x / cov > 0.9 for x in (a, c, t, g)):  # for position between 10 and cutoff, only trust the result if it's highly consisstant 
+                    elif cov > cutoff_low and any(x / cov > 0.9 for x in (a, c, t, g)):  # for position between cutoff_low and cutoff, only trust the result if it's highly consisstant 
                         max_key = max(count_dict, key=count_dict.get)
                         sequence_array[pos] = max_key
 

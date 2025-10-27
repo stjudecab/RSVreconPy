@@ -43,6 +43,7 @@ working_folder_name = config['OUTPUT_DIR']
 
 star_ThreadN = config.get('THREAD_N', 2)
 igv_cutoff = config.get('COV_CUTOFF', 50)
+igv_cutoff_low = config.get('COV_CUTOFF_LOW', 10)
 MAX_CONCURRENT_JOBS = config.get('MAX_CONCURRENT_JOBS', 2)
 additional_results_path = config.get('RSV_NEXT_PIPE_RES', None)
 
@@ -124,12 +125,12 @@ print(f"Latest database downloaded from RSV A and RSV B\n")
 ###################################################
 ##      start process with concurrent execution
 ###################################################
-def run_mapping(sample_id, mapres_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN, igv_cutoff):
+def run_mapping(sample_id, mapres_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN, igv_cutoff, igv_cutoff_low):
     """Run mapping command for a single sample"""
     root_file_path = os.path.dirname(os.path.realpath(__file__))
     log_file = os.path.join(log_folder_name, sample_id + '.log')
     errlog_file = os.path.join(log_folder_name, sample_id + '.err.log')
-    job_command = f"python {root_file_path}/Mapping.py {sample_id} '{mapres_folder_name}' '{original_read1}' '{original_read2}' '{reference_folder_name}' {star_ThreadN} {igv_cutoff}"
+    job_command = f"python {root_file_path}/Mapping.py {sample_id} '{mapres_folder_name}' '{original_read1}' '{original_read2}' '{reference_folder_name}' {star_ThreadN} {igv_cutoff} {igv_cutoff_low}"
     
     # Redirect output to log files
     with open(log_file, 'w') as log, open(errlog_file, 'w') as errlog:

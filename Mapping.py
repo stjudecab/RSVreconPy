@@ -8,7 +8,7 @@ import shutil
 from Genotyping import genotype_call_whole_genome, genotype_call_G_protein
 from RSV_functions import determine_subtype, processIGV, fetch_record_from_JSON, find_best_reference
 
-def sample_mapping(sample_id, working_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN, igv_cutoff, run_eachstep):
+def sample_mapping(sample_id, working_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN, igv_cutoff, igv_cutoff_low, run_eachstep):
     # skip Undetermined reads
     if "Undetermined" in sample_id:
         return
@@ -148,7 +148,7 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
     print(f"\t######################\tStep 5 Calling genotypes ...                      \t######################")
 
     # assemble genomic sequence
-    genome_sequence = processIGV(wig_file, new_fasta_file, int(igv_cutoff))
+    genome_sequence = processIGV(wig_file, new_fasta_file, int(igv_cutoff), int(igv_cutoff_low))
     query_file_path = os.path.join(cur_folder, 'sequence.fasta')
     with open(query_file_path, 'w') as fasta:
         fasta.write('>' + sample_id + "\n" + genome_sequence + "\n")
@@ -215,6 +215,7 @@ if __name__ == "__main__":
     reference_folder_name = sys.argv[5]
     star_ThreadN = sys.argv[6]
     igv_cutoff = sys.argv[7]
+    igv_cutoff_low = sys.argv[8]
     
     run_eachstep = {
         "fastp":True, 
@@ -230,4 +231,4 @@ if __name__ == "__main__":
     }
     #print(sys.argv)
 
-    sample_mapping(sample_id, working_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN, igv_cutoff, run_eachstep)
+    sample_mapping(sample_id, working_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN, igv_cutoff, igv_cutoff_low, run_eachstep)

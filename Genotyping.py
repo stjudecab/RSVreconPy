@@ -71,7 +71,7 @@ def genotype_call_whole_genome(query_file_path, ref_db_path, meta_file_path, out
     # set file locations
     merge_sequence_file = os.path.join(output_path, "Sequence_for_tree.fasta")
     merge_alignment_file = os.path.join(output_path, "Alignment_for_tree.fasta")
-    tree_file = os.path.join(output_path, "genotype.nwk")
+    tree_file = os.path.join(output_path, "Alignment_for_tree.fasta.treefile")
     tree_annotation_file = os.path.join(output_path, "genotype.csv")
 
     tree_pic_file = os.path.join(output_path, "genotype.png")
@@ -95,7 +95,8 @@ def genotype_call_whole_genome(query_file_path, ref_db_path, meta_file_path, out
         subprocess.run(cmd, shell=True, cwd=output_path)
 
         # make phylogenetic tree
-        cmd = f"FastTree -nt -gtr {merge_alignment_file} > {tree_file} 2> genotype_FastTree_log.txt"
+        #cmd = f"FastTree -nt -gtr {merge_alignment_file} > {tree_file} 2> genotype_FastTree_log.txt"
+        cmd = f"iqtree3 -s {merge_alignment_file}"
         subprocess.run(cmd, shell=True, cwd=output_path)
 
     # render tree
@@ -170,7 +171,7 @@ def genotype_call_G_protein(query_file_path, ref_db_path, output_path, reference
     # set file locations
     merge_sequence_file = os.path.join(output_path, "G_gene_Sequence_for_tree.fasta")
     merge_alignment_file = os.path.join(output_path, "G_gene_Alignment_for_tree.fasta")
-    tree_file = os.path.join(output_path, "G_gene_genotype.nwk")
+    tree_file = os.path.join(output_path, "G_gene_Alignment_for_tree.fasta.treefile")
     tree_annotation_file = os.path.join(output_path, "G_gene_genotype.csv")
 
     tree_pic_file = os.path.join(output_path, "G_gene_genotype.png")
@@ -194,7 +195,8 @@ def genotype_call_G_protein(query_file_path, ref_db_path, output_path, reference
         subprocess.run(cmd, shell=True, cwd=output_path)
 
         # make phylogenetic tree
-        cmd = f"FastTree -nt -gtr {merge_alignment_file} > {tree_file} 2> G_gene_genotype_FastTree_log.txt"
+        #cmd = f"FastTree -nt -gtr {merge_alignment_file} > {tree_file} 2> G_gene_genotype_FastTree_log.txt"
+        cmd = f"iqtree3 -s {merge_alignment_file}"
         subprocess.run(cmd, shell=True, cwd=output_path)
 
     # render tree

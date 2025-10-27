@@ -621,7 +621,7 @@ def generate_phylogenetic_tree(root_file_path, reference_folder_name, working_fo
         sequence_file = os.path.join(working_folder_name, "Sequence_A.fasta")
         merge_sequence_file = os.path.join(Temp_folder_name, "Sequence_for_tree_A.fasta")
         merge_alignment_file = os.path.join(Temp_folder_name, "Alignment_for_tree_A.fasta")
-        tree_file = os.path.join(Temp_folder_name, "RSV_A.nwk")
+        tree_file = os.path.join(Temp_folder_name, "Alignment_for_tree_A.fasta.treefile")
         tree_annotation_file = os.path.join(Temp_folder_name, "RSV_A.csv")
         tree_pic_file = os.path.join(Temp_folder_name, "RSV_A.png")
         tree_log = os.path.join(Temp_folder_name, "RSV_A_log.txt")
@@ -670,7 +670,8 @@ def generate_phylogenetic_tree(root_file_path, reference_folder_name, working_fo
             subprocess.run(cmd, shell=True, cwd=Temp_folder_name)
 
             # make phylogenetic tree
-            cmd = f"FastTree -nt -gtr {merge_alignment_file} > {tree_file} 2> subtypeA_FastTree_log.txt"
+            #cmd = f"FastTree -nt -gtr {merge_alignment_file} > {tree_file} 2> subtypeA_FastTree_log.txt"
+            cmd = f"iqtree3 -s {merge_alignment_file}"
             subprocess.run(cmd, shell=True, cwd=Temp_folder_name)
 
         # render tree
@@ -690,7 +691,7 @@ def generate_phylogenetic_tree(root_file_path, reference_folder_name, working_fo
         sequence_file = os.path.join(working_folder_name, "Sequence_B.fasta")
         merge_sequence_file = os.path.join(Temp_folder_name, "Sequence_for_tree_B.fasta")
         merge_alignment_file = os.path.join(Temp_folder_name, "Alignment_for_tree_B.fasta")
-        tree_file = os.path.join(Temp_folder_name, "RSV_B.nwk")
+        tree_file = os.path.join(Temp_folder_name, "Alignment_for_tree_B.fasta.treefile")
         tree_annotation_file = os.path.join(Temp_folder_name, "RSV_B.csv")
         tree_pic_file = os.path.join(Temp_folder_name, "RSV_B.png")
         tree_log = os.path.join(Temp_folder_name, "RSV_B_log.txt")
@@ -739,7 +740,8 @@ def generate_phylogenetic_tree(root_file_path, reference_folder_name, working_fo
             subprocess.run(cmd, shell=True, cwd=Temp_folder_name)
 
             # make phylogenetic tree
-            cmd = f"FastTree -nt -gtr {merge_alignment_file} > {tree_file} 2> subtypeB_FastTree_log.txt"
+            #cmd = f"FastTree -nt -gtr {merge_alignment_file} > {tree_file} 2> subtypeB_FastTree_log.txt"
+            cmd = f"iqtree3 -s {merge_alignment_file}"
             subprocess.run(cmd, shell=True, cwd=Temp_folder_name)
 
         # render tree

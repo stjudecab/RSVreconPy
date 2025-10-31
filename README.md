@@ -96,8 +96,9 @@ RSV_NEXT_PIPE_RES: /path/to/additional/results  # We allow users to compare RSVr
 ## Quick Start
 ### 1. Download test dataset and prebuilt reference 
 Download test dataset from [here](https://github.com/stjudecab/test_datasets/tree/rsvrecon). FastQ files are under "fastqs" folder.
+A larger dataset is available [here](https://github.com/stjudecab/RSVreconPy/releases/download/Release-V0.2/Data.zip)
 
-Download the pre-built reference database from [here](https://github.com/stjudecab/RSVreconPy/releases/download/Pre-release/Reference.zip)
+Download the pre-built reference database from [here](https://github.com/stjudecab/RSVreconPy/releases/download/Release-V0.2/Reference.zip)
 ### 2. Edit `config.yaml` with your paths
 Here is an example:
 ```yaml
@@ -112,10 +113,11 @@ MAX_CONCURRENT_JOBS: 10         # Parallel samples to process, notice: THREAD_N 
 
 # Analysis parameters
 TOOL: BWA                       # Currently only BWA supported
-COV_CUTOFF: 50                  # Coverage cutoff threshold
+COV_CUTOFF: 50                  # upper threshold in the dual-coverage cutoff system 
+COV_CUTOFF_LOW: 10              # lower threshold in the dual-coverage cutoff system
 
 # Optional
-RSV_NEXT_PIPE_RES: /path/to/additional/results  # We allow users to compare RSVrecon with RSV-NEXT-PIPE results. Please specify the "consensus" folder of RSV-NEXT-PIPE output for the same batch of data.
+RSV_NEXT_PIPE_RES: /path/to/additional/results  # We allow users to compare RSVrecon with RSV-NEXT-PIPE results. Please specify the "consensus" folder of RSV-NEXT-PIPE output for the same batch of data. You can disable it using "#"
 ```
 ### 3. Run pipeline:
 
@@ -181,7 +183,7 @@ dependencies:
   - bioconda::blast=2.14.1
   - bioconda::bwa
   - bioconda::mafft=7.505
-  - bioconda::fasttree=2.1.11
+  - bioconda::iqtree
 ```
 
 ## Troubleshooting

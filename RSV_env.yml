@@ -33,4 +33,4 @@ dependencies:
   - bioconda::blast=2.14.1
   - bioconda::bwa
   - bioconda::mafft=7.505
-  - bioconda::fasttree=2.1.11
+  - bioconda::iqtree

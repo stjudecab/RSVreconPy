@@ -210,7 +210,8 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_CONCURRENT_JOBS) as e
                     original_read2,
                     reference_folder_name,
                     star_ThreadN,
-                    igv_cutoff
+                    igv_cutoff,
+                    igv_cutoff_low
                 )
                 future_to_sample[future] = next_sample
                 print(f"Submitted job for sample: {next_sample}")

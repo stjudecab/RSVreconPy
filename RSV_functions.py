@@ -45,13 +45,12 @@ def detect_sequencing_files(data_folder):
     with os.scandir(data_folder) as entries:
         for entry in entries:
             if entry.name.endswith(extensions) and entry.is_file():
-                file = entry.name
-                file_path = os.path.join(data_folder, file)
+                file_name = entry.name
                 
                 # Try to match against various naming patterns
                 matched = False
                 for pattern in patterns:
-                    match = pattern.fullmatch(file)
+                    match = pattern.fullmatch(file_name)
                     if match:
                         sample_id = match.group(1)
                         read_num = match.group(2)
@@ -65,22 +64,9 @@ def detect_sequencing_files(data_folder):
                             sample_dict[sample_id] = [None, None]
                         
                         # Store file path
-                        sample_dict[sample_id][int(read_num)-1] = file_path
+                        sample_dict[sample_id][int(read_num)-1] = file_name
                         matched = True
                         break
-                
-                # Fallback to original method if no patterns matched
-                if not matched:
-                    if '_R1' in file or '_1.' in file:
-                        sample_id = re.split(r'_R1|_1\.', file)[0]
-                        if sample_id not in sample_dict:
-                            sample_dict[sample_id] = [None, None]
-                        sample_dict[sample_id][0] = file_path
-                    elif '_R2' in file or '_2.' in file:
-                        sample_id = re.split(r'_R2|_2\.', file)[0]
-                        if sample_id not in sample_dict:
-                            sample_dict[sample_id] = [None, None]
-                        sample_dict[sample_id][1] = file_path
     
     # Remove incomplete samples (only R1 or only R2 present)
     complete_samples = {k: v for k, v in sample_dict.items() if all(v)}

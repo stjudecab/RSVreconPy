@@ -95,7 +95,8 @@ def genotype_call_whole_genome(query_file_path, ref_db_path, meta_file_path, out
 
         # make phylogenetic tree
         #cmd = f"FastTree -nt -gtr {merge_alignment_file} > {tree_file} 2> genotype_FastTree_log.txt"
-        cmd = f"iqtree3 -s {merge_alignment_file}"
+        iqtree_log = os.path.join(output_path, "iqtree.log")
+        cmd = f"iqtree3 -s {merge_alignment_file} > {iqtree_log} 2>&1"
         subprocess.run(cmd, shell=True, cwd=output_path)
 
     # render tree

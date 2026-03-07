@@ -199,6 +199,14 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_CONCURRENT_JOBS) as e
                 completed += 1
                 if returncode == 0:
                     print(f"Completed ({completed}/{total_samples}): {sample_id} - Success")
+                    
+                    # Check for co-infection components to notify user in console
+                    comp_folders = [d for d in os.listdir(mapres_folder_name) 
+                                    if os.path.isdir(os.path.join(mapres_folder_name, d)) 
+                                    and d.startswith(f"{sample_id}-comp")]
+                    if comp_folders:
+                        print(f"!!!  CO-INFECTION identified for sample: {sample_id}")
+                        print(f"!!!  Components identified: {', '.join(comp_folders)}")
                 else:
                     print(f"Completed ({completed}/{total_samples}): {sample_id} - Failed (return code: {returncode})")
             except Exception as e:

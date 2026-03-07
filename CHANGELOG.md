@@ -5,11 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - v0.2
+## [0.2.0] - 2026-03-07
+
+### Added
+- Co-infection detection logic to identify multiple RSV strains (different subtypes or clades) in a single sample.
+- Automated read binning using BWA and Samtools to separate co-infection components into distinct read sets.
+- Component-specific assembly and genotyping pipelines, creating separate output directories (e.g., `-comp1`, `-comp2`).
+- Real-time console notifications in the main pipeline when co-infections are identified.
 
 ### Changed
+- Refactored `Mapping.py` to support multi-component processing and standardized read naming.
+- Updated `Report_functions.py` to correctly identify references and subtypes for co-infection components by inspecting the reference directory.
+- Silenced IQTREE3 STDOUT by redirecting output to log files to keep the terminal output clean.
 - Updated tree builder from FastTree to IQtree3 for more accurate phylogenetic analysis.
 - Updated the QC calling function (`qc_call`) for more nuanced quality assessment.
+
+### Fixed
+- Resolved `NameError` in `Mapping.py` related to KMA logging variables.
+- Resolved `FileNotFoundError` in reporting when processing co-infection components that utilized different reference genomes.
 
 ## [0.1.2] - 2025-04-01
 

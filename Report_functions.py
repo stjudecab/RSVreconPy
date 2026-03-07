@@ -351,9 +351,7 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
         # collect information from each sample
         Sample_folders = [f for f in os.listdir(working_folder_name) if os.path.isdir(os.path.join(working_folder_name, f))]
         for cur_folder in sorted(Sample_folders):
-            if os.path.isfile(cur_folder):
-                continue
-            if cur_folder == "Temp":
+            if os.path.isfile(cur_folder) or cur_folder == "Temp" or cur_folder.endswith(('_initial', '_temp')):
                 continue
 
             print(f"Start process {cur_folder} ...")
@@ -392,9 +390,17 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
 
                 sample = cur_folder.split("/")[-1]
 
-                kma_out_file = os.path.join(working_folder_name, cur_folder, 'KMA', cur_folder + '.res')
-                ref_str = determine_subtype(kma_out_file, reference_folder_name, 10)
-                ref_str = ref_str.split(",")
+                # Identify the actual reference used by checking the reference folder
+                ref_dir = os.path.join(working_folder_name, cur_folder, 'reference')
+                gff_files = [f for f in os.listdir(ref_dir) if f.endswith('.gff')]
+                if gff_files:
+                    actual_ref_name = gff_files[0].replace('.gff', '')
+                    info_table = os.path.join(reference_folder_name, 'RSV.csv')
+                    info_df = pd.read_csv(info_table, delimiter=',', index_col=0)
+                    actual_ref_subtype = info_df.loc[actual_ref_name, 'Subtype'] if actual_ref_name in info_df.index else "Unknown"
+                    ref_str = [actual_ref_subtype, actual_ref_name, actual_ref_subtype]
+                else:
+                    ref_str = ["Unknown", "Unknown", "Unknown"]
 
                 out.write(f"{sample},{QC_str},{map_str},{subtype_str},{ref_str[1]},{ref_str[2]}")
 
@@ -671,7 +677,8 @@ def generate_phylogenetic_tree(root_file_path, reference_folder_name, working_fo
 
             # make phylogenetic tree
             #cmd = f"FastTree -nt -gtr {merge_alignment_file} > {tree_file} 2> subtypeA_FastTree_log.txt"
-            cmd = f"iqtree3 -s {merge_alignment_file}"
+            iqtree_log = os.path.join(Temp_folder_name, "subtypeA_iqtree.log")
+            cmd = f"iqtree3 -s {merge_alignment_file} > {iqtree_log} 2>&1"
             subprocess.run(cmd, shell=True, cwd=Temp_folder_name)
 
         # render tree
@@ -741,7 +748,8 @@ def generate_phylogenetic_tree(root_file_path, reference_folder_name, working_fo
 
             # make phylogenetic tree
             #cmd = f"FastTree -nt -gtr {merge_alignment_file} > {tree_file} 2> subtypeB_FastTree_log.txt"
-            cmd = f"iqtree3 -s {merge_alignment_file}"
+            iqtree_log = os.path.join(Temp_folder_name, "subtypeB_iqtree.log")
+            cmd = f"iqtree3 -s {merge_alignment_file} > {iqtree_log} 2>&1"
             subprocess.run(cmd, shell=True, cwd=Temp_folder_name)
 
         # render tree
@@ -1505,9 +1513,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
     df = pd.read_csv(csv_file, skiprows = 1, index_col=0)
     Sample_folders = [f for f in os.listdir(mapres_folder) if os.path.isdir(os.path.join(mapres_folder, f))]
     for cur_folder in sorted(Sample_folders):
-        if os.path.isfile(cur_folder):
-            continue
-        if cur_folder == "Temp":
+        if os.path.isfile(cur_folder) or cur_folder == "Temp" or cur_folder.endswith(('_initial', '_temp')):
             continue
         
         section_id = cur_folder

@@ -585,3 +585,100 @@ def find_best_reference(kma_results_file, output_file=None):
             print(f"Error saving results: {e}")
     
     return results
+
+def detect_potential_coinfections(kma_results_file, reference_folder_name, score_ratio_cutoff=0.5):
+    """
+    Analyze KMA results to detect potential co-infections.
+    Returns a list of reference names.
+    """
+    try:
+        df = pd.read_csv(kma_results_file, sep='\t')
+    except:
+        return []
+    
+    if df.empty:
+        return []
+
+    # Sort by score descending
+    df = df.sort_values('Score', ascending=False).reset_index(drop=True)
+    
+    info_table = os.path.join(reference_folder_name, 'RSV.csv')
+    info_df = pd.read_csv(info_table, delimiter=',', index_col=0)
+
+    best_refs = [df.loc[0, '#Template']]
+    top_score = df.loc[0, 'Score']
+    
+    # Check top 5 hits for potential co-infection
+    for i in range(1, min(len(df), 5)):
+        curr_ref = df.loc[i, '#Template']
+        curr_score = df.loc[i, 'Score']
+        
+        # Only consider hits with a score at least half of the top hit
+        if curr_score / top_score < score_ratio_cutoff:
+            break
+            
+        # Check if distinct (different subtype or different strain name)
+        is_distinct = False
+        for ref in best_refs:
+            sub1 = info_df.loc[ref, 'Subtype']
+            sub2 = info_df.loc[curr_ref, 'Subtype']
+            if sub1 != sub2:
+                is_distinct = True
+                break
+            # If same subtype, check if they are different templates
+            if curr_ref != ref:
+                is_distinct = True
+                break
+        
+        if is_distinct:
+            best_refs.append(curr_ref)
+            if len(best_refs) >= 2: # Limit to 2 components for now
+                break
+                
+    return best_refs
+
+def separate_reads_for_coinfection(read1_trim, read2_trim, ref_list, reference_folder_name, output_folder, threads):
+    """
+    Separates reads into bins based on which reference they map to best.
+    """
+    # Create combined reference
+    ref_fasta_json = os.path.join(reference_folder_name, 'RSV_reference_FASTA.json')
+    combined_fasta = os.path.join(output_folder, "combined_refs.fasta")
+    with open(combined_fasta, 'w') as out:
+        for ref in ref_list:
+            fasta_content = fetch_record_from_JSON(ref, ref_fasta_json)
+            out.write(fasta_content + "\n")
+            
+    # Index with BWA
+    subprocess.run(f"bwa index \"{combined_fasta}\"", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    
+    # Map with BWA
+    sam_file = os.path.join(output_folder, "combined.sam")
+    subprocess.run(f"bwa mem -t {threads} \"{combined_fasta}\" \"{read1_trim}\" \"{read2_trim}\" > \"{sam_file}\"", shell=True, stderr=subprocess.DEVNULL)
+    
+    # Convert to BAM and sort by coordinate
+    bam_file = os.path.join(output_folder, "combined.bam")
+    subprocess.run(f"samtools view -Sb \"{sam_file}\" | samtools sort -o \"{bam_file}\"", shell=True, stderr=subprocess.DEVNULL)
+    subprocess.run(f"samtools index \"{bam_file}\"", shell=True, stderr=subprocess.DEVNULL)
+    
+    binned_files = {}
+    for ref in ref_list:
+        # Extract reads mapping to this specific reference
+        fasta_content = fetch_record_from_JSON(ref, ref_fasta_json)
+        seq_id = fasta_content.split('\n')[0][1:].split()[0]
+        
+        ref_bam = os.path.join(output_folder, f"{ref}.bam")
+        subprocess.run(f"samtools view -b -F 4 \"{bam_file}\" \"{seq_id}\" > \"{ref_bam}\"", shell=True, stderr=subprocess.DEVNULL)
+        
+        # Sort by name for fastq conversion
+        ref_bam_nsort = os.path.join(output_folder, f"{ref}_nsort.bam")
+        subprocess.run(f"samtools sort -n -o \"{ref_bam_nsort}\" \"{ref_bam}\"", shell=True, stderr=subprocess.DEVNULL)
+        
+        # Convert BAM back to FASTQ
+        r1 = os.path.join(output_folder, f"{ref}_R1.fastq")
+        r2 = os.path.join(output_folder, f"{ref}_R2.fastq")
+        subprocess.run(f"samtools fastq -1 \"{r1}\" -2 \"{r2}\" -0 /dev/null -s /dev/null \"{ref_bam_nsort}\"", shell=True, stderr=subprocess.DEVNULL)
+        
+        binned_files[ref] = (r1, r2)
+        
+    return binned_files

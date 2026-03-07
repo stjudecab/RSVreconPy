@@ -130,11 +130,23 @@ def run_mapping(sample_id, mapres_folder_name, original_read1, original_read2, r
     root_file_path = os.path.dirname(os.path.realpath(__file__))
     log_file = os.path.join(log_folder_name, sample_id + '.log')
     errlog_file = os.path.join(log_folder_name, sample_id + '.err.log')
-    job_command = f"python {root_file_path}/Mapping.py {sample_id} '{mapres_folder_name}' '{original_read1}' '{original_read2}' '{reference_folder_name}' {star_ThreadN} {igv_cutoff} {igv_cutoff_low}"
+    
+    job_command_args = [
+        sys.executable,  # Use the same python interpreter that is running this script
+        os.path.join(root_file_path, 'Mapping.py'),
+        sample_id,
+        mapres_folder_name,
+        original_read1,
+        original_read2,
+        reference_folder_name,
+        str(star_ThreadN),
+        str(igv_cutoff),
+        str(igv_cutoff_low)
+    ]
     
     # Redirect output to log files
     with open(log_file, 'w') as log, open(errlog_file, 'w') as errlog:
-        process = subprocess.run(job_command, shell=True, stdout=log, stderr=errlog)
+        process = subprocess.run(job_command_args, stdout=log, stderr=errlog)
     
     return sample_id, process.returncode
 
@@ -257,9 +269,3 @@ generate_html_report(root_file_path, report, working_folder_name, mapres_folder,
 print("Report and sequences have been generated!")
 
 print(f"######################\tSuccessfully completed!                 \t######################")
-
-
-
-
-
-

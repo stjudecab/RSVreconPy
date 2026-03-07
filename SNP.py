@@ -10,7 +10,7 @@ from RSV_functions import get_sub_folders, elements_not_in_array, pct_sum, deter
 def float_to_percentage(value):
     return "{:.2%}".format(value)
 
-def SNP_calling(wig_file, cutoff, genotype_text, gff_path, out_path, prefix_name, cov_cutoff):
+def detect_minor_variants(wig_file, cutoff, genotype_text, gff_path, out_path, prefix_name, cov_cutoff):
     if genotype_text == 'SubtypeA':
         genome_intervals = [(70,420),(599,375),(1111,1176),(2318,726),(3226,771),(4266,195),(4652,966),(5697,1725),(7640,585),(8158,273),(8532,6498)] # subtype A
         genome_xticks = [70,800,1600,2700,3550,4366,5000,6300,7650,8400,11500]
@@ -111,4 +111,4 @@ def SNP_calling(wig_file, cutoff, genotype_text, gff_path, out_path, prefix_name
 #gff_path = '/research/groups/cab/projects/automapper/common/lli75/RSV_run/3083501/Report/1_S1/reference/MG813995.gff'
 #out_path = './'
 #prefix_name = 'test'
-#SNP_calling(wig_file, cutoff, 'SubtypeA', gff_path, out_path, prefix_name)
+#detect_minor_variants(wig_file, cutoff, 'SubtypeA', gff_path, out_path, prefix_name)

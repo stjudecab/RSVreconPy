@@ -19,7 +19,7 @@ from matplotlib.colors import LinearSegmentedColormap, BoundaryNorm
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 from RSV_functions import parse_gff, find_gene_at_position, find_gff_files_in_path, get_genotype_res, get_version, get_sub_folders, elements_not_in_array, pct_sum, determine_subtype, processIGV, extract_gene_seq, detect_F_mutation, extract_key_residue_fgene, extract_gene_covarage, translate_nt_to_aa, get_date
-from SNP import SNP_calling
+from SNP import detect_minor_variants
 import seaborn as sns
 import base64
 from datetime import datetime
@@ -1315,7 +1315,7 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
             cutoff = 0.2
             gff_file = find_gff_files_in_path(os.path.join(mapres_folder, cur_folder, 'reference'))
             gff_path = os.path.join(mapres_folder, cur_folder, 'reference',gff_file[0])
-            table_data = SNP_calling(wig_file, cutoff, genotype_text, gff_path, temp_folder, cur_folder, igv_cutoff)
+            table_data = detect_minor_variants(wig_file, cutoff, genotype_text, gff_path, temp_folder, cur_folder, igv_cutoff)
             # heading
             subtitle = Paragraph('SNP details', styles['Heading4'])
             elements.append(subtitle)
@@ -1673,7 +1673,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
             cutoff = 0.2
             gff_file = find_gff_files_in_path(os.path.join(mapres_folder, cur_folder, 'reference'))
             gff_path = os.path.join(mapres_folder, cur_folder, 'reference',gff_file[0])
-            table_data = SNP_calling(wig_file, cutoff, genotype_text, gff_path, temp_folder, cur_folder, igv_cutoff)
+            table_data = detect_minor_variants(wig_file, cutoff, genotype_text, gff_path, temp_folder, cur_folder, igv_cutoff)
             
             header = table_data.pop(0)
             table_id = f"snp_table_{section_id}"

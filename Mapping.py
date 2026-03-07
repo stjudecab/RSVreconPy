@@ -5,7 +5,7 @@ import sys
 import subprocess
 import pandas as pd
 import shutil
-from Genotyping import genotype_call_whole_genome, genotype_call_G_protein
+from Genotyping import genotype_call_whole_genome
 from RSV_functions import determine_subtype, processIGV, fetch_record_from_JSON, find_best_reference
 
 def sample_mapping(sample_id, working_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN, igv_cutoff, igv_cutoff_low, run_eachstep):
@@ -165,7 +165,7 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
     root_file_path = os.path.dirname(os.path.realpath(__file__))
     render_file = os.path.join(root_file_path, 'RenderTree.R')
     
-    ## genotype using whole genome (Dumb method)
+    # Genotype using whole genome BLAST against a curated reference set
     if "SubtypeA" in subtype_str:
         ref_db_path = os.path.join(reference_folder_name, 'Genotype_ref', 'BlastDB', 'RSVA')
         meta_file_path = os.path.join(reference_folder_name, 'Genotype_ref', 'metadata_A.tsv')
@@ -175,17 +175,11 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
     else:
         return
 
-    print(f"genotype_call_whole_genome {query_file_path} {ref_db_path} {genotype_folder} {reference_folder_name} {render_file}")
     if run_eachstep['genotype_whole_genome'] is True:
+        print(f"genotype_call_whole_genome {query_file_path} {ref_db_path} {genotype_folder} {reference_folder_name} {render_file}")
         genotype_call_whole_genome(query_file_path, ref_db_path, meta_file_path, genotype_folder, reference_folder_name, render_file)
 
-    ## genotype using G protein (Dumb method)
-    #ref_db_path = os.path.join(reference_folder_name, 'Genotype_ref', 'G_genotype', 'G_subtype')
-    #print(f"genotype_call_G_protein {query_file_path} {ref_db_path} {genotype_folder} {reference_folder_name} {render_file}")
-    #if run_eachstep['genotype_G_gene'] is True:
-    #    genotype_call_G_protein(query_file_path, ref_db_path, genotype_folder, reference_folder_name, render_file)
-
-    ## blast query against GISAID
+    # Blast query against GISAID
     blast_out_file = os.path.join(genotype_folder, 'blastn_res_gisaid.tsv')
     ref_db_path = os.path.join(reference_folder_name, 'Genotype_ref', 'GISAIDDB', 'GISAID')
     cmd = f"blastn -query {query_file_path} -db {ref_db_path} -out {blast_out_file} -outfmt 6 -num_threads 1 -evalue 1e-10 -perc_identity 90"
@@ -193,7 +187,7 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
     if run_eachstep['blast_gisaid'] is True:
         subprocess.run(cmd, shell=True, cwd=genotype_folder)
 
-    ## genotype using whole genome using NextClade (Trust this one)
+    # Genotype using whole genome using NextClade
     if "SubtypeA" in subtype_str:
         ref_db_path = os.path.join(reference_folder_name, 'NextClade', 'rsv_a')
     elif "SubtypeB" in subtype_str:
@@ -225,7 +219,6 @@ if __name__ == "__main__":
         "samtools":True,
         "igvtools":True,
         "genotype_whole_genome":True,
-        "genotype_G_gene":True,
         "blast_gisaid":True,
         "nextclade":True
     }

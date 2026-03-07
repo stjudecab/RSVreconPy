@@ -14,6 +14,7 @@ Please visit our [nextflow implementation](https://github.com/stjudecab/rsvrecon
 - [Configuration](#configuration)
 - [Output](#output)
 - [Dependencies](#dependencies)
+- [Changelog](#changelog)
 - [Troubleshooting](#troubleshooting)
 
 ## Features
@@ -192,6 +193,10 @@ dependencies:
 - Environment creation fails → Try `conda env create -f RSV_env.yml`
 - Pipeline errors → Check `log/*.err.log` files
 - Memory issues → Reduce `MAX_CONCURRENT_JOBS`
+
+## Changelog
+
+See the CHANGELOG.md file for a history of changes to this project.
 
 ## Citation
 Our preprint is on-line at [bioRxiv](https://www.biorxiv.org/content/10.1101/2025.06.03.657184v1)

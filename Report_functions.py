@@ -211,7 +211,7 @@ def array_to_html_table(array, header, color=None, table_id=None, table_class=No
     # Start the HTML table with optional ID and class
     id_attr = f' id="{table_id}"' if table_id else ''
     class_attr = f' class="{table_class}"' if table_class else ''
-    html = f'<table border="1"{id_attr}{class_attr}>\n'
+    html = f'<table{id_attr}{class_attr}>\n'
 
     
     # make header
@@ -794,11 +794,15 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
     elements = []
 
     # title
-    title_style = styles['Title']
-    title_style.fontSize = 20
-    title_style.alignment = TA_LEFT
-    title = Paragraph("Detection of RSV from clinical samples", title_style)
-    elements.append(title)
+    title_style = ParagraphStyle(
+        name='ModernTitle',
+        parent=styles['Title'],
+        fontSize=24,
+        textColor=colors.HexColor('#2c3e50'),
+        alignment=TA_LEFT,
+        spaceAfter=20
+    )
+    elements.append(Paragraph("RSV Genome Reconstruction Report", title_style))
 
     # logo
     pil_img = PILImage.open(Logo)
@@ -942,19 +946,17 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
 
     # Create a TableStyle and add it to the table
     style = TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # set background color for the first row to grey
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # set text color for the first row to white
-
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2c3e50')),  # Dark slate
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('LINEBEFORE', (0, 0), (-1, -1), 0, (1, 1, 1)),  # Hide left border
         ('LINEAFTER', (0, 0), (-1, -1), 0, (1, 1, 1)),   # Hide right border
-
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # align all cells to the center
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # set font for the first row to Helvetica-Bold
-        ('FONTSIZE', (0, 0), (-1, -1), 9),  # set font size entire table
-
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),  # add more space below the text of the first row
-        ('BACKGROUND', (0, 1), (-1, -1), colors.white),  # set background color for the other rows to beige
-        ('GRID', (0,0), (-1,-1), 1, colors.black)  # set grid color to black and line width to 1
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#dee2e6')),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE')
     ])
 
     # Set the background color of each cell based on its value
@@ -1140,17 +1142,15 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
         elements.append(paragraph)
 
         style = TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # set background color for the first row to grey
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # set text color for the first row to white
-
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # align all cells to the center
-            ('LEFTMARGIN', (0,0), (-1,-1), 0),     # align table to the left of page
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # set font for the first row to Helvetica-Bold
-            ('FONTSIZE', (0, 0), (-1, 0), 9),  # set font size for the first row to 10
-
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),  # add more space below the text of the first row
-            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),  # set background color for the other rows to beige
-            ('GRID', (0,0), (-1,-1), 1, colors.black)  # set grid color to black and line width to 1
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#34495e')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('LEFTMARGIN', (0,0), (-1,-1), 0),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 9),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#fdfdfd')),
+            ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#ecf0f1'))
         ])
 
         # most identical strains on GISAID and Next strain
@@ -1388,6 +1388,32 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
     with open(template_file, 'r') as tem_handle:
         html_report_str = tem_handle.read()
 
+    # Inject modern CSS
+    modern_css = """
+    <style>
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8f9fa; color: #333; margin: 0; }
+        .sidebar { background-color: #82C8E5; color: white; padding: 25px; position: fixed; height: 100%; overflow-y: auto; width: 250px; }
+        .sidebar h2 { color: #ecf0f1; padding-bottom: 10px; font-size: 1.2rem; }
+        .sidebar ul { list-style: none; padding: 0; }
+        .sidebar li a { color: #bdc3c7; text-decoration: none; display: block; padding: 10px 0; transition: 0.3s; cursor: pointer; border-bottom: 1px solid #34495e; }
+        .sidebar li a:hover { color: white; background-color: #34495e; padding-left: 10px; }
+        .main-content { margin-left: 300px; padding: 40px; max-width: 1200px; }
+        .card { background: white; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 40px; overflow: hidden; border: 1px solid #e1e4e8; }
+        .card-header { background-color: #f1f3f5; padding: 20px 30px; border-bottom: 1px solid #e1e4e8; }
+        .card-header h2 { margin: 0; font-size: 1.6rem; color: #82C8E5; }
+        .card-body { padding: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 25px; background: white; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 14px 18px; text-align: left; border-bottom: 1px solid #e9ecef; }
+        thead { background-color: #f8f9fa; font-weight: bold; color: #495057; }
+        .summary_table_class thead { background-color: #82C8E5; color: white; }
+        .content-section h2 { color: #82C8E5; border-left: 6px solid #3498db; padding-left: 20px; margin-top: 40px; margin-bottom: 20px; }
+        .genotype-badge { display: inline-block; padding: 8px 20px; border-radius: 25px; font-weight: bold; font-size: 1.2rem; background-color: #e9ecef; color: #2c3e50; margin-bottom: 15px; }
+        .qc-reason { font-size: 0.95rem; color: #495057; background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #dee2e6; margin: 15px 0; }
+        .coinfection-box { background-color: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 8px; margin: 20px 0; display: flex; align-items: center; }
+    </style>
+    """
+    html_report_str = html_report_str.replace('</head>', f'{modern_css}</head>')
+
     # set the temp folder under working folder
     temp_folder = os.path.join(working_folder, 'Temp')
     if not os.path.exists(temp_folder):
@@ -1546,10 +1572,10 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
         section_id = cur_folder
 
         sidebar_div += f"<li><a onclick=\"showSection('{section_id}')\">{section_id}</a></li>"
-        main_content_div += f"<div id=\"{section_id}\" class=\"content-section\">"
-
-        main_content_div += f"<h2>Sample: {section_id}</h2>\n"
-
+        main_content_div += f"<div id=\"{section_id}\" class=\"content-section card\">"
+        main_content_div += f"<div class=\"card-header\"><h2>Sample: {section_id}</h2></div>"
+        main_content_div += f"<div class=\"card-body\">"
+        
         # ######################################## genotype calling
         main_content_div += f"<h3>Genotype calls</h3>\n"
 
@@ -1593,17 +1619,17 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
         else:
             base64_string = image_to_base64(os.path.join(file_path, 'Resource','error.png'))
 
-        genotype_para  = f"<img src='data:image/png;base64,{base64_string}' style='margin-top:0px;width:30px'><b>{genotype_text}</b>"
+        genotype_para  = f"<div class='genotype-badge'><img src='data:image/png;base64,{base64_string}' style='margin-top:0px;width:24px;vertical-align:middle;margin-right:10px'>{genotype_text}</div>"
             
         qc_reason = df.loc[cur_folder, "QC_Reason"]
-        genotype_para += f"<br/><br/>Mapping QC details:  {qc_reason}"
+        genotype_para += f"<div class='qc-reason'><strong>Mapping QC:</strong> {qc_reason}</div>"
         
         is_coinfection = df.loc[cur_folder, "Co-infection"]
         parent_sample = df.loc[cur_folder, "Parent Sample"]
         if is_coinfection == "Yes":
             coinfection_icon_path = os.path.join(file_path, 'Resource', 'coinfection.png')
             base64_string_coinfection = image_to_base64(coinfection_icon_path)
-            genotype_para += f"<br/><br/><img src='data:image/png;base64,{base64_string_coinfection}' style='margin-top:0px;width:40px'> Co-infection: <b>{is_coinfection}</b> (Parent: {parent_sample})"
+            genotype_para += f"<div class='coinfection-box'><img src='data:image/png;base64,{base64_string_coinfection}' style='margin-top:0px;width:30px;margin-right:15px'> <span><strong>Co-infection detected!</strong> (Parent: {parent_sample})</span></div>"
         genotype_para += f"<br/><br/>F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
 
         main_content_div += genotype_para
@@ -1719,7 +1745,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
             main_content_div += f"{html_table}\n"
 
 
-        main_content_div += '</div>\n'  # close div for current sample
+        main_content_div += '</div></div>\n'  # close card-body and card div for current sample
 
     # close div, finish the html file
 

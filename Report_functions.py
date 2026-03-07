@@ -334,7 +334,7 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
     CSV_header += "Subtype,reference_accession,ref_subtype,"
     CSV_header += "F protein mutations,"
     CSV_header += "NS1_cov,NS2_cov,N_cov,P_cov,M_cov,SH_cov,G_cov,F_cov,M2-1_cov,M2-2_cov,L_cov,"
-    CSV_header += "Whole Genome Clade(NextClade),Whole Genome Clade(Blast)"
+    CSV_header += "Whole Genome Clade(NextClade),Whole Genome Clade(Blast),Co-infection,Parent Sample"
 
     subtype_a_names = []
     subtype_b_names = []
@@ -355,6 +355,10 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
                 continue
 
             print(f"Start process {cur_folder} ...")
+
+            sample = cur_folder.split("/")[-1]
+            is_coinfection = "Yes" if "-comp" in sample else "No"
+            parent_sample = sample.split("-comp")[0] if "-comp" in sample else sample
 
             # Step 1: collect QC info from JSON file
             QC_json_file = os.path.join(working_folder_name, cur_folder, 'fastp.json')
@@ -387,8 +391,6 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
                         subtype_str = subtype_str[0]
                 else:
                     subtype_str = 'Not RSV'
-
-                sample = cur_folder.split("/")[-1]
 
                 # Identify the actual reference used by checking the reference folder
                 ref_dir = os.path.join(working_folder_name, cur_folder, 'reference')
@@ -501,15 +503,14 @@ def generate_csv_fasta(report, sequence_file, reference_folder_name, working_fol
                         W_subtype_str = 'Not RSV'
                 else:
                     W_subtype_str = 'Not RSV'
-                out.write(f",{W_subtype_str}\n")
+                out.write(f",{W_subtype_str},{is_coinfection},{parent_sample}\n")
 
             else:
-                sample = cur_folder.split("/")[-1]
                 rate = after['total_reads'] / before['total_reads'] * 100
                 QC_str = f"{before['total_reads']},{before['q20_rate']},{before['q30_rate']},{after['total_reads']},{after['q20_rate']},{after['q30_rate']},{rate},"
                 map_str = f"0,0,100,0,"
                 subtype_str = 'Not RSV'
-                out.write(f"{sample},{QC_str}{map_str}{subtype_str},NA,Not RSV,,0,0,0,0,0,0,0,0,0,0,0,{subtype_str},{subtype_str}\n")
+                out.write(f"{sample},{QC_str}{map_str}{subtype_str},NA,Not RSV,,0,0,0,0,0,0,0,0,0,0,0,{subtype_str},{subtype_str},{is_coinfection},{parent_sample}\n")
 
     # make F protein CSV report
     F_report_A = report.replace('Report.csv', 'F_mutation_A_report.csv')
@@ -826,6 +827,8 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
 
     table_info_text = f"Pipeline Verions: {current_version}, Reported on: {today_str}<br/> Subtypes of each reference are highlighted in different colors: <font color='red'>Subtype A</font> and <font color='blue'>Subtype B</font>"
     table_info_text += f"<br/> Genotype calling is based on <a href='https://nextstrain.org/rsv/a/genome'><b>Nextstrain</b> and <b>Nextclade3</b>, Data updated {current_version_date}</a><br/> A clade lable with * indicates the clade of best blast hit strain due to negative results from NextClade3 <br/>Click the sample name to jump to the detail section<br/> "
+    coinfection_icon_path = os.path.join(file_path, 'Resource', 'coinfection.png')
+    table_info_text += f"<br/><img src='{coinfection_icon_path}' valign='middle' width='30' height='30'/> indicates Co-infection <br/><br/>"
     paragraph = Paragraph(table_info_text, styles['BodyText'])
     elements.append(paragraph)
     spacer = Spacer(1, 6)  # width and height in points
@@ -836,7 +839,7 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
     # Format the column as percentages
     df.loc[:,'QC rate'] = df.loc[:,'QC rate'] / 100 # QC rate
 
-    df = df.loc[:, ['Sample name', 'QC rate', 'Uniquely mapped reads(%)', 'Subtype','reference_accession','ref_subtype', 'Whole Genome Clade(NextClade)', 'Whole Genome Clade(Blast)', 'G_cov', 'Overall_Quality']]
+    df = df.loc[:, ['Sample name', 'QC rate', 'Uniquely mapped reads(%)', 'Subtype','reference_accession','ref_subtype', 'Whole Genome Clade(NextClade)', 'Whole Genome Clade(Blast)', 'G_cov', 'Overall_Quality', 'Co-infection']]
     data = df.values.tolist()
 
     custom_style = ParagraphStyle(
@@ -921,11 +924,18 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
         #if g_genotype_text == 'Low G coverage':
         #    g_genotype_text = 'Low cov'
 
-        data[row] = [cur_sample_link, f'{data[row][1]:.2%}', cur_sample_png, genotype_text, sign_png]
+        # co-infection icon
+        if data[row][10] == "Yes":
+            coinfection_icon_path = os.path.join(file_path, 'Resource', 'coinfection.png')
+            coinfection_fig = Image(coinfection_icon_path, width=0.2*inch, height=0.2*inch)
+        else:
+            coinfection_fig = ""
 
-    df_columns = ['Sample name', 'Pass QC', 'Mapping rate', 'Clade', 'Sign']
+        data[row] = [cur_sample_link, f'{data[row][1]:.2%}', cur_sample_png, genotype_text, sign_png, coinfection_fig]
+
+    df_columns = ['Sample name', 'Pass QC', 'Mapping rate', 'Clade', 'Sign', 'Co-inf']
     data.insert(0, df_columns)
-    col_widths = [1.5*inch, 0.7*inch, 4*inch, 0.8*inch, 0.4*inch]
+    col_widths = [1.5*inch, 0.7*inch, 4*inch, 0.8*inch, 0.4*inch, 0.4*inch]
 
     table = Table(data, colWidths = col_widths)
     #table._argW = [100,60,150,80]
@@ -1114,6 +1124,13 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
             #genotype_para += f"Genotype Resource:   <b><a href='https://nextstrain.org/rsv/a/genome'>Nextstrain (click for details), Data updated 2024-08-01</a></b>"
         qc_reason = df.loc[cur_folder, "QC_Reason"]
         genotype_para += f"<br/><br/>Mapping QC details:  {qc_reason}"
+        
+        is_coinfection = df.loc[cur_folder, "Co-infection"]
+        parent_sample = df.loc[cur_folder, "Parent Sample"]
+        if is_coinfection == "Yes":
+            coinfection_icon_path = os.path.join(file_path, 'Resource', 'coinfection.png')
+            genotype_para += f"<br/><br/><img src='{coinfection_icon_path}' valign='middle' width='30' height='30'/> Co-infection: <b>{is_coinfection}</b> (Parent: {parent_sample})"
+        
         genotype_para += f"<br/><br/>F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
 
         paragraph = Paragraph(genotype_para)
@@ -1392,6 +1409,8 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
 
     table_info_text = f"Pipeline Verions: {current_version}, Reported on: {today_str}<br/> Subtypes of each reference are highlighted in different colors: <font color='red'>Subtype A</font> and <font color='blue'>Subtype B</font>"
     table_info_text += f"<br/> Genotype calling is based on <a href='https://nextstrain.org/rsv/a/genome'  target=\"_blank\"><b>Nextstrain</b> and <b>Nextclade3</b>, Data updated {current_version_date}</a><br/> A clade lable with * indicates the clade of best blast hit strain due to negative results from NextClade3 <br/>Click the sample name to jump to the detail section<br/> "
+    coinfection_icon_path = os.path.join(file_path, 'Resource', 'coinfection.png')
+    table_info_text += f"<img src='{coinfection_icon_path}' style='margin-top:0px;height:30px'/> indicates Co-infection <br/>"
 
     main_content_div += '<div id="summary_section" class="content-section">'
     main_content_div += f"<h1>{title}</h1>\n"
@@ -1404,7 +1423,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
     df = pd.read_csv(csv_file, skiprows=1)
     df.loc[:,'QC rate'] = df.loc[:,'QC rate'] / 100 # QC rate
 
-    df = df.loc[:, ['Sample name', 'QC rate', 'Uniquely mapped reads(%)', 'Subtype','reference_accession','ref_subtype', 'Whole Genome Clade(NextClade)', 'Whole Genome Clade(Blast)', 'G_cov', 'Overall_Quality']]
+    df = df.loc[:, ['Sample name', 'QC rate', 'Uniquely mapped reads(%)', 'Subtype','reference_accession','ref_subtype', 'Whole Genome Clade(NextClade)', 'Whole Genome Clade(Blast)', 'G_cov', 'Overall_Quality', 'Co-infection']]
     data = df.values.tolist()
 
     for row in range(0, len(data)):
@@ -1454,9 +1473,17 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
         sign_fig_base64_string = image_to_base64(sign_png)
         sign_fig = f"<img src='data:image/png;base64,{sign_fig_base64_string}' alt=\"sign_fig\" style='margin-top:0px;height:30px'>\n"
 
-        data[row] = [cur_sample_link, f'{data[row][1]:.2%}', mapping_fig, genotype_text, sign_fig]
+        # co-infection icon
+        if data[row][10] == "Yes":
+            coinfection_icon_path = os.path.join(file_path, 'Resource', 'coinfection.png')
+            base64_coinfection = image_to_base64(coinfection_icon_path)
+            coinfection_fig = f"<img src='data:image/png;base64,{base64_coinfection}' alt='coinfection' style='margin-top:0px;height:30px'>\n"
+        else:
+            coinfection_fig = ""
 
-    df_columns = ['Sample name', 'Pass QC', 'Mapping rate', 'Clade',  'Sign']
+        data[row] = [cur_sample_link, f'{data[row][1]:.2%}', mapping_fig, genotype_text, sign_fig, coinfection_fig]
+
+    df_columns = ['Sample name', 'Pass QC', 'Mapping rate', 'Clade',  'Sign', 'Co-inf']
     
     # Set the background color of each cell based on its value
     bg_color = generate_empty_2d_array(data)
@@ -1570,8 +1597,13 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
             
         qc_reason = df.loc[cur_folder, "QC_Reason"]
         genotype_para += f"<br/><br/>Mapping QC details:  {qc_reason}"
-        #genotype_para += f";  <b>{g_genotype_text}</b> (based on G-ectodomain)<br/><br/>"
-        #genotype_para += f"Genotype Resource:   <b><a href='https://nextstrain.org/rsv/a/genome'>Nextstrain (click for details), Data updated 2024-08-01</a></b>"
+        
+        is_coinfection = df.loc[cur_folder, "Co-infection"]
+        parent_sample = df.loc[cur_folder, "Parent Sample"]
+        if is_coinfection == "Yes":
+            coinfection_icon_path = os.path.join(file_path, 'Resource', 'coinfection.png')
+            base64_string_coinfection = image_to_base64(coinfection_icon_path)
+            genotype_para += f"<br/><br/><img src='data:image/png;base64,{base64_string_coinfection}' style='margin-top:0px;width:40px'> Co-infection: <b>{is_coinfection}</b> (Parent: {parent_sample})"
         genotype_para += f"<br/><br/>F protein mutations:  <b>{F_protein_mutation_text}</b> <br/><br/>"
 
         main_content_div += genotype_para

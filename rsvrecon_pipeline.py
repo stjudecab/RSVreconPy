@@ -41,10 +41,12 @@ data_folder_name = config['DATA_DIR']
 reference_folder_name = config['REFERENCE_DIR']
 working_folder_name = config['OUTPUT_DIR']
 
+read_type = config.get('READ_TYPE', 'NGS') # 'NGS' or 'LR'
 star_ThreadN = config.get('THREAD_N', 2)
 igv_cutoff = config.get('COV_CUTOFF', 50)
 igv_cutoff_low = config.get('COV_CUTOFF_LOW', 10)
 MAX_CONCURRENT_JOBS = config.get('MAX_CONCURRENT_JOBS', 2)
+score_ratio_cutoff = config.get('SCORE_RATIO_CUTOFF', 0.2)
 additional_results_path = config.get('RSV_NEXT_PIPE_RES', None)
 
 # Only check path existence if it's not None
@@ -52,12 +54,6 @@ if additional_results_path is not None and os.path.exists(additional_results_pat
     pass  # Path exists and is valid
 else:
     additional_results_path = None
-
-tool = config.get('TOOL', 'BWA')
-
-if tool not in ['BWA']:
-    print(tool + " is not a supported aligner! Please use BWA!\n")
-    sys.exit()
 
 ###################################################
 ##      Check tools' availability
@@ -70,10 +66,13 @@ check_tool_availability_res += check_tool_availability("igvtools")
 check_tool_availability_res += check_tool_availability("samtools")
 # Check for fastp
 check_tool_availability_res += check_tool_availability("fastp")
-# Check for aligners
-check_tool_availability_res += check_tool_availability("bwa")
 # Check for kma
 check_tool_availability_res += check_tool_availability('kma')
+# Check for aligners
+if read_type == 'LR':
+    check_tool_availability_res += check_tool_availability('minimap2')
+else:
+    check_tool_availability_res += check_tool_availability("bwa")
 # Check for blastn
 check_tool_availability_res += check_tool_availability('blastn')
 # Check for mafft
@@ -125,7 +124,7 @@ print(f"Latest database downloaded from RSV A and RSV B\n")
 ###################################################
 ##      start process with concurrent execution
 ###################################################
-def run_mapping(sample_id, mapres_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN, igv_cutoff, igv_cutoff_low):
+def run_mapping(sample_id, mapres_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN, igv_cutoff, igv_cutoff_low, read_type, score_ratio_cutoff):
     """Run mapping command for a single sample"""
     root_file_path = os.path.dirname(os.path.realpath(__file__))
     log_file = os.path.join(log_folder_name, sample_id + '.log')
@@ -137,11 +136,13 @@ def run_mapping(sample_id, mapres_folder_name, original_read1, original_read2, r
         sample_id,
         mapres_folder_name,
         original_read1,
-        original_read2,
+        str(original_read2),
         reference_folder_name,
         str(star_ThreadN),
         str(igv_cutoff),
-        str(igv_cutoff_low)
+        str(igv_cutoff_low),
+        read_type,
+        str(score_ratio_cutoff)
     ]
     
     # Redirect output to log files
@@ -167,7 +168,7 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_CONCURRENT_JOBS) as e
             continue
             
         original_read1 = os.path.join(data_folder_name, sample_dict[sample_id][0])
-        original_read2 = os.path.join(data_folder_name, sample_dict[sample_id][1])
+        original_read2 = os.path.join(data_folder_name, sample_dict[sample_id][1]) if sample_dict[sample_id][1] else None
         
         future = executor.submit(
             run_mapping,
@@ -178,7 +179,9 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_CONCURRENT_JOBS) as e
             reference_folder_name,
             star_ThreadN,
             igv_cutoff,
-            igv_cutoff_low
+            igv_cutoff_low,
+            read_type,
+            score_ratio_cutoff
         )
         future_to_sample[future] = sample_id
         print(f"Submitted job for sample: {sample_id}")
@@ -220,7 +223,7 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_CONCURRENT_JOBS) as e
                     continue
                     
                 original_read1 = os.path.join(data_folder_name, sample_dict[next_sample][0])
-                original_read2 = os.path.join(data_folder_name, sample_dict[next_sample][1])
+                original_read2 = os.path.join(data_folder_name, sample_dict[next_sample][1]) if sample_dict[next_sample][1] else None
                 
                 future = executor.submit(
                     run_mapping,
@@ -231,7 +234,9 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_CONCURRENT_JOBS) as e
                     reference_folder_name,
                     star_ThreadN,
                     igv_cutoff,
-                    igv_cutoff_low
+                    igv_cutoff_low,
+                    read_type,
+                    score_ratio_cutoff
                 )
                 future_to_sample[future] = next_sample
                 print(f"Submitted job for sample: {next_sample}")

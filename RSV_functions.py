@@ -67,9 +67,16 @@ def detect_sequencing_files(data_folder):
                         sample_dict[sample_id][int(read_num)-1] = file_name
                         matched = True
                         break
+                
+                # Fallback for single-end/long-read files that don't match paired patterns
+                if not matched:
+                    sample_id = file_name.split('.')[0]
+                    if sample_id not in sample_dict:
+                        sample_dict[sample_id] = [file_name, None]
+                    matched = True
     
-    # Remove incomplete samples (only R1 or only R2 present)
-    complete_samples = {k: v for k, v in sample_dict.items() if all(v)}
+    # Allow samples with at least R1 (handles single-end long reads)
+    complete_samples = {k: v for k, v in sample_dict.items() if v[0] is not None}
     
     return complete_samples
 
@@ -586,7 +593,7 @@ def find_best_reference(kma_results_file, output_file=None):
     
     return results
 
-def detect_potential_coinfections(kma_results_file, reference_folder_name, score_ratio_cutoff=0.5):
+def detect_potential_coinfections(kma_results_file, reference_folder_name, score_ratio_cutoff=0.2, read_type='NGS', min_identity=90.0):
     """
     Analyze KMA results to detect potential co-infections.
     Returns a list of reference names.
@@ -605,6 +612,16 @@ def detect_potential_coinfections(kma_results_file, reference_folder_name, score
     info_table = os.path.join(reference_folder_name, 'RSV.csv')
     info_df = pd.read_csv(info_table, delimiter=',', index_col=0)
 
+    # Load clade information for more precise distinctness check
+    clade_map = {}
+    meta_file = os.path.join(reference_folder_name, 'Genotype_ref', 'WholeGenome_genotype', 'NextStrain.tsv')
+    if os.path.exists(meta_file):
+        try:
+            meta_df = pd.read_csv(meta_file, sep='\t', index_col=0)
+            clade_map = meta_df['clade'].to_dict()
+        except:
+            pass
+
     best_refs = [df.loc[0, '#Template']]
     top_score = df.loc[0, 'Score']
     
@@ -612,24 +629,36 @@ def detect_potential_coinfections(kma_results_file, reference_folder_name, score
     for i in range(1, min(len(df), 5)):
         curr_ref = df.loc[i, '#Template']
         curr_score = df.loc[i, 'Score']
+        #curr_identity = df.loc[i, 'Template_Identity']
         
-        # Only consider hits with a score at least half of the top hit
-        if curr_score / top_score < score_ratio_cutoff:
+        ratio = curr_score / top_score
+        if ratio < score_ratio_cutoff:
             break
-            
-        # Check if distinct (different subtype or different strain name)
+        
+        # Only consider hits with high mapping identity (Point 3)
+        #if curr_identity < min_identity:
+        #    continue
+        
+
         is_distinct = False
         for ref in best_refs:
-            sub1 = info_df.loc[ref, 'Subtype']
-            sub2 = info_df.loc[curr_ref, 'Subtype']
+            sub1 = info_df.loc[ref, 'Subtype'] if ref in info_df.index else "Unknown"
+            sub2 = info_df.loc[curr_ref, 'Subtype'] if curr_ref in info_df.index else "Unknown"
+
             if sub1 != sub2:
+                # Different subtypes (A vs B) is a strong signal for co-infection
                 is_distinct = True
                 break
-            # If same subtype, check if they are different templates
-            if curr_ref != ref:
-                is_distinct = True
-                break
-        
+            else:
+                # Same subtype. Check if they belong to different clades.
+                clade1 = clade_map.get(ref)
+                clade2 = clade_map.get(curr_ref)
+
+                if clade1 and clade2 and clade1 != clade2:
+                    # Different clades within same subtype.
+                    is_distinct = True
+                    break
+
         if is_distinct:
             best_refs.append(curr_ref)
             if len(best_refs) >= 2: # Limit to 2 components for now
@@ -637,7 +666,7 @@ def detect_potential_coinfections(kma_results_file, reference_folder_name, score
                 
     return best_refs
 
-def separate_reads_for_coinfection(read1_trim, read2_trim, ref_list, reference_folder_name, output_folder, threads):
+def separate_reads_for_coinfection(read1_trim, read2_trim, ref_list, reference_folder_name, output_folder, threads, read_type='NGS'):
     """
     Separates reads into bins based on which reference they map to best.
     """
@@ -649,12 +678,17 @@ def separate_reads_for_coinfection(read1_trim, read2_trim, ref_list, reference_f
             fasta_content = fetch_record_from_JSON(ref, ref_fasta_json)
             out.write(fasta_content + "\n")
             
-    # Index with BWA
-    subprocess.run(f"bwa index \"{combined_fasta}\"", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    
-    # Map with BWA
     sam_file = os.path.join(output_folder, "combined.sam")
-    subprocess.run(f"bwa mem -t {threads} \"{combined_fasta}\" \"{read1_trim}\" \"{read2_trim}\" > \"{sam_file}\"", shell=True, stderr=subprocess.DEVNULL)
+    if read_type == 'LR':
+        # Use minimap2 for long reads
+        cmd = f"minimap2 -ax map-ont -t {threads} \"{combined_fasta}\" \"{read1_trim}\" > \"{sam_file}\""
+    else:
+        # Index and map with BWA for short reads
+        subprocess.run(f"bwa index \"{combined_fasta}\"", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        read2_arg = f"\"{read2_trim}\"" if read2_trim else ""
+        cmd = f"bwa mem -t {threads} \"{combined_fasta}\" \"{read1_trim}\" {read2_arg} > \"{sam_file}\""
+    
+    subprocess.run(cmd, shell=True, stderr=subprocess.DEVNULL)
     
     # Convert to BAM and sort by coordinate
     bam_file = os.path.join(output_folder, "combined.bam")
@@ -676,8 +710,12 @@ def separate_reads_for_coinfection(read1_trim, read2_trim, ref_list, reference_f
         
         # Convert BAM back to FASTQ
         r1 = os.path.join(output_folder, f"{ref}_R1.fastq")
-        r2 = os.path.join(output_folder, f"{ref}_R2.fastq")
-        subprocess.run(f"samtools fastq -1 \"{r1}\" -2 \"{r2}\" -0 /dev/null -s /dev/null \"{ref_bam_nsort}\"", shell=True, stderr=subprocess.DEVNULL)
+        if read_type == 'LR':
+            r2 = None
+            subprocess.run(f"samtools fastq \"{ref_bam_nsort}\" > \"{r1}\"", shell=True, stderr=subprocess.DEVNULL)
+        else:
+            r2 = os.path.join(output_folder, f"{ref}_R2.fastq")
+            subprocess.run(f"samtools fastq -1 \"{r1}\" -2 \"{r2}\" -0 /dev/null -s /dev/null \"{ref_bam_nsort}\"", shell=True, stderr=subprocess.DEVNULL)
         
         binned_files[ref] = (r1, r2)
         

@@ -9,3 +9,5 @@ Set_env.sh
 /test
 /__pycache__
 /__pycache__
+/test_ont
+/data_ont

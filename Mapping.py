@@ -8,7 +8,7 @@ import shutil
 from Genotyping import genotype_call_whole_genome
 from RSV_functions import determine_subtype, processIGV, fetch_record_from_JSON, find_best_reference, detect_potential_coinfections, separate_reads_for_coinfection
 
-def run_assembly_steps(sample_id, cur_folder, read1_trim, read2_trim, Selected_ref_name, reference_folder_name, star_ThreadN, igv_cutoff, igv_cutoff_low, run_eachstep):
+def run_assembly_steps(sample_id, cur_folder, read1_trim, read2_trim, Selected_ref_name, reference_folder_name, star_ThreadN, igv_cutoff, igv_cutoff_low, run_eachstep, read_type='NGS'):
     """Encapsulates the assembly and genotyping steps for a single reference."""
     # make log folder
     log_cur_folder = os.path.join(cur_folder, 'log')
@@ -39,12 +39,17 @@ def run_assembly_steps(sample_id, cur_folder, read1_trim, read2_trim, Selected_r
         gff.write(original_gff)
 
     ref_output_dir = os.path.join(ref_folder, Selected_ref_name)
-    log_file = os.path.join(log_cur_folder, 'bwa_build_genome_log.txt')
-    star_command = f"bwa index -p \"{ref_output_dir}\" \"{new_fasta_file}\" &> \"{log_file}\""
-    print(star_command)
+    ref_index = ref_output_dir + ".mmi" if read_type == 'LR' else ref_output_dir
+    log_file = os.path.join(log_cur_folder, 'index_genome_log.txt')
 
+    if read_type == 'NGS':
+        index_command = f"bwa index -p \"{ref_output_dir}\" \"{new_fasta_file}\" &> \"{log_file}\""
+    else:
+        index_command = f"minimap2 -d \"{ref_index}\" \"{new_fasta_file}\" &> \"{log_file}\""
+
+    print(index_command)
     if run_eachstep['index'] is True:
-        subprocess.run(star_command, shell=True, cwd=cur_folder)
+        subprocess.run(index_command, shell=True, cwd=cur_folder)
 
     ##############################################################################
     ## step 3    reads mapping
@@ -57,7 +62,14 @@ def run_assembly_steps(sample_id, cur_folder, read1_trim, read2_trim, Selected_r
 
     log_file = os.path.join(log_cur_folder, 'mapping_log.txt')
     sam_file = os.path.join(map_folder, 'sample_aligned.sam')
-    cmd_mapping = f"bwa mem -t {star_ThreadN} \"{ref_output_dir}\" \"{read1_trim}\" \"{read2_trim}\" > \"{sam_file}\" 2> \"{log_file}\""
+    
+    if read_type == 'LR':
+        # Use the index if it exists, otherwise fall back to fasta
+        target = ref_index if os.path.exists(ref_index) else new_fasta_file
+        cmd_mapping = f"minimap2 -ax map-ont -t {star_ThreadN} \"{target}\" \"{read1_trim}\" > \"{sam_file}\" 2> \"{log_file}\""
+    else:
+        cmd_mapping = f"bwa mem -t {star_ThreadN} \"{ref_output_dir}\" \"{read1_trim}\" \"{read2_trim}\" > \"{sam_file}\" 2> \"{log_file}\""
+    
     print(cmd_mapping)
 
     if run_eachstep['align'] is True:
@@ -125,12 +137,11 @@ def run_assembly_steps(sample_id, cur_folder, read1_trim, read2_trim, Selected_r
     render_file = os.path.join(root_file_path, 'RenderTree.R')
     
     # Genotype using whole genome BLAST against a curated reference set
+    meta_file_path = os.path.join(reference_folder_name, 'Genotype_ref', 'WholeGenome_genotype', 'NextStrain.tsv')
     if "SubtypeA" in subtype_str:
         ref_db_path = os.path.join(reference_folder_name, 'Genotype_ref', 'BlastDB', 'RSVA')
-        meta_file_path = os.path.join(reference_folder_name, 'Genotype_ref', 'metadata_A.tsv')
     elif "SubtypeB" in subtype_str:
         ref_db_path = os.path.join(reference_folder_name, 'Genotype_ref', 'BlastDB', 'RSVB')
-        meta_file_path = os.path.join(reference_folder_name, 'Genotype_ref', 'metadata_B.tsv')
     else:
         return
 
@@ -159,7 +170,7 @@ def run_assembly_steps(sample_id, cur_folder, read1_trim, read2_trim, Selected_r
     if run_eachstep['nextclade'] is True:
         subprocess.run(nextclade_cmd, shell=True, cwd=genotype_folder)
 
-def sample_mapping(sample_id, working_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN, igv_cutoff, igv_cutoff_low, run_eachstep):
+def sample_mapping(sample_id, working_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN, igv_cutoff, igv_cutoff_low, run_eachstep, read_type='NGS', score_ratio_cutoff=0.2):
     # skip Undetermined reads
     if "Undetermined" in sample_id:
         return
@@ -180,7 +191,12 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
     read1_trim = os.path.join(temp_sample_folder, "reads_trimed_R1.fastq")
     read2_trim = os.path.join(temp_sample_folder, "reads_trimed_R2.fastq")
     log_file = os.path.join(log_cur_folder, 'fastp_log.txt')
-    cmd = f"fastp -i \"{original_read1}\" -I \"{original_read2}\" -o \"{read1_trim}\" -O \"{read2_trim}\" &> \"{log_file}\""
+    
+    if original_read2 and original_read2 != "None":
+        cmd = f"fastp -i \"{original_read1}\" -I \"{original_read2}\" -o \"{read1_trim}\" -O \"{read2_trim}\" &> \"{log_file}\""
+    else:
+        cmd = f"fastp -i \"{original_read1}\" -o \"{read1_trim}\" &> \"{log_file}\""
+        
     if run_eachstep['fastp'] is True:
         subprocess.run(cmd, shell=True, cwd=temp_sample_folder)
 
@@ -194,12 +210,13 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
         os.mkdir(kma_folder)
     kma_out = os.path.join(kma_folder, sample_id)
     kma_log = os.path.join(log_cur_folder, 'kma_log.txt')
-    kma_cmd = f"kma -ipe \"{read1_trim}\" \"{read2_trim}\" -o \"{kma_out}\" -t_db \"{kma_db}\" -1t1 -t 3 -mrs 0.9 -mq 50 &> \"{kma_log}\""
+    read2_kma = f"\"{read2_trim}\"" if original_read2 and original_read2 != "None" else ""
+    kma_cmd = f"kma -i \"{read1_trim}\" {read2_kma} -o \"{kma_out}\" -t_db \"{kma_db}\" -1t1 -t 3 -mrs 0.9 -mq 50 &> \"{kma_log}\""
     if run_eachstep['kma'] is True:
         subprocess.run(kma_cmd, shell=True, cwd=temp_sample_folder)
 
     kma_out_file = kma_out + '.res'
-    detected_refs = detect_potential_coinfections(kma_out_file, reference_folder_name)
+    detected_refs = detect_potential_coinfections(kma_out_file, reference_folder_name, score_ratio_cutoff=score_ratio_cutoff, read_type=read_type)
 
     if len(detected_refs) > 1:
         # Notification for co-infection
@@ -210,7 +227,7 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
         print("!"*60 + "\n")
 
         # Separate reads for each component
-        binned_reads = separate_reads_for_coinfection(read1_trim, read2_trim, detected_refs, reference_folder_name, temp_sample_folder, star_ThreadN)
+        binned_reads = separate_reads_for_coinfection(read1_trim, read2_trim, detected_refs, reference_folder_name, temp_sample_folder, star_ThreadN, read_type)
         
         for i, ref_name in enumerate(detected_refs):
             comp_id = f"{sample_id}-comp{i+1}"
@@ -221,20 +238,29 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
             # Move binned reads to component folder and rename to standard names
             comp_read1_src, comp_read2_src = binned_reads[ref_name]
             comp_read1 = os.path.join(comp_folder, "reads_trimed_R1.fastq")
-            comp_read2 = os.path.join(comp_folder, "reads_trimed_R2.fastq")
             shutil.move(comp_read1_src, comp_read1)
-            shutil.move(comp_read2_src, comp_read2)
+            
+            if comp_read2_src:
+                comp_read2 = os.path.join(comp_folder, "reads_trimed_R2.fastq")
+                shutil.move(comp_read2_src, comp_read2)
+            else:
+                comp_read2 = None
 
             # Run fastp on binned reads to get accurate QC metrics for this component
             comp_log_folder = os.path.join(comp_folder, 'log')
             if not os.path.exists(comp_log_folder): os.mkdir(comp_log_folder)
             comp_fastp_log = os.path.join(comp_log_folder, 'fastp_log.txt')
             comp_fastp_json = os.path.join(comp_folder, 'fastp.json')
-            cmd_fastp = f"fastp -i \"{comp_read1}\" -I \"{comp_read2}\" -o \"{comp_read1}.tmp\" -O \"{comp_read2}.tmp\" -j \"{comp_fastp_json}\" &> \"{comp_fastp_log}\""
+            
+            if read_type == 'LR':
+                cmd_fastp = f"fastp -i \"{comp_read1}\" -o \"{comp_read1}.tmp\" -j \"{comp_fastp_json}\" &> \"{comp_fastp_log}\""
+            else:
+                cmd_fastp = f"fastp -i \"{comp_read1}\" -I \"{comp_read2}\" -o \"{comp_read1}.tmp\" -O \"{comp_read2}.tmp\" -j \"{comp_fastp_json}\" &> \"{comp_fastp_log}\""
+            
             subprocess.run(cmd_fastp, shell=True, cwd=comp_folder)
             if os.path.exists(comp_read1 + ".tmp"):
                 shutil.move(comp_read1 + ".tmp", comp_read1)
-            if os.path.exists(comp_read2 + ".tmp"):
+            if comp_read2 and os.path.exists(comp_read2 + ".tmp"):
                 shutil.move(comp_read2 + ".tmp", comp_read2)
 
             # Copy KMA results for the report generator
@@ -242,7 +268,7 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
             os.makedirs(comp_kma_folder, exist_ok=True)
             shutil.copy(kma_out_file, os.path.join(comp_kma_folder, f"{comp_id}.res"))
             
-            run_assembly_steps(comp_id, comp_folder, comp_read1, comp_read2, ref_name, reference_folder_name, star_ThreadN, igv_cutoff, igv_cutoff_low, run_eachstep)
+            run_assembly_steps(comp_id, comp_folder, comp_read1, comp_read2, ref_name, reference_folder_name, star_ThreadN, igv_cutoff, igv_cutoff_low, run_eachstep, read_type)
     elif len(detected_refs) == 1:
         # Single infection
         cur_folder = os.path.join(working_folder_name, sample_id)
@@ -257,7 +283,7 @@ def sample_mapping(sample_id, working_folder_name, original_read1, original_read
         read1_trim = os.path.join(cur_folder, "reads_trimed_R1.fastq")
         read2_trim = os.path.join(cur_folder, "reads_trimed_R2.fastq")
         
-        run_assembly_steps(sample_id, cur_folder, read1_trim, read2_trim, detected_refs[0], reference_folder_name, star_ThreadN, igv_cutoff, igv_cutoff_low, run_eachstep)
+        run_assembly_steps(sample_id, cur_folder, read1_trim, read2_trim, detected_refs[0], reference_folder_name, star_ThreadN, igv_cutoff, igv_cutoff_low, run_eachstep, read_type)
     
     # Cleanup temp folder
     if os.path.exists(temp_sample_folder):
@@ -273,6 +299,8 @@ if __name__ == "__main__":
     star_ThreadN = sys.argv[6]
     igv_cutoff = sys.argv[7]
     igv_cutoff_low = sys.argv[8]
+    read_type = sys.argv[9] if len(sys.argv) > 9 else 'NGS'
+    score_ratio_cutoff = float(sys.argv[10]) if len(sys.argv) > 10 else 0.2
     
     run_eachstep = {
         "fastp":True, 
@@ -287,4 +315,4 @@ if __name__ == "__main__":
     }
     #print(sys.argv)
 
-    sample_mapping(sample_id, working_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN, igv_cutoff, igv_cutoff_low, run_eachstep)
+    sample_mapping(sample_id, working_folder_name, original_read1, original_read2, reference_folder_name, star_ThreadN, igv_cutoff, igv_cutoff_low, run_eachstep, read_type, score_ratio_cutoff)

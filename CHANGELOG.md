@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.3.0] - 2026-03-08
+### Added
+- Support for Long-Read (LR) sequencing data (e.g., Oxford Nanopore) using `minimap2` for alignment and indexing.
+- Configurable `READ_TYPE` parameter (`NGS` vs `LR`) and `SCORE_RATIO_CUTOFF` in `config.yaml`.
+- Refined co-infection detection logic using clade information from `NextStrain.tsv` to improve accuracy for long-read data.
+
+### Changed
+- Updated `Mapping.py` and `RSV_functions.py` to handle single-end reads gracefully during QC and read binning.
+
 ## [0.2.1] - 2026-03-07
 ### Changed
 - Modernized PDF and HTML report formats with a professional card-based layout and improved CSS.
@@ -20,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Highlighted and styled co-infection notifications in individual sample report sections.
 
 ### Changed
+- Enhanced visual hierarchy in reports using slate-blue color schemes and responsive design.
 - Refactored `Mapping.py` to support multi-component processing and standardized read naming.
 - Updated `Report_functions.py` to correctly identify references and subtypes for co-infection components by inspecting the reference directory.
 - Silenced IQTREE3 STDOUT by redirecting output to log files to keep the terminal output clean.

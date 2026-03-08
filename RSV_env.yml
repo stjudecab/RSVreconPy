@@ -34,3 +34,4 @@ dependencies:
   - bioconda::bwa
   - bioconda::mafft=7.505
   - bioconda::iqtree
+  - bioconda::minimap2

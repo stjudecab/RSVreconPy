@@ -81,6 +81,7 @@ Example `config.yaml`:
 DATA_DIR: /path/to/input/fastq_files         # Please put all your paired-FASTQ files under this input folder
 REFERENCE_DIR: /path/to/reference/sequences  # Please download our pre-built reference, unzip it, then paste the path here. Make sure you have both read and write permission
 OUTPUT_DIR: /path/to/output/directory        # please specify a output folder path
+READ_TYPE: NGS                               # NGS for short read and LR for long read
 
 # Performance parameters
 THREAD_N: 2                     # Threads per sample, for BWA-MEM
@@ -89,6 +90,7 @@ MAX_CONCURRENT_JOBS: 10         # Parallel samples to process, notice: THREAD_N 
 # Analysis parameters
 TOOL: BWA                       # Currently only BWA supported
 COV_CUTOFF: 50                  # Coverage cutoff threshold
+SCORE_RATIO_CUTOFF: 0.2         # ratio cutoff for co-infection detection, between 0 - 1, set it lower for better sensitivity
 
 # Optional
 RSV_NEXT_PIPE_RES: /path/to/additional/results  # We allow users to compare RSVrecon with RSV-NEXT-PIPE results. Please specify the "consensus" folder of RSV-NEXT-PIPE output for the same batch of data.
@@ -107,15 +109,16 @@ Here is an example:
 DATA_DIR: /path/to/input/fastq_files         # Please put all your paired-FASTQ files under this input folder
 REFERENCE_DIR: /path/to/reference/sequences  # Please download our pre-built reference, unzip it, then paste the path here. Make sure you have both read and write permission
 OUTPUT_DIR: /path/to/output/directory        # please specify a output folder path
+READ_TYPE: NGS                               # NGS for short read and LR for long read
 
 # Performance parameters
 THREAD_N: 2                     # Threads per sample, for BWA-MEM
 MAX_CONCURRENT_JOBS: 10         # Parallel samples to process, notice: THREAD_N * MAX_CONCURRENT_JOBS should < than your number of CPUs
 
 # Analysis parameters
-TOOL: BWA                       # Currently only BWA supported
 COV_CUTOFF: 50                  # upper threshold in the dual-coverage cutoff system 
 COV_CUTOFF_LOW: 10              # lower threshold in the dual-coverage cutoff system
+SCORE_RATIO_CUTOFF: 0.2         # ratio cutoff for co-infection detection, between 0 - 1, set it lower for better sensitivity
 
 # Optional
 RSV_NEXT_PIPE_RES: /path/to/additional/results  # We allow users to compare RSVrecon with RSV-NEXT-PIPE results. Please specify the "consensus" folder of RSV-NEXT-PIPE output for the same batch of data. You can disable it using "#"
@@ -185,6 +188,7 @@ dependencies:
   - bioconda::bwa
   - bioconda::mafft=7.505
   - bioconda::iqtree
+  - bioconda::minimap2
 ```
 
 ## Troubleshooting
@@ -199,4 +203,4 @@ dependencies:
 See the CHANGELOG.md file for a history of changes to this project.
 
 ## Citation
-Our preprint is on-line at [bioRxiv](https://www.biorxiv.org/content/10.1101/2025.06.03.657184v1)
+This tool is described in a publication available at [WILEY](https://onlinelibrary.wiley.com/doi/10.1111/irv.70203)

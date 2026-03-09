@@ -30,7 +30,7 @@ Please visit our [nextflow implementation](https://github.com/stjudecab/rsvrecon
 ### 1. Clone Repository
 #### Option A: Clone with Git (recommended)
 ```bash
-git clone https://github.com/yourusername/RSVrecon.git
+git clone https://github.com/stjudecab/RSVreconPy
 cd RSVrecon
 ```
 #### Option B: Download ZIP

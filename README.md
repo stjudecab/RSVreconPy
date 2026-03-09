@@ -88,8 +88,8 @@ THREAD_N: 2                     # Threads per sample, for BWA-MEM
 MAX_CONCURRENT_JOBS: 10         # Parallel samples to process, notice: THREAD_N * MAX_CONCURRENT_JOBS should < than your number of CPUs
 
 # Analysis parameters
-TOOL: BWA                       # Currently only BWA supported
-COV_CUTOFF: 50                  # Coverage cutoff threshold
+COV_CUTOFF: 50                  # upper threshold in the dual-coverage cutoff system 
+COV_CUTOFF_LOW: 10              # lower threshold in the dual-coverage cutoff system
 SCORE_RATIO_CUTOFF: 0.2         # ratio cutoff for co-infection detection, between 0 - 1, set it lower for better sensitivity
 
 # Optional

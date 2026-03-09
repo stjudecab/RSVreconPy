@@ -31,14 +31,14 @@ Please visit our [nextflow implementation](https://github.com/stjudecab/rsvrecon
 #### Option A: Clone with Git (recommended)
 ```bash
 git clone https://github.com/stjudecab/RSVreconPy
-cd RSVrecon
+cd RSVreconPy
 ```
 #### Option B: Download ZIP
 Download the latest release from Github
 Unzip the package:
 ```bash
-gunzip RSVrecon-main.zip
-cd RSVrecon-main
+gunzip RSVreconPy-main.zip
+cd RSVreconPy-main
 ```
 #### 1.1: Download reference database
 Download the pre-built reference database and unzip it to a location that you have read/write permission

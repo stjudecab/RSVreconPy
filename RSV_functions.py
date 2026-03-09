@@ -593,77 +593,124 @@ def find_best_reference(kma_results_file, output_file=None):
     
     return results
 
-def detect_potential_coinfections(kma_results_file, reference_folder_name, score_ratio_cutoff=0.2, read_type='NGS', min_identity=90.0):
+def detect_potential_coinfections(
+    kma_results_file,
+    reference_folder_name,
+    score_ratio_cutoff=0.2,
+    read_type='NGS',
+    # --- new quality filter parameters (tunable) ---
+    min_depth=5.0,
+    min_template_coverage=5.0,
+    min_score=10000,
+    min_expected=1.0,
+):
     """
     Analyze KMA results to detect potential co-infections.
-    Returns a list of reference names.
+    Returns a list of reference names (1 = single infection, 2 = co-infection).
+
+    Quality filters (applied before co-infection logic):
+      min_depth             : minimum mean coverage depth (filters stochastic noise)
+      min_template_coverage : minimum % of template covered (filters conserved-patch hits)
+      min_score             : absolute score floor (filters near-zero read samples)
+      min_expected          : Expected > 0 required (filters samples with too few reads
+                              for KMA to compute a baseline — classic negative control signature)
+
+    If NO hits pass the quality filters, the single highest-Score hit is returned anyway,
+    as required by downstream steps.
     """
+    # ------------------------------------------------------------------ load
     try:
         df = pd.read_csv(kma_results_file, sep='\t')
-    except:
+    except Exception:
         return []
-    
+
     if df.empty:
         return []
 
-    # Sort by score descending
+    # Normalise column name — KMA sometimes writes '#Template'
+    if '#Template' in df.columns:
+        df = df.rename(columns={'#Template': 'Template'})
+
     df = df.sort_values('Score', ascending=False).reset_index(drop=True)
-    
+
+    # ------------------------------------------------- load reference tables
     info_table = os.path.join(reference_folder_name, 'RSV.csv')
     info_df = pd.read_csv(info_table, delimiter=',', index_col=0)
 
-    # Load clade information for more precise distinctness check
     clade_map = {}
-    meta_file = os.path.join(reference_folder_name, 'Genotype_ref', 'WholeGenome_genotype', 'NextStrain.tsv')
+    meta_file = os.path.join(
+        reference_folder_name, 'Genotype_ref',
+        'WholeGenome_genotype', 'NextStrain.tsv'
+    )
     if os.path.exists(meta_file):
         try:
             meta_df = pd.read_csv(meta_file, sep='\t', index_col=0)
             clade_map = meta_df['clade'].to_dict()
-        except:
+        except Exception:
             pass
 
-    best_refs = [df.loc[0, '#Template']]
-    top_score = df.loc[0, 'Score']
-    
-    # Check top 5 hits for potential co-infection
-    for i in range(1, min(len(df), 5)):
-        curr_ref = df.loc[i, '#Template']
-        curr_score = df.loc[i, 'Score']
-        #curr_identity = df.loc[i, 'Template_Identity']
-        
+    # ------------------------------------------------- quality filter
+    # Build a boolean mask for all four criteria
+    quality_mask = (
+        (df['Expected']           >= min_expected)          # neg-control guard
+        & (df['Depth']            >= min_depth)             # real coverage
+        & (df['Template_Coverage'] >= min_template_coverage) # genome-wide mapping
+        & (df['Score']            >= min_score)             # absolute signal floor
+    )
+
+    filtered_df = df[quality_mask].reset_index(drop=True)
+
+    # --- fallback: if nothing passes, return the single best hit as required
+    if filtered_df.empty:
+        return [df.loc[0, 'Template']]
+
+    # -------------------------------------------- co-infection detection
+    best_refs = [filtered_df.loc[0, 'Template']]
+    top_score = filtered_df.loc[0, 'Score']
+
+    # Check top 5 *filtered* hits for co-infection signal
+    for i in range(1, min(len(filtered_df), 5)):
+        curr_ref   = filtered_df.loc[i, 'Template']
+        curr_score = filtered_df.loc[i, 'Score']
+
+        # --- score ratio gate (unchanged logic, now on filtered data)
         ratio = curr_score / top_score
         if ratio < score_ratio_cutoff:
             break
-        
-        # Only consider hits with high mapping identity (Point 3)
-        #if curr_identity < min_identity:
-        #    continue
-        
 
+        # --- coverage gate on the candidate hit itself
+        # A co-infecting strain should cover a meaningful fraction of its
+        # own reference — not just pile onto a conserved region.
+        # Using the same min_template_coverage already applied in the filter,
+        # so this is already handled, but kept explicit for clarity.
+        curr_coverage = filtered_df.loc[i, 'Template_Coverage']
+        if curr_coverage < min_template_coverage:
+            continue
+
+        # --- distinctness check (unchanged logic)
         is_distinct = False
         for ref in best_refs:
-            sub1 = info_df.loc[ref, 'Subtype'] if ref in info_df.index else "Unknown"
-            sub2 = info_df.loc[curr_ref, 'Subtype'] if curr_ref in info_df.index else "Unknown"
+            sub1 = info_df.loc[ref,      'Subtype'] if ref      in info_df.index else 'Unknown'
+            sub2 = info_df.loc[curr_ref, 'Subtype'] if curr_ref in info_df.index else 'Unknown'
 
             if sub1 != sub2:
-                # Different subtypes (A vs B) is a strong signal for co-infection
+                # Different subtypes (A vs B): strong co-infection signal
                 is_distinct = True
                 break
-            else:
-                # Same subtype. Check if they belong to different clades.
-                clade1 = clade_map.get(ref)
-                clade2 = clade_map.get(curr_ref)
 
-                if clade1 and clade2 and clade1 != clade2:
-                    # Different clades within same subtype.
-                    is_distinct = True
-                    break
+            # Same subtype — require different clades (avoids flagging
+            # near-identical strains from the same clade as co-infection)
+            clade1 = clade_map.get(ref)
+            clade2 = clade_map.get(curr_ref)
+            if clade1 and clade2 and clade1 != clade2:
+                is_distinct = True
+                break
 
         if is_distinct:
             best_refs.append(curr_ref)
-            if len(best_refs) >= 2: # Limit to 2 components for now
+            if len(best_refs) >= 2:   # cap at 2 components for now
                 break
-                
+
     return best_refs
 
 def separate_reads_for_coinfection(read1_trim, read2_trim, ref_list, reference_folder_name, output_folder, threads, read_type='NGS'):

@@ -1436,7 +1436,8 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
     table_info_text = f"Pipeline Verions: {current_version}, Reported on: {today_str}<br/> Subtypes of each reference are highlighted in different colors: <font color='red'>Subtype A</font> and <font color='blue'>Subtype B</font>"
     table_info_text += f"<br/> Genotype calling is based on <a href='https://nextstrain.org/rsv/a/genome'  target=\"_blank\"><b>Nextstrain</b> and <b>Nextclade3</b>, Data updated {current_version_date}</a><br/> A clade lable with * indicates the clade of best blast hit strain due to negative results from NextClade3 <br/>Click the sample name to jump to the detail section<br/> "
     coinfection_icon_path = os.path.join(file_path, 'Resource', 'coinfection.png')
-    table_info_text += f"<img src='{coinfection_icon_path}' style='margin-top:0px;height:30px'/> indicates Co-infection <br/>"
+    base64_coinfection = image_to_base64(coinfection_icon_path)
+    table_info_text += f"<img src='data:image/png;base64,{base64_coinfection}' alt='coinfection' style='margin-top:0px;height:30px'/> indicates Co-infection <br/>"
 
     main_content_div += '<div id="summary_section" class="content-section">'
     main_content_div += f"<h1>{title}</h1>\n"
@@ -1501,8 +1502,6 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
 
         # co-infection icon
         if data[row][10] == "Yes":
-            coinfection_icon_path = os.path.join(file_path, 'Resource', 'coinfection.png')
-            base64_coinfection = image_to_base64(coinfection_icon_path)
             coinfection_fig = f"<img src='data:image/png;base64,{base64_coinfection}' alt='coinfection' style='margin-top:0px;height:30px'>\n"
         else:
             coinfection_fig = ""

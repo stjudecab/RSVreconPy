@@ -1394,9 +1394,11 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8f9fa; color: #333; margin: 0; }
         .sidebar { background-color: #82C8E5; color: white; padding: 25px; position: fixed; height: 100%; overflow-y: auto; width: 250px; }
         .sidebar h2 { color: #ecf0f1; padding-bottom: 10px; font-size: 1.2rem; }
+        .sidebar h2 a { color: #ecf0f1; text-decoration: none; cursor: pointer; }
         .sidebar ul { list-style: none; padding: 0; }
         .sidebar li a { color: #bdc3c7; text-decoration: none; display: block; padding: 10px 0; transition: 0.3s; cursor: pointer; border-bottom: 1px solid #34495e; }
         .sidebar li a:hover { color: white; background-color: #34495e; padding-left: 10px; }
+        .sidebar a.active { color: white !important; background-color: #34495e; padding-left: 10px; font-weight: bold; border-radius: 4px; }
         .main-content { margin-left: 300px; padding: 40px; max-width: 1200px; }
         .card { background: white; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 40px; overflow: hidden; border: 1px solid #e1e4e8; }
         .card-header { background-color: #f1f3f5; padding: 20px 30px; border-bottom: 1px solid #e1e4e8; }
@@ -1411,6 +1413,24 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
         .qc-reason { font-size: 0.95rem; color: #495057; background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #dee2e6; margin: 15px 0; }
         .coinfection-box { background-color: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 8px; margin: 20px 0; display: flex; align-items: center; }
     </style>
+    <script>
+        function showSection(sectionId) {
+            // Hide all content sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(s => s.style.display = 'none');
+            // Show the targeted section
+            const target = document.getElementById(sectionId);
+            if (target) target.style.display = 'block';
+            // Highlight the active link in the sidebar
+            const links = document.querySelectorAll('.sidebar a');
+            links.forEach(l => {
+                l.classList.remove('active');
+                if (l.getAttribute('onclick') && l.getAttribute('onclick').includes("'" + sectionId + "'")) {
+                    l.classList.add('active');
+                }
+            });
+        }
+    </script>
     """
     html_report_str = html_report_str.replace('</head>', f'{modern_css}</head>')
 
@@ -1750,6 +1770,7 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
 
     sidebar_div += '</ul></div>'    # close ul and div for sidebar
     main_content_div += '</div>'    # close div for main content
+    main_content_div += '<script>showSection("summary_section");</script>' # Initialize view and highlight
     main_content_div += '</body></html>'    # end of body and html
 
     # generate html report

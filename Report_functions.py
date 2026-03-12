@@ -1060,13 +1060,9 @@ def generate_pdf_report(file_path, csv_file, working_folder, mapres_folder, igv_
     elements.append(subtitle_summary_section)
 
     df = pd.read_csv(csv_file, skiprows = 1, index_col=0)
-    Sample_folders = [f for f in os.listdir(mapres_folder) if os.path.isdir(os.path.join(mapres_folder, f))]
+    sample_list = df.index.tolist()
     sample_count = 0
-    for cur_folder in sorted(Sample_folders):
-        if os.path.isfile(cur_folder):
-            continue
-        if cur_folder == "Temp":
-            continue
+    for cur_folder in sorted(sample_list):
         #print(cur_folder + "\n")
         
         if sample_count != 0:
@@ -1583,10 +1579,8 @@ def generate_html_report(file_path, csv_file, working_folder, mapres_folder, igv
     sidebar_div += '<ul>\n'
 
     df = pd.read_csv(csv_file, skiprows = 1, index_col=0)
-    Sample_folders = [f for f in os.listdir(mapres_folder) if os.path.isdir(os.path.join(mapres_folder, f))]
-    for cur_folder in sorted(Sample_folders):
-        if os.path.isfile(cur_folder) or cur_folder == "Temp" or cur_folder.endswith(('_initial', '_temp')):
-            continue
+    sample_list = df.index.tolist()
+    for cur_folder in sorted(sample_list):
         
         section_id = cur_folder
 

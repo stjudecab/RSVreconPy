@@ -79,7 +79,8 @@ check_tool_availability_res += check_tool_availability('blastn')
 check_tool_availability_res += check_tool_availability('mafft')
 
 if check_tool_availability_res > 0:
-    sys.exit()
+    print("Required tools are missing. Exiting before sample processing.")
+    sys.exit(1)
 
 #print(f"######################\tStep 0  PASSED ...                      \t######################")
 
